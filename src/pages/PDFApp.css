@@ -752,9 +752,32 @@
 }
 
 .pdfapp-page-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
+  position: relative;   /* anchor for the highlight overlay */
+  /* no width: 100% — shrink-wraps the canvas so overlay covers it exactly */
+}
+
+/* ── Citation highlight overlay ────────────────────────────────────── */
+.pdfapp-highlight-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.pdfapp-highlight-rect {
+  position: absolute;
+  background: rgba(59, 130, 246, 0.18);
+  border: 2px solid rgba(59, 130, 246, 0.75);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15);
+  animation: highlight-pop 0.35s ease-out forwards;
+}
+
+@keyframes highlight-pop {
+  0%   { opacity: 0; transform: scaleY(0.85); }
+  60%  { opacity: 1; transform: scaleY(1.03); }
+  100% { opacity: 1; transform: scaleY(1); }
 }
 
 .pdfapp-page-canvas {

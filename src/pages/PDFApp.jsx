@@ -413,6 +413,14 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
   const [activeCitations, setActiveCitations] = useState(new Map()) // n → chunk
+
+  // Scroll to the first cited page whenever activeCitations changes
+  useEffect(() => {
+    if (!activeCitations.size) return
+    const firstChunk = activeCitations.values().next().value
+    const canvas = pagesContainerRef.current?.querySelector(`[data-page="${firstChunk.page_num}"]`)
+    canvas?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [activeCitations])
   const chatAbortRef = useRef(null)
   const chatBottomRef = useRef(null)
 
@@ -1281,9 +1289,26 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     )}
                     {pageCount != null && Array.from({ length: pageCount }, (_, index) => {
                       const pageNum = index + 1
+                      const pageHighlights = [...activeCitations.values()].filter(c => c.page_num === pageNum && c.bbox)
                       return (
                         <div key={`${activeDocumentId}-${pageNum}`} className="pdfapp-page-wrapper">
                           <canvas data-page={pageNum} className="pdfapp-page-canvas" />
+                          {pageHighlights.length > 0 && (
+                            <div className="pdfapp-highlight-overlay">
+                              {pageHighlights.map((chunk, i) => (
+                                <div
+                                  key={i}
+                                  className="pdfapp-highlight-rect"
+                                  style={{
+                                    left:   `${chunk.bbox[0] * 100}%`,
+                                    top:    `${chunk.bbox[1] * 100}%`,
+                                    width:  `${(chunk.bbox[2] - chunk.bbox[0]) * 100}%`,
+                                    height: `${(chunk.bbox[3] - chunk.bbox[1]) * 100}%`,
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )
                     })}
