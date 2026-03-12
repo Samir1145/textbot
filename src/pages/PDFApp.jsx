@@ -8,6 +8,7 @@ import { LEGAL_SKILLS } from '../skills/legalSkills.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
 import { getDocRagStatus, indexDocPages, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories, suggestFormatCategories } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF } from '../utils/pdfExtract.js'
+import { buildEvidenceBlock, parseCitations, tokeniseMessage } from '../utils/parseCitations.js'
 import './PDFApp.css'
 
 // ── Shared PDF text extraction (used by both summarize and skill runs) ──
@@ -411,6 +412,7 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   const [chatMessages, setChatMessages] = useState([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+  const [activeCitations, setActiveCitations] = useState(new Map()) // n → chunk
   const chatAbortRef = useRef(null)
   const chatBottomRef = useRef(null)
 
@@ -447,22 +449,14 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     const controller = new AbortController()
     chatAbortRef.current = controller
 
-    // RAG: retrieve relevant chunks for this query
+    // RAG: retrieve relevant chunks and build numbered evidence block
     let ragContext = ''
+    let chunkMap = new Map()
     if (ragStatus === 'indexed' && activeDocumentId) {
-      if (caseSearchActive && caseId) {
-        const chunks = await searchCaseChunks(caseId, text, 5)
-        if (chunks.length) {
-          ragContext = '\n\nRelevant sections across all case documents (semantic search):\n' +
-            chunks.map(c => `[Doc ${c.doc_id}, Page ${c.page_num}]\n${c.text}`).join('\n\n')
-        }
-      } else {
-        const chunks = await searchDocChunks(activeDocumentId, text, 3, { caseId })
-        if (chunks.length) {
-          ragContext = '\n\nRelevant document sections (retrieved via semantic search):\n' +
-            chunks.map(c => `[Page ${c.page_num}]\n${c.text}`).join('\n\n')
-        }
-      }
+      const rawChunks = caseSearchActive && caseId
+        ? await searchCaseChunks(caseId, text, 5)
+        : await searchDocChunks(activeDocumentId, text, 3, { caseId });
+      ({ ragContext, chunkMap } = buildEvidenceBlock(rawChunks))
     }
 
     // Build message history for Ollama
@@ -511,6 +505,16 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
             }
           } catch { /* partial JSON */ }
         }
+      }
+
+      // ATG: parse which [n] citations the LLM actually used
+      const msgCitations = parseCitations(accumulated, chunkMap)
+      if (msgCitations.size) {
+        setChatMessages(prev => [
+          ...prev.slice(0, -1),
+          { role: 'assistant', content: accumulated, citations: msgCitations },
+        ])
+        setActiveCitations(msgCitations)
       }
     } catch (err) {
       if (err.name === 'AbortError') return
@@ -952,6 +956,39 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
   // We express their shares as a ratio: centerSplit : (100 - centerSplit)
   const centerFlex = centerSplit
   const rightFlex = 100 - centerSplit
+
+  // Render chat bubble content — replaces [n] markers with clickable citation chips
+  function renderMessageContent(msg, isLast) {
+    const tokens = msg.citations?.size ? tokeniseMessage(msg.content) : [msg.content]
+    const cursor = chatLoading && isLast && msg.role === 'assistant'
+      ? <span className="pdfapp-cursor">▌</span> : null
+
+    if (tokens.length === 1 && typeof tokens[0] === 'string') {
+      return <>{tokens[0]}{cursor}</>
+    }
+    return (
+      <>
+        {tokens.map((token, i) => {
+          if (typeof token === 'number') {
+            const chunk = msg.citations.get(token)
+            if (!chunk) return `[${token}]`
+            return (
+              <button
+                key={i}
+                className={`pdfapp-citation-chip${activeCitations.has(token) ? ' pdfapp-citation-chip--active' : ''}`}
+                title={`Page ${chunk.page_num} — ${chunk.text.slice(0, 120)}${chunk.text.length > 120 ? '…' : ''}`}
+                onClick={() => setActiveCitations(new Map([[token, chunk]]))}
+              >
+                {token}
+              </button>
+            )
+          }
+          return token
+        })}
+        {cursor}
+      </>
+    )
+  }
 
   return (
     <div className="pdfapp" ref={containerRef}>
@@ -1550,7 +1587,9 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   {msg.role === 'assistant' && (
                     <div className="pdfapp-chat-avatar">L</div>
                   )}
-                  <div className="pdfapp-chat-bubble">{msg.content}{chatLoading && i === chatMessages.length - 1 && msg.role === 'assistant' && <span className="pdfapp-cursor">▌</span>}</div>
+                  <div className="pdfapp-chat-bubble">
+                    {renderMessageContent(msg, i === chatMessages.length - 1)}
+                  </div>
                 </div>
               ))}
               <div ref={chatBottomRef} />
