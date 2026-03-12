@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequire } from 'module'
+import { createHash } from 'crypto'
 
 const require = createRequire(import.meta.url)
 const Database = require('better-sqlite3')
@@ -82,6 +83,40 @@ app.post('/api/cases/:caseId/extractions/:docId', (req, res) => {
     path.join(getCaseSubdir(req.params.caseId, 'extractions'), `${safeId(req.params.docId)}.json`),
     JSON.stringify(req.body)
   )
+  res.json({ ok: true })
+})
+
+app.delete('/api/cases/:caseId/extractions/:docId', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'extractions'), `${safeId(req.params.docId)}.json`)
+  try { fs.unlinkSync(filePath) } catch { /* already gone */ }
+  res.json({ ok: true })
+})
+
+app.delete('/api/extractions/:docId', (req, res) => {
+  const filePath = path.join(DATA_DIR, 'extractions', `${safeId(req.params.docId)}.json`)
+  try { fs.unlinkSync(filePath) } catch { /* already gone */ }
+  res.json({ ok: true })
+})
+
+// ── Case-scoped Chat History ──
+
+app.get('/api/cases/:caseId/chat/:docId', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'chat'), `${safeId(req.params.docId)}.json`)
+  if (!fs.existsSync(filePath)) return res.json([])
+  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+})
+
+app.post('/api/cases/:caseId/chat/:docId', (req, res) => {
+  fs.writeFileSync(
+    path.join(getCaseSubdir(req.params.caseId, 'chat'), `${safeId(req.params.docId)}.json`),
+    JSON.stringify(req.body)
+  )
+  res.json({ ok: true })
+})
+
+app.delete('/api/cases/:caseId/chat/:docId', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'chat'), `${safeId(req.params.docId)}.json`)
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
   res.json({ ok: true })
 })
 
@@ -240,12 +275,31 @@ async function getRagDb() {
         `)
     }
 
+    // Migration v3: add chunk_hash column for incremental indexing
+    try { db.exec("ALTER TABLE doc_chunks ADD COLUMN chunk_hash TEXT") } catch { /* already exists */ }
+
+    // Embedding cache: avoids re-calling Ollama for chunks whose text hasn't changed
+    db.exec(`CREATE TABLE IF NOT EXISTS embed_cache (hash TEXT PRIMARY KEY, embedding BLOB)`)
+
     db.prepare("INSERT OR REPLACE INTO rag_meta VALUES ('dim',   ?)").run(String(dim))
     db.prepare("INSERT OR REPLACE INTO rag_meta VALUES ('model', ?)").run(EMBED_MODEL)
 
     _ragDb = db
     _embedDim = dim
     return { db, dim }
+}
+
+// Embed with cache — skips Ollama call if text hash is already in embed_cache
+async function embedCached(text, db) {
+    const hash = createHash('sha256').update(text).digest('hex')
+    const cached = db.prepare('SELECT embedding FROM embed_cache WHERE hash = ?').get(hash)
+    if (cached) {
+        const floats = Array.from(new Float32Array(cached.embedding.buffer))
+        return { floats, hash, cached: true }
+    }
+    const floats = await embed(text)
+    db.prepare('INSERT OR REPLACE INTO embed_cache (hash, embedding) VALUES (?, ?)').run(hash, toBlob(floats))
+    return { floats, hash, cached: false }
 }
 
 // DELETE /api/rag/clear-doc/:docId  — remove all chunks for a doc (call before re-indexing)
@@ -269,6 +323,7 @@ app.delete('/api/rag/clear-doc/:docId', (req, res) => {
 
 // POST /api/rag/index-doc  — embed + store a batch of paragraph chunks for a document
 // chunks: [{ pageNum, chunkIdx, text, bbox }]
+// Skips Ollama call when text hash matches embed_cache (incremental indexing).
 app.post('/api/rag/index-doc', async (req, res) => {
     try {
         const { docId, chunks, caseId = 'default' } = req.body
@@ -278,21 +333,71 @@ app.post('/api/rag/index-doc', async (req, res) => {
         const safeDocId = safeId(docId)
         const safeCaseId = safeId(caseId)
         let indexed = 0
+        let skipped = 0
 
         for (const { pageNum, chunkIdx, text, bbox } of chunks) {
             if (!text?.trim()) continue
-            const emb = await embed(text)
             const bboxJson = bbox ? JSON.stringify(bbox) : null
-            const { lastInsertRowid: chunkId } = db.prepare(
-                'INSERT OR REPLACE INTO doc_chunks (doc_id, case_id, page_num, chunk_idx, text, bbox) VALUES (?, ?, ?, ?, ?, ?)'
-            ).run(safeDocId, safeCaseId, pageNum, chunkIdx ?? indexed, text, bboxJson)
-            db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(chunkId))
-            db.prepare('INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)').run(BigInt(chunkId), toBlob(emb))
+            const ci = chunkIdx ?? indexed
+
+            // Check if this chunk already exists with the same text hash
+            const existing = db.prepare(
+                'SELECT id, chunk_hash FROM doc_chunks WHERE doc_id = ? AND case_id = ? AND page_num = ? AND chunk_idx = ?'
+            ).get(safeDocId, safeCaseId, pageNum, ci)
+
+            const { floats, hash } = await embedCached(text, db)
+
+            if (existing) {
+                if (existing.chunk_hash === hash) {
+                    // Unchanged — update bbox if needed but skip re-embedding
+                    db.prepare('UPDATE doc_chunks SET bbox = ? WHERE id = ?').run(bboxJson, existing.id)
+                    skipped++
+                    continue
+                }
+                // Text changed — replace vec entry
+                db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(existing.id))
+                db.prepare('UPDATE doc_chunks SET text = ?, bbox = ?, chunk_hash = ? WHERE id = ?')
+                    .run(text, bboxJson, hash, existing.id)
+                db.prepare('INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)').run(BigInt(existing.id), toBlob(floats))
+            } else {
+                const { lastInsertRowid: chunkId } = db.prepare(
+                    'INSERT INTO doc_chunks (doc_id, case_id, page_num, chunk_idx, text, bbox, chunk_hash) VALUES (?, ?, ?, ?, ?, ?, ?)'
+                ).run(safeDocId, safeCaseId, pageNum, ci, text, bboxJson, hash)
+                db.prepare('INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)').run(BigInt(chunkId), toBlob(floats))
+            }
             indexed++
         }
-        res.json({ ok: true, indexed })
+        res.json({ ok: true, indexed, skipped })
     } catch (err) {
         console.error('[RAG] index-doc error:', err.message)
+        res.status(500).json({ error: err.message })
+    }
+})
+
+// POST /api/rag/prune-doc  — remove chunks that are no longer present (incremental indexing cleanup)
+// body: { docId, caseId, keep: [{pageNum, chunkIdx}] }
+app.post('/api/rag/prune-doc', (req, res) => {
+    try {
+        if (!_ragDb) return res.json({ ok: true, pruned: 0 })
+        const { docId, caseId = 'default', keep } = req.body
+        if (!docId || !Array.isArray(keep)) return res.status(400).json({ error: 'Missing docId or keep' })
+
+        const safeDocId = safeId(docId)
+        const safeCaseId = safeId(caseId)
+
+        const existing = _ragDb.prepare(
+            'SELECT id, page_num, chunk_idx FROM doc_chunks WHERE doc_id = ? AND case_id = ?'
+        ).all(safeDocId, safeCaseId)
+
+        const keepSet = new Set(keep.map(k => `${k.pageNum}:${k.chunkIdx}`))
+        const toDelete = existing.filter(r => !keepSet.has(`${r.page_num}:${r.chunk_idx}`))
+
+        for (const row of toDelete) {
+            _ragDb.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
+            _ragDb.prepare('DELETE FROM doc_chunks WHERE id = ?').run(row.id)
+        }
+        res.json({ ok: true, pruned: toDelete.length })
+    } catch (err) {
         res.status(500).json({ error: err.message })
     }
 })
@@ -318,6 +423,29 @@ app.get('/api/rag/doc-status/:docId', (req, res) => {
     }
 })
 
+// Keyword overlap score — TF-style, normalized by sqrt(doc_len) to penalize long chunks less
+function keywordScore(query, text) {
+    const qTokens = new Set(query.toLowerCase().split(/\W+/).filter(t => t.length > 2))
+    if (!qTokens.size) return 0
+    const tWords = text.toLowerCase().split(/\W+/)
+    const hits = tWords.filter(t => qTokens.has(t)).length
+    return hits / (Math.sqrt(tWords.length) || 1)
+}
+
+// Combined re-ranking: 60% vector similarity + 40% keyword overlap
+function rerank(chunks, distMap, query, k) {
+    const maxDist = Math.max(...chunks.map(c => distMap.get(c.id)), 1e-6)
+    return chunks
+        .map(c => ({
+            ...c,
+            _score: 0.6 * (1 - distMap.get(c.id) / maxDist) + 0.4 * keywordScore(query, c.text),
+            distance: distMap.get(c.id),
+        }))
+        .sort((a, b) => b._score - a._score)
+        .slice(0, k)
+        .map(({ _score, ...c }) => c)
+}
+
 // POST /api/rag/search  — semantic search within a document
 app.post('/api/rag/search', async (req, res) => {
     try {
@@ -342,11 +470,9 @@ app.post('/api/rag/search', async (req, res) => {
             `SELECT id, page_num, chunk_idx, text, bbox FROM doc_chunks WHERE doc_id = ? AND id IN (${placeholders})`
         ).all(safeId(docId), ...ids)
 
-        chunks.sort((a, b) => distMap.get(a.id) - distMap.get(b.id))
-        res.json(chunks.slice(0, k).map(c => ({
+        res.json(rerank(chunks, distMap, query, k).map(c => ({
             ...c,
             bbox: c.bbox ? JSON.parse(c.bbox) : null,
-            distance: distMap.get(c.id),
         })))
     } catch (err) {
         console.error('[RAG] search error:', err.message)
@@ -378,11 +504,9 @@ app.post('/api/rag/search-case', async (req, res) => {
             `SELECT id, doc_id, page_num, chunk_idx, text, bbox FROM doc_chunks WHERE case_id = ? AND id IN (${placeholders})`
         ).all(safeId(caseId), ...ids)
 
-        chunks.sort((a, b) => distMap.get(a.id) - distMap.get(b.id))
-        res.json(chunks.slice(0, k).map(c => ({
+        res.json(rerank(chunks, distMap, query, k).map(c => ({
             ...c,
             bbox: c.bbox ? JSON.parse(c.bbox) : null,
-            distance: distMap.get(c.id),
         })))
     } catch (err) {
         console.error('[RAG] search-case error:', err.message)

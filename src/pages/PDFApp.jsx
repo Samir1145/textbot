@@ -1,15 +1,34 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { flushSync } from 'react-dom'
 import { useTheme } from '../useTheme.js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { createWorker } from 'tesseract.js'
-import { loadSummary, saveSummary, saveSkillResult, loadSkillResult, loadSavedSkillIds, uploadCaseBlob, loadCaseBlob } from '../db.js'
+import { loadSummary, saveSummary, saveSkillResult, loadSkillResult, loadSavedSkillIds, uploadCaseBlob, loadCaseBlob, loadChatHistory, saveChatHistory } from '../db.js'
 import { LEGAL_SKILLS } from '../skills/legalSkills.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
-import { getDocRagStatus, indexDocPages, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories, suggestFormatCategories } from '../rag.js'
+import { getDocRagStatus, indexDocPages, pruneDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF } from '../utils/pdfExtract.js'
-import { buildEvidenceBlock, parseCitations, tokeniseMessage } from '../utils/parseCitations.js'
+import { buildEvidenceBlock, parseCitations, tokeniseMessage, narrowCitations, distanceToScore } from '../utils/parseCitations.js'
+import { streamOllamaChat, callOllama } from '../utils/ollamaStream.js'
 import './PDFApp.css'
+
+// ── Follow-up suggestion generator ─────────────────────────────────────────
+async function _fetchSuggestions(question, answer) {
+  const content = await callOllama({
+    messages: [
+      { role: 'system', content: 'Generate exactly 3 concise follow-up questions based on this Q&A exchange. Return ONLY a valid JSON array of 3 short question strings, nothing else.' },
+      { role: 'user', content: `Q: ${question}\nA: ${answer.slice(0, 600)}` },
+    ],
+  })
+  if (!content) return []
+  const match = content.match(/\[[\s\S]*?\]/)
+  if (!match) return []
+  try {
+    const parsed = JSON.parse(match[0])
+    return Array.isArray(parsed) ? parsed.slice(0, 3).map(String) : []
+  } catch { return [] }
+}
 
 // ── Shared PDF text extraction (used by both summarize and skill runs) ──
 async function extractTextFromPDF(pdf, { onStatus, signal }) {
@@ -101,28 +120,31 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   const [activeDocUrl, setActiveDocUrl] = useState(null)
   const [pageCount, setPageCount] = useState(null)
   const [pageCountsById, setPageCountsById] = useState({})
+  const [pageDims, setPageDims] = useState({})   // pageNum → {w,h} — drives skeleton sizing
+  const [renderScale, setRenderScale] = useState(1.25)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [pdfError, setPdfError] = useState(null)
+  const [thumbsOpen, setThumbsOpen] = useState(false)
+  const [showChunkOverlay, setShowChunkOverlay] = useState(false)
+  const [jumpPage, setJumpPage] = useState('')
   const fileInputRef = useRef(null)
   const pagesContainerRef = useRef(null)
-  const pdfDocRef = useRef(null)   // store loaded pdf for text extraction
+  const thumbsContainerRef = useRef(null)
+  const pdfDocRef = useRef(null)         // main-thread pdf instance for text extraction
+  const pageDimsRef = useRef({})         // mirror of pageDims state, readable inside callbacks
+  const renderWorkerRef = useRef(null)
+  const thumbWorkerRef = useRef(null)
+  const observerRef = useRef(null)
+  const thumbObserverRef = useRef(null)
+  const renderScaleRef = useRef(1.25)
+  const pdfBufferRef = useRef(null)      // cached PDF bytes for zoom re-renders
+  const prevActiveDocUrlRef = useRef(null)
+  const prevActiveDocIdRef = useRef(null)
 
   const containerRef = useRef(null)
   const isDragging = useRef(false)
   const dragStartX = useRef(0)
   const dragStartSplit = useRef(CENTER_DEFAULT_PCT)
-
-  const handleAddDocumentClick = () => {
-    if (parties.length === 0) {
-      const newId = crypto.randomUUID()
-      setParties([{ id: newId, name: 'Party 1', documents: [] }])
-      setActivePartyId(newId)
-      pendingAddPartyRef.current = newId
-    } else {
-      pendingAddPartyRef.current = activePartyId || parties[0].id
-    }
-    fileInputRef.current?.click()
-  }
 
   const handleFilesSelected = (event) => {
     const files = Array.from(event.target.files || [])
@@ -278,115 +300,246 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     }
   }, [activeDocumentId, documents])
 
-  // Load PDF via pdfjs-dist and render all pages into canvases
+  // Load PDF — rendering off main thread via OffscreenCanvas worker.
+  // Handles both doc changes (full reset) and zoom changes (re-render only).
   useEffect(() => {
-    // Reset pages immediately so old canvases are unmounted
-    setPageCount(null)
-    setExtractedText(null)
-    setExtractedPages(null)
-    setExtractionSource(null)
-    setExtractionError(null)
-    setExtractionStatus('')
-    setExtractingText(false)
-    if (extractionAbortRef.current) { extractionAbortRef.current.abort(); extractionAbortRef.current = null }
+    renderScaleRef.current = renderScale
+    const isDocChange = activeDocUrl !== prevActiveDocUrlRef.current
+                     || activeDocumentId !== prevActiveDocIdRef.current
+    prevActiveDocUrlRef.current = activeDocUrl
+    prevActiveDocIdRef.current  = activeDocumentId
+
+    // Reset scroll to top on doc change so new document starts from page 1
+    if (isDocChange && pagesContainerRef.current) {
+      pagesContainerRef.current.scrollTop = 0
+    }
+
+    // Always terminate the previous render worker and observer
+    if (observerRef.current) { observerRef.current.disconnect(); observerRef.current = null }
+    if (renderWorkerRef.current) { renderWorkerRef.current.terminate(); renderWorkerRef.current = null }
+
+    if (isDocChange) {
+      // Full reset — clear extraction + rendering state
+      setPageCount(null)
+      setPageDims({})
+      pageDimsRef.current = {}
+      setExtractedText(null)
+      extractedTextRef.current = null
+      setExtractedPages(null)
+      setExtractionSource(null)
+      setExtractionError(null)
+      setExtractionStatus('')
+      setExtractingText(false)
+      if (extractionAbortRef.current) { extractionAbortRef.current.abort(); extractionAbortRef.current = null }
+      if (pdfDocRef.current) { pdfDocRef.current.destroy(); pdfDocRef.current = null }
+      pdfBufferRef.current = null
+    }
+    // (Zoom-only: extraction state kept; canvases remount via renderScale in key)
 
     if (!activeDocUrl) {
-      setPdfLoading(false)
-      setPdfError(null)
+      if (isDocChange) { setPdfLoading(false); setPdfError(null) }
       return
     }
 
     let cancelled = false
-    let pdfDoc = null
-    setPdfLoading(true)
-    setPdfError(null)
 
-    const loadingTask = pdfjsLib.getDocument({ url: activeDocUrl })
+    if (isDocChange) {
+      setPdfLoading(true)
+      setPdfError(null)
+      // Restore cached dims from localStorage for instant skeleton sizing
+      try {
+        const saved = JSON.parse(localStorage.getItem(`pdf-dims-${activeDocumentId}`) || 'null')
+        if (saved) { pageDimsRef.current = saved; setPageDims(saved) }
+      } catch { /* ignore */ }
+    }
 
-    loadingTask.promise
-      .then(async (pdf) => {
-        if (cancelled) {
-          pdf.destroy()
-          return
+    // ── Render worker (OffscreenCanvas — off main thread) ─────────────────
+    const worker = new Worker(
+      new URL('../workers/pdfRenderer.worker.js', import.meta.url),
+      { type: 'module' }
+    )
+    renderWorkerRef.current = worker
+
+    function setupObserver() {
+      if (cancelled) return
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return
+          const canvas = entry.target
+          if (canvas.dataset.transferred || !canvas.isConnected) return
+          canvas.dataset.transferred = 'true'
+
+          const pageNum = parseInt(canvas.dataset.page, 10)
+          canvas.style.backgroundColor = 'transparent'
+          try {
+            const offscreen = canvas.transferControlToOffscreen()
+            renderWorkerRef.current?.postMessage(
+              { type: 'render', pageNum, canvas: offscreen, dpr: window.devicePixelRatio || 1 },
+              [offscreen]
+            )
+          } catch (err) {
+            console.warn(`[PDF] OffscreenCanvas unavailable for page ${pageNum}:`, err)
+          }
+        })
+      }, { root: pagesContainerRef.current, rootMargin: '200px 0px 200px 0px' })
+
+      observerRef.current = observer
+      pagesContainerRef.current
+        ?.querySelectorAll('.pdfapp-page-canvas')
+        ?.forEach(canvas => observer.observe(canvas))
+    }
+
+    worker.onerror = (err) => {
+      if (!cancelled) { setPdfError(err.message || 'Render worker error'); if (isDocChange) setPdfLoading(false) }
+    }
+
+    worker.onmessage = ({ data: msg }) => {
+      if (cancelled) return
+      if (msg.type === 'ready') {
+        const { numPages, dims } = msg
+        pageDimsRef.current = dims
+        // flushSync forces React to commit dim/size state to DOM before the
+        // observer fires — prevents the canvas from displaying at raw physical-
+        // pixel dimensions (2× on retina) before CSS sizes are applied.
+        flushSync(() => {
+          setPageDims(dims)
+          if (isDocChange) {
+            setPageCount(numPages)
+            setPageCountsById(prev => ({ ...prev, [activeDocumentId]: numPages }))
+            setPdfLoading(false)
+          }
+        })
+        // Only persist dims at default scale (avoid caching zoom-specific sizes)
+        if (renderScale === 1.25) {
+          try { localStorage.setItem(`pdf-dims-${activeDocumentId}`, JSON.stringify(dims)) } catch { /* quota */ }
         }
-        pdfDoc = pdf
-        pdfDocRef.current = pdf
-        setPageCount(pdf.numPages)
-        setPageCountsById(prev => ({ ...prev, [activeDocumentId]: pdf.numPages }))
-
-        setPdfLoading(false)
-
-        // Wait two frames so React can render canvases for the new pageCount
-        await new Promise(requestAnimationFrame)
-        await new Promise(requestAnimationFrame)
-        if (cancelled) return
-
-        // Fetch just the first page to get aspect ratio / dimensions
-        const page1 = await pdf.getPage(1)
-        const viewport1 = page1.getViewport({ scale: 1.25 })
-        const pWidth = viewport1.width
-        const pHeight = viewport1.height
-
-        // Setup an IntersectionObserver to lazy-render pages
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const canvas = entry.target
-              if (canvas.dataset.rendered) return
-              canvas.dataset.rendered = 'true'
-
-              const pageNum = parseInt(canvas.dataset.page, 10)
-              pdf.getPage(pageNum).then(async (page) => {
-                if (cancelled) return
-                const viewport = page.getViewport({ scale: 1.25 })
-                const context = canvas.getContext('2d')
-                const dpr = window.devicePixelRatio || 1
-
-                canvas.width = Math.floor(viewport.width * dpr)
-                canvas.height = Math.floor(viewport.height * dpr)
-                canvas.style.width = `${Math.floor(viewport.width)}px`
-                canvas.style.height = `${Math.floor(viewport.height)}px`
-                // Remove skeleton background
-                canvas.style.backgroundColor = 'transparent'
-                context.setTransform(dpr, 0, 0, dpr, 0, 0)
-
-                await page.render({ canvasContext: context, viewport }).promise
-              }).catch(err => {
-                if (!cancelled) console.error(`Error rendering page ${pageNum}:`, err)
-              })
-            }
+        // DOM is already updated — single rAF to let the browser paint before observing
+        requestAnimationFrame(() => setupObserver())
+      } else if (msg.type === 'dims-update') {
+        // Some pages have different dimensions from page 1 — patch them
+        const updated = { ...pageDimsRef.current, ...msg.dims }
+        pageDimsRef.current = updated
+        setPageDims(updated)
+        if (renderScale === 1.25) {
+          try { localStorage.setItem(`pdf-dims-${activeDocumentId}`, JSON.stringify(updated)) } catch { /* quota */ }
+        }
+      } else if (msg.type === 'rendered') {
+        // Build text layer imperatively after the worker finishes drawing a page
+        const { pageNum } = msg
+        if (!pdfDocRef.current) return
+        const scale = renderScaleRef.current
+        pdfDocRef.current.getPage(pageNum).then(page => {
+          if (cancelled) return
+          const vp = page.getViewport({ scale })
+          return page.getTextContent().then(tc => {
+            if (cancelled) return
+            const container = pagesContainerRef.current?.querySelector(`[data-textlayer="${pageNum}"]`)
+            if (!container) return
+            container.innerHTML = ''
+            new pdfjsLib.TextLayer({ textContentSource: tc, container, viewport: vp }).render()
           })
-        }, {
-          root: pagesContainerRef.current,
-          rootMargin: '100% 0px 100% 0px' // render 1 screen above/below
-        })
+        }).catch(() => {})
+      } else if (msg.type === 'error') {
+        if (!cancelled) { setPdfError(msg.error || 'PDF render error'); if (isDocChange) setPdfLoading(false) }
+      }
+    }
 
-        const canvases = pagesContainerRef.current?.querySelectorAll?.('.pdfapp-page-canvas')
-        canvases?.forEach?.(canvas => {
-          // pre-set skeleton dimensions so scrolling works immediately
-          canvas.style.width = `${Math.floor(pWidth)}px`
-          canvas.style.height = `${Math.floor(pHeight)}px`
-          canvas.style.backgroundColor = '#1f2937' // dark placeholder
-          observer.observe(canvas)
+    // Init worker — reuse cached buffer on zoom, fetch fresh on doc change
+    if (!isDocChange && pdfBufferRef.current) {
+      // Zoom: re-init with cached buffer (zero new network requests)
+      const renderBuffer = pdfBufferRef.current.slice(0)
+      worker.postMessage({ type: 'init', pdfData: renderBuffer, scale: renderScale }, [renderBuffer])
+    } else {
+      // Doc change: fetch once, split into two copies
+      fetch(activeDocUrl)
+        .then(r => {
+          if (!r.ok) throw new Error(`Failed to fetch PDF (${r.status})`)
+          return r.arrayBuffer()
         })
+        .then(async (buffer) => {
+          if (cancelled) return
+          pdfBufferRef.current  = buffer.slice(0)  // save for zoom re-renders
+          const renderBuffer    = buffer             // transferred (zero-copy) to worker
+          const mainBuffer      = buffer.slice(0)   // clone for main-thread pdf.js
 
-        pdfDoc._observer = observer
-      })
-      .catch((err) => {
-        if (cancelled) return
-        setPdfError(err?.message || 'Failed to load PDF')
-        setPdfLoading(false)
-        console.error(err)
-      })
+          worker.postMessage({ type: 'init', pdfData: renderBuffer, scale: renderScale }, [renderBuffer])
+
+          // Main-thread pdf.js for extraction / summarise / RAG indexing
+          const task = pdfjsLib.getDocument({
+            data: mainBuffer,
+            standardFontDataUrl: '/standard_fonts/',
+            cMapUrl: '/cmaps/',
+            cMapPacked: true,
+          })
+          const pdf  = await task.promise
+          if (cancelled) { pdf.destroy(); return }
+          pdfDocRef.current = pdf
+        })
+        .catch(err => {
+          if (!cancelled) { setPdfError(err?.message || 'Failed to load PDF'); if (isDocChange) setPdfLoading(false) }
+        })
+    }
 
     return () => {
       cancelled = true
-      if (pdfDoc) {
-        if (pdfDoc._observer) pdfDoc._observer.disconnect()
-        pdfDoc.destroy()
-      }
+      if (observerRef.current) { observerRef.current.disconnect(); observerRef.current = null }
+      if (renderWorkerRef.current) { renderWorkerRef.current.terminate(); renderWorkerRef.current = null }
+      // Destroy main pdf only on doc change (kept alive across zoom changes for extraction)
+      if (isDocChange && pdfDocRef.current) { pdfDocRef.current.destroy(); pdfDocRef.current = null }
     }
-  }, [activeDocUrl, activeDocumentId])
+  }, [activeDocUrl, activeDocumentId, renderScale])
+
+  // Thumbnail worker — spun up when the thumbnail panel opens
+  useEffect(() => {
+    if (!thumbsOpen || !pdfBufferRef.current || !pageCount) {
+      if (thumbWorkerRef.current) { thumbWorkerRef.current.terminate(); thumbWorkerRef.current = null }
+      if (thumbObserverRef.current) { thumbObserverRef.current.disconnect(); thumbObserverRef.current = null }
+      return
+    }
+
+    let cancelled = false
+    const worker = new Worker(
+      new URL('../workers/pdfRenderer.worker.js', import.meta.url),
+      { type: 'module' }
+    )
+    thumbWorkerRef.current = worker
+
+    worker.onmessage = ({ data: msg }) => {
+      if (cancelled || msg.type !== 'ready') return
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (cancelled || !thumbsContainerRef.current) return
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return
+            const canvas = entry.target
+            if (canvas.dataset.transferred || !canvas.isConnected) return
+            canvas.dataset.transferred = 'true'
+            try {
+              const offscreen = canvas.transferControlToOffscreen()
+              thumbWorkerRef.current?.postMessage(
+                { type: 'render', pageNum: parseInt(canvas.dataset.page, 10), canvas: offscreen, dpr: 1 },
+                [offscreen]
+              )
+            } catch { /* OffscreenCanvas not supported */ }
+          })
+        }, { root: thumbsContainerRef.current, rootMargin: '600px' })
+        thumbObserverRef.current = observer
+        thumbsContainerRef.current
+          ?.querySelectorAll('.pdfapp-thumb-canvas')
+          ?.forEach(c => observer.observe(c))
+      }))
+    }
+
+    const buf = pdfBufferRef.current.slice(0)
+    worker.postMessage({ type: 'init', pdfData: buf, scale: 0.15 }, [buf])
+
+    return () => {
+      cancelled = true
+      worker.terminate()
+      thumbWorkerRef.current = null
+      if (thumbObserverRef.current) { thumbObserverRef.current.disconnect(); thumbObserverRef.current = null }
+    }
+  }, [thumbsOpen, pageCount])
 
   // ── Summarize (OCR + Text LLM) ────────────────
   const [summary, setSummary] = useState('')
@@ -400,11 +553,29 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
 
   // Stores bbox-rich pages from the most recent extraction for this doc (avoids re-OCR when indexing)
   const lastExtractionPagesRef = useRef({ docId: null, pages: null })
+  const extractedTextRef = useRef(null)
 
   // ── RAG state ──
   const [ragStatus, setRagStatus] = useState(null)   // null | 'indexing' | 'indexed'
   const [ragProgress, setRagProgress] = useState('')
-  const [ragSuggestions, setRagSuggestions] = useState([])
+
+  // ── Activity log ──
+  const [logs, setLogs] = useState([])
+  const [logOpen, setLogOpen] = useState(true)
+  const logBottomRef = useRef(null)
+
+  const addLog = useCallback((msg, level = 'info') => {
+    if (!msg?.trim()) return
+    setLogs(prev => [
+      ...prev.slice(-299),
+      { id: crypto.randomUUID(), time: new Date(), msg: msg.trim(), level },
+    ])
+  }, [])
+
+  // Auto-scroll log to bottom when new entries arrive
+  useEffect(() => {
+    if (logOpen) logBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [logs, logOpen])
 
   // ── LexChat ──
   const [lexChatOpen, setLexChatOpen] = useState(false)
@@ -429,29 +600,40 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     if (lexChatOpen) chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages, lexChatOpen])
 
-  // Reset chat + RAG state when document changes; check if new doc is already indexed
+  // Reset chat + RAG state when document changes; load persisted chat history
   useEffect(() => {
     setChatMessages([])
     setChatInput('')
     setRagStatus(null)
-    setRagSuggestions([])
     setRagProgress('')
+    setActiveCitations(new Map())
 
     if (!activeDocumentId) return
+
+    // Load saved chat history (case mode only)
+    if (caseId) {
+      loadChatHistory(activeDocumentId, { caseId }).then(msgs => {
+        if (msgs.length) setChatMessages(msgs)
+      }).catch(() => {})
+    }
+
     getDocRagStatus(activeDocumentId, { caseId }).then(({ indexed }) => {
       if (indexed) setRagStatus('indexed')
     }).catch(() => {})
-  }, [activeDocumentId])
+  }, [activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
 
   const handleChatSend = useCallback(async () => {
     const text = chatInput.trim()
     if (!text || chatLoading) return
 
-    const userMsg = { role: 'user', content: text }
-    setChatMessages(prev => [...prev, userMsg])
+    const userMsg = { role: 'user', id: crypto.randomUUID(), content: text }
+    // Track finalMessages locally so we can persist after streaming completes
+    let finalMessages = [...chatMessages, userMsg]
+    setChatMessages(finalMessages)
     setChatInput('')
     setChatLoading(true)
+    addLog(`LexChat query: ${text.slice(0, 80)}${text.length > 80 ? '…' : ''}`, 'info')
     setActiveCitations(new Map()) // clear previous highlights
 
     if (chatAbortRef.current) chatAbortRef.current.abort()
@@ -468,97 +650,83 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
       ({ ragContext, chunkMap } = buildEvidenceBlock(rawChunks))
     }
 
+    // Fallback: when not indexed, include full extracted text (truncated) so the model has document context
+    const _extractedText = extractedTextRef.current
+    const docContext = ragContext
+      ? ragContext
+      : _extractedText
+        ? `\n\nDocument text:\n${_extractedText.slice(0, 12000)}${_extractedText.length > 12000 ? '\n[…document continues…]' : ''}`
+        : ''
+
     // Build message history for Ollama
-    const systemPrompt = `You are LexChat, an expert legal AI assistant. You help legal professionals analyze documents, answer legal questions, and provide guidance on legal matters.${summary ? `\n\nDocument analysis:\n${summary}` : ''}${ragContext}
+    const systemPrompt = `You are LexChat, an expert legal AI assistant. You help legal professionals analyze documents, answer legal questions, and provide guidance on legal matters.${summary ? `\n\nDocument analysis:\n${summary}` : ''}${docContext}
 
 Important: You assist with legal workflows but do not provide legal advice. Always recommend qualified legal professionals for final decisions.`
 
-    const messages = [
+    const ollamaMessages = [
       { role: 'system', content: systemPrompt },
       ...chatMessages,
       userMsg,
     ]
 
+    const assistantId = crypto.randomUUID()
+    finalMessages = [...finalMessages, { id: assistantId, role: 'assistant', content: '' }]
+    setChatMessages(finalMessages)
+
     try {
-      const res = await fetch('/api/ollama/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer 68d73d3a870148f6818d364c549c2bc3._C2su8V3eWzsWN5F7Zk27DGt',
-        },
+      const accumulated = await streamOllamaChat({
+        messages: ollamaMessages,
         signal: controller.signal,
-        body: JSON.stringify({ model: 'qwen3.5:cloud', messages, stream: true }),
+        onChunk: text => setChatMessages(prev => [...prev.slice(0, -1), { id: assistantId, role: 'assistant', content: text }]),
       })
-
-      if (!res.ok) throw new Error(`Ollama returned ${res.status}`)
-
-      let accumulated = ''
-      setChatMessages(prev => [...prev, { role: 'assistant', content: '' }])
-
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const lines = decoder.decode(value, { stream: true }).split('\n').filter(Boolean)
-        for (const line of lines) {
-          try {
-            const json = JSON.parse(line)
-            if (json.message?.content) {
-              accumulated += json.message.content
-              setChatMessages(prev => [
-                ...prev.slice(0, -1),
-                { role: 'assistant', content: accumulated },
-              ])
-            }
-          } catch { /* partial JSON */ }
-        }
-      }
+      let accumulated_final = accumulated
 
       // ATG: parse which [n] citations the LLM actually used
-      const msgCitations = parseCitations(accumulated, chunkMap)
+      let msgCitations = parseCitations(accumulated_final, chunkMap)
+      // Narrow paragraph-level bboxes to sentence-level using extraction cache
       if (msgCitations.size) {
-        setChatMessages(prev => [
-          ...prev.slice(0, -1),
-          { role: 'assistant', content: accumulated, citations: msgCitations },
-        ])
-        setActiveCitations(msgCitations)
+        const cachedPages = lastExtractionPagesRef.current?.docId === activeDocumentId
+          ? lastExtractionPagesRef.current.pages
+          : null
+        msgCitations = narrowCitations(msgCitations, accumulated_final, cachedPages)
       }
+      const assistantMsg = msgCitations.size
+        ? { id: assistantId, role: 'assistant', content: accumulated_final, citations: msgCitations }
+        : { id: assistantId, role: 'assistant', content: accumulated_final }
+
+      finalMessages = [...finalMessages.slice(0, -1), assistantMsg]
+      setChatMessages(prev => [...prev.slice(0, -1), assistantMsg])
+      if (msgCitations.size) setActiveCitations(msgCitations)
+
+      // Persist chat history (case mode only)
+      if (caseId) saveChatHistory(activeDocumentId, finalMessages, { caseId }).catch(() => {})
+
+      addLog('LexChat response received', 'ok')
+
+      // Fire follow-up suggestions async — non-blocking
+      _fetchSuggestions(text, accumulated_final).then(suggestions => {
+        if (!suggestions?.length) return
+        setChatMessages(prev => prev.map(m =>
+          m.id === assistantId ? { ...m, suggestions } : m
+        ))
+      }).catch(() => {})
     } catch (err) {
       if (err.name === 'AbortError') return
-      setChatMessages(prev => [...prev, { role: 'assistant', content: `Error: ${err.message}` }])
+      addLog(`LexChat error: ${err.message}`, 'error')
+      const errMsg = { role: 'assistant', content: `Error: ${err.message}` }
+      finalMessages = [...finalMessages, errMsg]
+      setChatMessages(prev => [...prev, errMsg])
+      if (caseId) saveChatHistory(activeDocumentId, finalMessages, { caseId }).catch(() => {})
     } finally {
       setChatLoading(false)
     }
-  }, [chatInput, chatLoading, chatMessages, summary, ragStatus, activeDocumentId, caseSearchActive, caseId])
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const dropdownRef = useRef(null)
-  const [draftingOpen, setDraftingOpen] = useState(false)
-  const draftingRef = useRef(null)
-
-  // Close dropdowns on outside click
-  useEffect(() => {
-    if (!dropdownOpen) return
-    const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [dropdownOpen])
-
-  useEffect(() => {
-    if (!draftingOpen) return
-    const handler = (e) => {
-      if (draftingRef.current && !draftingRef.current.contains(e.target)) {
-        setDraftingOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [draftingOpen])
+  }, [chatInput, chatLoading, chatMessages, summary, ragStatus, activeDocumentId, caseSearchActive, caseId, addLog])
+  const [lexAgentOpen, setLexAgentOpen] = useState(false)
+  const [lexAgentMessages, setLexAgentMessages] = useState([])
+  const [lexAgentInput, setLexAgentInput] = useState('')
+  const [lexAgentLoading, setLexAgentLoading] = useState(false)
+  const lexAgentAbortRef = useRef(null)
+  const lexAgentBottomRef = useRef(null)
 
   // Load existing summary + saved skill IDs when document changes
   useEffect(() => {
@@ -589,12 +757,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
 
   const handleIndexDocument = useCallback(async () => {
-    const pdf = pdfDocRef.current
-    if (!pdf || ragStatus === 'indexing') return
+    if (ragStatus === 'indexing') return
+    const cached = lastExtractionPagesRef.current
+    const hasCachedPages = cached.docId === activeDocumentId && cached.pages
+    // Need the main-thread pdf only if we have no cached pages to fall back on
+    if (!hasCachedPages && !pdfDocRef.current) return
 
     setRagStatus('indexing')
-    setDraftingOpen(true)
-
     try {
       // Step 1 — index format categories (skips already-done ones)
       setRagProgress('Setting up categories (first time only)…')
@@ -602,11 +771,11 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
       // Step 2 — get bbox-aware paragraph chunks
       // Prefer cached pages from extraction (has OCR bboxes too); fallback to native re-extract
-      const cached = lastExtractionPagesRef.current
       let pages
-      if (cached.docId === activeDocumentId && cached.pages) {
+      if (hasCachedPages) {
         pages = cached.pages
       } else {
+        const pdf = pdfDocRef.current
         setRagProgress('Extracting text with coordinates…')
         pages = await extractPageChunksFromPDF(pdf, { onStatus: setRagProgress })
       }
@@ -617,10 +786,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           .map((c, idx) => ({ pageNum: p.pageNum, chunkIdx: idx, text: c.text, bbox: c.bbox }))
       )
 
-      // Step 3 — clear existing + embed + store in batches
-      setRagProgress('Clearing previous index…')
-      await clearDocChunks(activeDocumentId, { caseId })
-
+      // Step 3 — incremental embed + store in batches (server skips unchanged hashes)
       const BATCH = 10
       for (let i = 0; i < allChunks.length; i += BATCH) {
         const batch = allChunks.slice(i, i + BATCH)
@@ -628,22 +794,19 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         await indexDocPages(activeDocumentId, batch, { caseId })
       }
 
+      // Prune stale chunks (from previous versions with different chunk count/layout)
+      setRagProgress('Pruning stale chunks…')
+      await pruneDocChunks(activeDocumentId, allChunks.map(c => ({ pageNum: c.pageNum, chunkIdx: c.chunkIdx })), { caseId })
+
       setRagStatus('indexed')
 
-      // Step 4 — fetch smart suggestions using summary or first chunk
-      const query = (savedSummaryText || summary || allChunks[0]?.text || '').substring(0, 1000)
-      if (query.trim()) {
-        setRagProgress('Finding relevant templates…')
-        const suggestions = await suggestFormatCategories(query)
-        setRagSuggestions(suggestions)
-      }
     } catch (err) {
       console.error('[RAG] indexing failed:', err)
       setRagStatus(null)
     } finally {
       setRagProgress('')
     }
-  }, [activeDocumentId, ragStatus, savedSummaryText, summary])
+  }, [activeDocumentId, ragStatus, caseId])
 
   const handleSummarize = useCallback(async () => {
     if (savedSummaryText) {
@@ -679,38 +842,14 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       }
 
       setSummaryStatus('Generating summary…')
-      const res = await fetch('/api/ollama/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer 68d73d3a870148f6818d364c549c2bc3._C2su8V3eWzsWN5F7Zk27DGt',
-        },
+      const accumulated = await streamOllamaChat({
+        messages: [{ role: 'user', content: `You are a document analysis assistant. Summarize the following document text. Include all key points, important details, and notable information. Format the summary clearly with sections if the document covers multiple topics.\n\n${fullText}` }],
         signal: controller.signal,
-        body: JSON.stringify({
-          model: 'qwen3.5:cloud',
-          messages: [{ role: 'user', content: `You are a document analysis assistant. Summarize the following document text. Include all key points, important details, and notable information. Format the summary clearly with sections if the document covers multiple topics.\n\n${fullText}` }],
-          stream: true,
-        }),
+        onChunk: setSummary,
       })
-
-      if (!res.ok) throw new Error(`Ollama returned ${res.status}: ${await res.text()}`)
-
-      setSummaryStatus('')
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let accumulated = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) { saveSummary(activeDocumentId, accumulated, { caseId }).catch(console.error); break }
-        const lines = decoder.decode(value, { stream: true }).split('\n').filter(Boolean)
-        for (const line of lines) {
-          try {
-            const json = JSON.parse(line)
-            if (json.message?.content) { accumulated += json.message.content; setSummary(accumulated) }
-            if (json.done) { saveSummary(activeDocumentId, accumulated, { caseId }).catch(console.error); setSavedSummaryText(accumulated); break }
-          } catch { /* partial JSON */ }
-        }
+      if (accumulated) {
+        saveSummary(activeDocumentId, accumulated, { caseId }).catch(console.error)
+        setSavedSummaryText(accumulated)
       }
     } catch (err) {
       if (err.name === 'AbortError') return
@@ -749,41 +888,14 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       }
 
       setSummaryStatus(`Running ${skill.name}…`)
-      const res = await fetch('/api/ollama/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer 68d73d3a870148f6818d364c549c2bc3._C2su8V3eWzsWN5F7Zk27DGt',
-        },
+      const accumulated = await streamOllamaChat({
+        messages: [
+          { role: 'system', content: skill.systemPrompt },
+          { role: 'user', content: `Please analyze the following document:\n\n${fullText}` },
+        ],
         signal: controller.signal,
-        body: JSON.stringify({
-          model: 'qwen3.5:cloud',
-          messages: [
-            { role: 'system', content: skill.systemPrompt },
-            { role: 'user', content: `Please analyze the following document:\n\n${fullText}` },
-          ],
-          stream: true,
-        }),
+        onChunk: setSummary,
       })
-
-      if (!res.ok) throw new Error(`Ollama returned ${res.status}: ${await res.text()}`)
-
-      setSummaryStatus('')
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let accumulated = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const lines = decoder.decode(value, { stream: true }).split('\n').filter(Boolean)
-        for (const line of lines) {
-          try {
-            const json = JSON.parse(line)
-            if (json.message?.content) { accumulated += json.message.content; setSummary(accumulated) }
-          } catch { /* partial JSON */ }
-        }
-      }
 
       // Save result and mark skill as saved for this document
       if (accumulated && activeDocumentId) {
@@ -807,6 +919,91 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     setSummarizing(false)
   }, [])
 
+
+  // ── LexAgent — scroll to bottom when messages update ──────────────────
+  useEffect(() => {
+    if (lexAgentOpen) lexAgentBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [lexAgentMessages, lexAgentOpen])
+
+  // ── LexAgent — reset messages when doc changes ─────────────────────────
+  useEffect(() => {
+    setLexAgentMessages([])
+    setLexAgentInput('')
+  }, [activeDocumentId])
+
+  // Run a skill inside the LexAgent chat panel
+  const handleLexAgentSkill = useCallback(async (skill) => {
+    if (lexAgentLoading) return
+    const fullText = extractedTextRef.current
+    if (!fullText?.trim()) {
+      setLexAgentMessages(prev => [...prev, { role: 'assistant', id: crypto.randomUUID(), content: 'Document text not yet extracted. Please wait for extraction to finish.' }])
+      return
+    }
+
+    if (lexAgentAbortRef.current) lexAgentAbortRef.current.abort()
+    const controller = new AbortController()
+    lexAgentAbortRef.current = controller
+
+    const userMsg = { role: 'user', id: crypto.randomUUID(), content: `Run: **${skill.name}**` }
+    const assistantId = crypto.randomUUID()
+    setLexAgentMessages(prev => [...prev, userMsg, { role: 'assistant', id: assistantId, content: '' }])
+    setLexAgentLoading(true)
+
+    try {
+      const accumulated = await streamOllamaChat({
+        messages: [
+          { role: 'system', content: skill.systemPrompt },
+          { role: 'user', content: `Please analyze the following document:\n\n${fullText}` },
+        ],
+        signal: controller.signal,
+        onChunk: text => setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: text }]),
+      })
+
+      if (accumulated && activeDocumentId) {
+        saveSkillResult(activeDocumentId, skill.id, accumulated, { caseId }).catch(console.error)
+        setSavedSkillIds(prev => prev.includes(skill.id) ? prev : [...prev, skill.id])
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return
+      setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: `Error: ${err.message}` }])
+    } finally {
+      setLexAgentLoading(false)
+    }
+  }, [lexAgentLoading, activeDocumentId, caseId])
+
+  // Send a follow-up message in LexAgent
+  const handleLexAgentSend = useCallback(async () => {
+    const text = lexAgentInput.trim()
+    if (!text || lexAgentLoading) return
+
+    if (lexAgentAbortRef.current) lexAgentAbortRef.current.abort()
+    const controller = new AbortController()
+    lexAgentAbortRef.current = controller
+
+    const userMsg = { role: 'user', id: crypto.randomUUID(), content: text }
+    const assistantId = crypto.randomUUID()
+    const history = [...lexAgentMessages, userMsg]
+    setLexAgentMessages([...history, { role: 'assistant', id: assistantId, content: '' }])
+    setLexAgentInput('')
+    setLexAgentLoading(true)
+
+    try {
+      await streamOllamaChat({
+        messages: [
+          { role: 'system', content: 'You are LexAgent, a legal AI assistant. Answer questions about the document analysis above. Be concise and cite the relevant parts of the analysis.' },
+          ...history.map(m => ({ role: m.role, content: m.content })),
+        ],
+        signal: controller.signal,
+        onChunk: text => setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: text }]),
+      })
+    } catch (err) {
+      if (err.name === 'AbortError') return
+      setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: `Error: ${err.message}` }])
+    } finally {
+      setLexAgentLoading(false)
+    }
+  }, [lexAgentInput, lexAgentLoading, lexAgentMessages, caseId])
+
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
   const [extractedPages, setExtractedPages] = useState(null) // [{pageNum, chunks: [{text, bbox}]}]
@@ -817,6 +1014,18 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
   const [extractionError, setExtractionError] = useState(null)
   const [extractionSource, setExtractionSource] = useState(null) // 'text' | 'ocr' | null
   const extractionAbortRef = useRef(null)
+
+  // Watch key status strings and mirror them into the log automatically
+  useEffect(() => { if (extractionStatus) addLog(extractionStatus) }, [extractionStatus, addLog])
+  useEffect(() => { if (ragProgress)      addLog(ragProgress)      }, [ragProgress, addLog])
+  useEffect(() => {
+    if (ragStatus === 'indexed')  addLog('RAG index complete — semantic search active', 'ok')
+    if (ragStatus === 'indexing') addLog('Starting RAG indexing…', 'info')
+  }, [ragStatus, addLog])
+  useEffect(() => {
+    if (pdfLoading) addLog('Loading PDF…')
+    else if (!pdfLoading && pageCount) addLog(`PDF loaded — ${pageCount} pages`, 'ok')
+  }, [pdfLoading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Core extraction runner — called both automatically on doc load and from the retry button
   const runExtraction = useCallback(async (docId, file) => {
@@ -834,9 +1043,17 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         onStatus: setExtractionStatus,
         signal: controller.signal,
         caseId,
+        // Emit partial pages early so LexChat can answer before full extraction finishes
+        onPartialResult: ({ text, pages: partialPages }) => {
+          extractedTextRef.current = text
+          setExtractedText(text)
+          setExtractedPages(partialPages)
+          lastExtractionPagesRef.current = { docId, pages: partialPages }
+        },
       })
       if (result) {
         setExtractedText(result.text)
+        extractedTextRef.current = result.text
         setExtractedPages(result.pages ?? null)
         setExtractionSource(result.isOcr ? 'ocr' : 'text')
         setDocStatuses(prev => ({ ...prev, [docId]: 'done' }))
@@ -855,28 +1072,45 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     }
   }, []) // all used setters and extractAndSaveText are stable references
 
-  // Auto-trigger on document change: load from cache or run extraction
+  // On document change: load from cache if available (user manually starts extraction otherwise)
   useEffect(() => {
     if (!activeDocumentId) return
-    const activeDoc = documents.find(d => d.id === activeDocumentId)
-    if (!activeDoc?.file) return
-
     let cancelled = false
     loadExtraction(activeDocumentId, { caseId }).then(saved => {
       if (cancelled) return
-      if (saved?.text) {
+      const totalCachedChunks = saved?.pages?.reduce((s, p) => s + (p.chunks?.length ?? 0), 0) ?? 0
+      if (saved?.text && totalCachedChunks > 0) {
         setExtractedText(saved.text)
+        extractedTextRef.current = saved.text
         setExtractionSource(saved.isOcr ? 'ocr' : 'text')
         setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'done' }))
-      } else {
-        runExtraction(activeDocumentId, activeDoc.file)
+        if (saved.pages) {
+          setExtractedPages(saved.pages)
+          lastExtractionPagesRef.current = { docId: activeDocumentId, pages: saved.pages }
+        }
+      } else if (saved) {
+        // Stale cache (0 chunks) — delete it so next manual run starts fresh
+        const url = caseId
+          ? `/api/cases/${encodeURIComponent(caseId)}/extractions/${activeDocumentId}`
+          : `/api/extractions/${activeDocumentId}`
+        fetch(url, { method: 'DELETE' }).catch(() => {})
       }
-    }).catch(() => {
-      if (!cancelled) runExtraction(activeDocumentId, activeDoc.file)
-    })
+    }).catch(() => {})
 
     return () => { cancelled = true }
-  }, [activeDocumentId, documents, runExtraction])
+  }, [activeDocumentId, caseId])
+
+  // Auto-index for RAG after extraction completes.
+  // Also re-indexes when full extraction arrives after a partial index (ragStatus resets to null via
+  // the doc-change effect, so the check here naturally catches both first and full runs).
+  useEffect(() => {
+    const cached = lastExtractionPagesRef.current
+    const hasCachedPages = cached?.docId === activeDocumentId && cached?.pages
+    if (extractedPages && ragStatus === null && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
+      handleIndexDocument()
+    }
+  }, [extractedPages, ragStatus, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const textPanelDragging = useRef(false)
   const textPanelDragStartY = useRef(0)
   const textPanelDragStartH = useRef(0)
@@ -1218,6 +1452,34 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               )}
             </div>
 
+            {/* ── Activity Log ── */}
+            <div className="pdfapp-log-panel">
+              <button
+                type="button"
+                className="pdfapp-log-header"
+                onClick={() => setLogOpen(o => !o)}
+              >
+                <span>Activity Log</span>
+                <span className="pdfapp-log-chevron">{logOpen ? '▾' : '▸'}</span>
+              </button>
+              {logOpen && (
+                <div className="pdfapp-log-entries">
+                  {logs.length === 0 && (
+                    <div className="pdfapp-log-empty">No activity yet</div>
+                  )}
+                  {logs.map(entry => (
+                    <div key={entry.id} className={`pdfapp-log-entry pdfapp-log-entry--${entry.level}`}>
+                      <span className="pdfapp-log-time">
+                        {entry.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </span>
+                      <span className="pdfapp-log-msg">{entry.msg}</span>
+                    </div>
+                  ))}
+                  <div ref={logBottomRef} />
+                </div>
+              )}
+            </div>
+
             {/* Footer with collapse button */}
             <div className="pdfapp-sb-footer">
               <button
@@ -1257,6 +1519,36 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         )}
       </div>
 
+      {/* ── Thumbnails strip (between sidebar and center) ── */}
+      {thumbsOpen && pageCount && (
+        <div className="pdfapp-thumbs" ref={thumbsContainerRef}>
+          {Array.from({ length: pageCount }, (_, i) => {
+            const n = i + 1
+            const dim = pageDims[n] || pageDims[1]
+            const thumbW = 72
+            const thumbH = dim ? Math.round(thumbW * dim.h / dim.w) : Math.round(thumbW * 1.414)
+            return (
+              <div
+                key={`thumb-${activeDocumentId}-${n}`}
+                className="pdfapp-thumb-item"
+                onClick={() => {
+                  pagesContainerRef.current
+                    ?.querySelector(`[data-page="${n}"]`)
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }}
+              >
+                <canvas
+                  data-page={n}
+                  className="pdfapp-thumb-canvas"
+                  style={{ width: thumbW, height: thumbH }}
+                />
+                <span className="pdfapp-thumb-num">{n}</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       {/* ── Panel 2: Center (PDF viewer) ── */}
       <div className="pdfapp-center" style={{ flex: centerFlex }}>
         {(() => {
@@ -1271,18 +1563,85 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           return (
             <div className="pdfapp-center-content">
               <div className="pdfapp-center-header">
-                <span className="pdfapp-center-filename" title={activeDoc.name}>
-                  {activeDoc.name}
-                </span>
+                <div className="pdfapp-toolbar-left">
+                  {/* Thumbnail toggle */}
+                  <button
+                    className={`pdfapp-toolbar-btn${thumbsOpen ? ' pdfapp-toolbar-btn--active' : ''}`}
+                    onClick={() => setThumbsOpen(o => !o)}
+                    title={thumbsOpen ? 'Hide thumbnails' : 'Show page thumbnails'}
+                    disabled={!pageCount}
+                  >
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                  </button>
+                  <span className="pdfapp-center-filename" title={activeDoc.name}>
+                    {activeDoc.name}
+                  </span>
+                </div>
+                <div className="pdfapp-toolbar-right">
+                  {/* Chunk overlay toggle */}
+                  <button
+                    className={`pdfapp-toolbar-btn${showChunkOverlay ? ' pdfapp-toolbar-btn--active' : ''}`}
+                    onClick={() => setShowChunkOverlay(o => !o)}
+                    title={showChunkOverlay ? 'Hide chunk bboxes' : 'Show chunk bboxes'}
+                    disabled={!extractedPages}
+                  >
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/>
+                      <rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/>
+                    </svg>
+                  </button>
+                  {/* Zoom controls */}
+                  <button
+                    className="pdfapp-toolbar-btn"
+                    onClick={() => setRenderScale(s => Math.max(0.5, +((s - 0.25).toFixed(2))))}
+                    title="Zoom out"
+                    disabled={renderScale <= 0.5}
+                  >−</button>
+                  <span className="pdfapp-toolbar-zoom">{Math.round(renderScale * 100)}%</span>
+                  <button
+                    className="pdfapp-toolbar-btn"
+                    onClick={() => setRenderScale(s => Math.min(3.0, +((s + 0.25).toFixed(2))))}
+                    title="Zoom in"
+                    disabled={renderScale >= 3.0}
+                  >+</button>
+                  {/* Jump to page */}
+                  {pageCount && (
+                    <>
+                      <input
+                        type="number"
+                        className="pdfapp-toolbar-page-input"
+                        min={1}
+                        max={pageCount}
+                        value={jumpPage}
+                        placeholder="pg"
+                        onChange={e => setJumpPage(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            const n = parseInt(jumpPage, 10)
+                            if (n >= 1 && n <= pageCount) {
+                              pagesContainerRef.current
+                                ?.querySelector(`[data-page="${n}"]`)
+                                ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                            }
+                          }
+                        }}
+                      />
+                      <span className="pdfapp-toolbar-page-total">/ {pageCount}</span>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="pdfapp-center-body">
+              <div className="pdfapp-center-body" ref={pagesContainerRef}>
                 {pdfError && (
                   <div className="pdfapp-center-placeholder">
                     {pdfError}
                   </div>
                 )}
                 {!pdfError && (
-                  <div className="pdfapp-center-pages" ref={pagesContainerRef}>
+                  <div className="pdfapp-center-pages">
                     {pdfLoading && (
                       <div className="pdfapp-center-placeholder pdfapp-center-placeholder--inline">
                         Loading PDF…
@@ -1290,24 +1649,60 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     )}
                     {pageCount != null && Array.from({ length: pageCount }, (_, index) => {
                       const pageNum = index + 1
+                      const dim = pageDims[pageNum]
                       const pageHighlights = [...activeCitations.values()].filter(c => c.page_num === pageNum && c.bbox)
+                      const chunkData = showChunkOverlay && extractedPages?.find(p => p.pageNum === pageNum)
                       return (
-                        <div key={`${activeDocumentId}-${pageNum}`} className="pdfapp-page-wrapper">
-                          <canvas data-page={pageNum} className="pdfapp-page-canvas" />
+                        <div key={`${activeDocumentId}-${pageNum}-${renderScale}`} className="pdfapp-page-wrapper">
+                          <canvas
+                            data-page={pageNum}
+                            className="pdfapp-page-canvas"
+                            style={dim
+                              ? { width: `${dim.w}px`, height: `${dim.h}px`, backgroundColor: '#1f2937' }
+                              : { backgroundColor: '#1f2937' }
+                            }
+                          />
+                          {/* Selectable text layer — built imperatively after render */}
+                          <div className="pdfapp-text-layer" data-textlayer={pageNum} />
+                          {/* Citation highlights */}
                           {pageHighlights.length > 0 && (
                             <div className="pdfapp-highlight-overlay">
-                              {pageHighlights.map((chunk, i) => (
+                              {pageHighlights.map((chunk, i) => {
+                                const b = chunk.narrowBbox || chunk.bbox
+                                return (
                                 <div
                                   key={i}
-                                  className="pdfapp-highlight-rect"
+                                  className={`pdfapp-highlight-rect${chunk.narrowBbox ? ' pdfapp-highlight-rect--narrow' : ''}`}
                                   style={{
-                                    left:   `${chunk.bbox[0] * 100}%`,
-                                    top:    `${chunk.bbox[1] * 100}%`,
-                                    width:  `${(chunk.bbox[2] - chunk.bbox[0]) * 100}%`,
-                                    height: `${(chunk.bbox[3] - chunk.bbox[1]) * 100}%`,
+                                    left:   `${b[0] * 100}%`,
+                                    top:    `${b[1] * 100}%`,
+                                    width:  `${(b[2] - b[0]) * 100}%`,
+                                    height: `${(b[3] - b[1]) * 100}%`,
                                   }}
                                 />
-                              ))}
+                                )
+                              })}
+                            </div>
+                          )}
+                          {/* Chunk bbox overlay (toggle) */}
+                          {chunkData && chunkData.chunks?.length > 0 && (
+                            <div className="pdfapp-chunk-overlay">
+                              {chunkData.chunks.map((chunk, ci) => {
+                                const b = chunk.bbox
+                                if (!b) return null
+                                return (
+                                  <div
+                                    key={ci}
+                                    className="pdfapp-chunk-overlay-rect"
+                                    style={{
+                                      left:   `${b[0] * 100}%`,
+                                      top:    `${b[1] * 100}%`,
+                                      width:  `${(b[2] - b[0]) * 100}%`,
+                                      height: `${(b[3] - b[1]) * 100}%`,
+                                    }}
+                                  />
+                                )
+                              })}
                             </div>
                           )}
                         </div>
@@ -1328,11 +1723,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     onMouseDown={onTextPanelHandleDown}
                   />
                 )}
-                <div
-                  className="pdfapp-extracted-header"
-                  onClick={() => setExtractedTextOpen(o => !o)}
-                >
-                  <div className="pdfapp-extracted-header-left">
+                {/* ── Header row: title + badges + controls ── */}
+                <div className="pdfapp-extracted-header">
+                  <div
+                    className="pdfapp-extracted-header-left"
+                    onClick={() => setExtractedTextOpen(o => !o)}
+                    style={{ cursor: 'pointer', flex: 1, display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
                     <span>Text Chunks</span>
                     {extractionSource && (
                       <span className={`pdfapp-extraction-badge pdfapp-extraction-badge--${extractionSource}`}>
@@ -1344,9 +1741,51 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                         {extractedPages.reduce((s, p) => s + p.chunks.length, 0)} chunks
                       </span>
                     )}
+                    {extractingText && (
+                      <div className="pdfapp-spinner pdfapp-spinner--small" style={{ marginLeft: 4 }} />
+                    )}
                   </div>
-                  <span className="pdfapp-extracted-arrow">{extractedTextOpen ? '▲' : '▼'}</span>
+
+                  {/* ── Extraction controls ── */}
+                  <div className="pdfapp-extract-controls" onClick={e => e.stopPropagation()}>
+                    {extractingText ? (
+                      <button
+                        className="pdfapp-extract-btn pdfapp-extract-btn--stop"
+                        title="Stop extraction"
+                        onClick={() => { extractionAbortRef.current?.abort(); setExtractingText(false); setExtractionStatus('') }}
+                      >
+                        ■ Stop
+                      </button>
+                    ) : extractedPages ? (
+                      <button
+                        className="pdfapp-extract-btn pdfapp-extract-btn--rerun"
+                        title="Re-run extraction"
+                        disabled={!activeDoc?.file || pdfLoading}
+                        onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
+                      >
+                        ↺ Re-run
+                      </button>
+                    ) : (
+                      <button
+                        className="pdfapp-extract-btn pdfapp-extract-btn--start"
+                        title="Start text extraction / OCR"
+                        disabled={!activeDoc?.file || pdfLoading}
+                        onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
+                      >
+                        ▶ Extract
+                      </button>
+                    )}
+                  </div>
+
+                  <span
+                    className="pdfapp-extracted-arrow"
+                    onClick={() => setExtractedTextOpen(o => !o)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {extractedTextOpen ? '▲' : '▼'}
+                  </span>
                 </div>
+
                 {extractedTextOpen && (
                   extractedPages ? (
                     <div className="pdfapp-chunks-body">
@@ -1366,45 +1805,46 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                           </div>
                         ))
                       )}
-                    </div>
-                  ) : extractedText ? (
-                    <div className="pdfapp-chunks-body">
-                      <div className="pdfapp-chunk-card pdfapp-chunk-card--legacy">
-                        <div className="pdfapp-chunk-meta">
-                          <span className="pdfapp-chunk-tag pdfapp-chunk-tag--page">cached</span>
+                      {extractingText && (
+                        <div className="pdfapp-extracted-prompt" style={{ paddingTop: 8 }}>
+                          <div className="pdfapp-spinner pdfapp-spinner--small" />
+                          <span className="pdfapp-extracted-status">{extractionStatus}</span>
                         </div>
-                        <pre className="pdfapp-chunk-text pdfapp-chunk-text--pre">{extractedText}</pre>
-                      </div>
+                      )}
                     </div>
                   ) : extractingText ? (
                     <div className="pdfapp-extracted-prompt">
-                      <div className="pdfapp-spinner pdfapp-spinner--small" />
                       <span className="pdfapp-extracted-status">{extractionStatus || 'Extracting…'}</span>
                     </div>
                   ) : extractionError ? (
                     <div className="pdfapp-extracted-prompt">
                       <span className="pdfapp-extracted-error">{extractionError}</span>
-                      <button
-                        className="pdfapp-extracted-run-btn"
-                        onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
-                      >
-                        Retry
-                      </button>
                     </div>
                   ) : (
                     <div className="pdfapp-extracted-prompt">
-                      <span className="pdfapp-extracted-placeholder">No text extracted yet.</span>
-                      <button
-                        className="pdfapp-extracted-run-btn"
-                        onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
-                        disabled={!activeDocumentId || pdfLoading}
-                      >
-                        Run text extraction
-                      </button>
+                      <span className="pdfapp-extracted-placeholder">
+                        Press <strong>▶ Extract</strong> to run text extraction{activeDoc?.file ? '' : ' (no file loaded)'}.
+                      </span>
                     </div>
                   )
                 )}
               </div>
+            </div>
+          )
+        })()}
+
+        {/* ── Activity status bar ── */}
+        {(() => {
+          const msg =
+            pdfLoading      ? (ragProgress || 'Loading PDF…') :
+            extractingText  ? (extractionStatus || 'Extracting text…') :
+            ragStatus === 'indexing' ? (ragProgress || 'Indexing document…') :
+            null
+          if (!msg) return null
+          return (
+            <div className="pdfapp-status-bar">
+              <div className="pdfapp-spinner pdfapp-spinner--small pdfapp-status-bar__spinner" />
+              <span className="pdfapp-status-bar__text">{msg}</span>
             </div>
           )
         })()}
@@ -1420,6 +1860,91 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
       {/* ── Panel 3: Right Workspace — Summary ── */}
       <div className="pdfapp-right" style={{ flex: rightFlex }}>
+        {lexAgentOpen && (
+          <div className="pdfapp-lexagent">
+            <div className="pdfapp-lexagent-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+              </svg>
+              <span>LexAgent</span>
+              {lexAgentLoading && <div className="pdfapp-spinner pdfapp-spinner--small" />}
+            </div>
+
+            <div className="pdfapp-lexagent-messages">
+              {/* Skill picker — always visible at top */}
+              <div className="pdfapp-lexagent-skills">
+                <p className="pdfapp-lexagent-intro">
+                  {lexAgentMessages.length === 0
+                    ? "Hi, I'm LexAgent. Select a skill to analyze this document:"
+                    : "Run another skill:"}
+                </p>
+                <div className="pdfapp-lexagent-skill-grid">
+                  {LEGAL_SKILLS.map(skill => (
+                    <button
+                      key={skill.id}
+                      className={`pdfapp-lexagent-skill-card${savedSkillIds.includes(skill.id) ? ' pdfapp-lexagent-skill-card--done' : ''}`}
+                      onClick={() => handleLexAgentSkill(skill)}
+                      disabled={lexAgentLoading || !activeDocumentId}
+                    >
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                      </svg>
+                      <span>{skill.name}</span>
+                      {savedSkillIds.includes(skill.id) && (
+                        <span className="pdfapp-lexagent-skill-done" title="Saved result available">✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chat messages */}
+              {lexAgentMessages.map((msg, i) => (
+                <div key={msg.id ?? i} className={`pdfapp-chat-msg pdfapp-chat-msg--${msg.role}`}>
+                  {msg.role === 'assistant' && <div className="pdfapp-chat-avatar">A</div>}
+                  <div className="pdfapp-chat-msg-body">
+                    <div className="pdfapp-chat-bubble">
+                      {msg.content}
+                      {msg.role === 'assistant' && lexAgentLoading && i === lexAgentMessages.length - 1 && (
+                        <span className="pdfapp-cursor">▌</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div ref={lexAgentBottomRef} />
+            </div>
+
+            {lexAgentMessages.length > 0 && (
+              <div className="pdfapp-chat-input-row">
+                <textarea
+                  className="pdfapp-chat-input"
+                  value={lexAgentInput}
+                  onChange={e => setLexAgentInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleLexAgentSend() } }}
+                  placeholder="Ask a follow-up question…"
+                  rows={1}
+                  disabled={lexAgentLoading}
+                />
+                <button
+                  className="pdfapp-chat-send"
+                  onClick={handleLexAgentSend}
+                  disabled={lexAgentLoading || !lexAgentInput.trim()}
+                >
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="pdfapp-summary-header">
           {summarizing ? (
             <button
@@ -1433,167 +1958,41 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
             </button>
           ) : (
             <>
-            <div className="pdfapp-actions-dropdown" ref={draftingRef}>
-              <button
-                className="pdfapp-actions-btn"
-                onClick={() => setDraftingOpen(o => !o)}
-                disabled={!activeDocumentId || pdfLoading}
-              >
-                Drafting
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-              {draftingOpen && (
-                <div className="pdfapp-actions-menu">
-                  {/* RAG: suggest templates when indexed */}
-                  {ragStatus === 'indexing' && (
-                    <div className="pdfapp-drafting-loading">
-                      <div className="pdfapp-spinner pdfapp-spinner--small" />
-                      <span>{ragProgress || 'Indexing document…'}</span>
-                    </div>
-                  )}
-
-                  {ragStatus === 'indexed' && ragSuggestions.length > 0 && (<>
-                    <div className="pdfapp-actions-menu-section">AI Suggestions</div>
-                    {ragSuggestions.map(s => (
-                      <button
-                        key={s.name}
-                        className="pdfapp-actions-menu-item pdfapp-actions-menu-item--drafting"
-                        onClick={() => setDraftingOpen(false)}
-                        title={s.description}
-                      >
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                        <span className="pdfapp-drafting-item-text">
-                          <strong>{s.name}</strong>
-                          <em>{s.description}</em>
-                        </span>
-                      </button>
-                    ))}
-                    <div className="pdfapp-actions-menu-divider" />
-                  </>)}
-
-                  {/* Index button when not yet indexed */}
-                  {ragStatus === null && activeDocumentId && (
-                    <>
-                      <button
-                        className="pdfapp-actions-menu-item pdfapp-rag-index-btn"
-                        onClick={() => { handleIndexDocument() }}
-                        disabled={pdfLoading}
-                      >
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        ✨ Smart Suggestions — Index Document
-                      </button>
-                      <div className="pdfapp-actions-menu-divider" />
-                    </>
-                  )}
-
-                  <div className="pdfapp-actions-menu-section">All Categories</div>
-                  {FORMAT_CATEGORIES.map(cat => (
-                    <button
-                      key={cat.name}
-                      className="pdfapp-actions-menu-item"
-                      onClick={() => setDraftingOpen(false)}
-                      title={cat.description}
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                      </svg>
-                      {cat.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="pdfapp-actions-dropdown" ref={dropdownRef}>
-              <button
-                className="pdfapp-actions-btn"
-                onClick={() => setDropdownOpen(o => !o)}
-                disabled={!activeDocumentId || pdfLoading}
-              >
-                Analysis
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-              {dropdownOpen && (
-                <div className="pdfapp-actions-menu">
-                  {/* Saved results — only shown if at least one exists */}
-                  {(savedSummaryText || savedSkillIds.length > 0) && (<>
-                    {savedSummaryText && (
-                      <button
-                        className="pdfapp-actions-menu-item pdfapp-actions-menu-item--saved"
-                        onClick={() => { setDropdownOpen(false); handleSummarize() }}
-                      >
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        View Saved <strong>Summary</strong>
-                      </button>
-                    )}
-                    {savedSkillIds.map(skillId => {
-                      const skill = LEGAL_SKILLS.find(s => s.id === skillId)
-                      if (!skill) return null
-                      return (
-                        <button
-                          key={skillId}
-                          className="pdfapp-actions-menu-item pdfapp-actions-menu-item--saved"
-                          onClick={async () => {
-                            setDropdownOpen(false)
-                            const text = await loadSkillResult(activeDocumentId, skillId, { caseId })
-                            if (text) { setSummary(text); setActiveSkillName(skill.name) }
-                          }}
-                        >
-                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                          View Saved <strong>{skill.name}</strong>
-                        </button>
-                      )
-                    })}
-                    <div className="pdfapp-actions-menu-divider" />
-                  </>)}
-
-                  {/* Legal skills to run */}
-                  <div className="pdfapp-actions-menu-section">Legal Skills</div>
-                  {LEGAL_SKILLS.map(skill => (
-                    <button
-                      key={skill.id}
-                      className="pdfapp-actions-menu-item"
-                      onClick={() => { setDropdownOpen(false); handleRunSkill(skill) }}
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                      </svg>
-                      {skill.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <button
+              className={`pdfapp-actions-btn${lexAgentOpen ? ' pdfapp-actions-btn--active' : ''}`}
+              onClick={() => { setLexAgentOpen(o => !o); if (lexChatOpen) setLexChatOpen(false) }}
+              disabled={!activeDocumentId || pdfLoading}
+              title="LexAgent — run legal skills and ask follow-up questions"
+            >
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+              </svg>
+              LexAgent
+            </button>
             </>
           )}
           <button
             className={`pdfapp-lexchat-btn ${lexChatOpen ? 'pdfapp-lexchat-btn--active' : ''}`}
-            onClick={() => setLexChatOpen(o => !o)}
-            title={ragStatus === 'indexed' ? 'LexChat — RAG enabled (semantic search active)' : 'LexChat — AI legal assistant'}
+            onClick={() => { setLexChatOpen(o => !o); if (lexAgentOpen) setLexAgentOpen(false) }}
+            title={
+              ragStatus === 'indexed' ? 'LexChat — RAG active (semantic search ready)' :
+              ragStatus === 'indexing' ? ragProgress || 'Indexing document for RAG…' :
+              'LexChat — AI legal assistant'
+            }
           >
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             LexChat
-            {ragStatus === 'indexed' && <span className="pdfapp-rag-dot" title="RAG active" />}
+            <span
+              className={`pdfapp-rag-status-dot pdfapp-rag-status-dot--${ragStatus ?? 'none'}`}
+              title={
+                ragStatus === 'indexed'  ? 'Indexed — semantic search active' :
+                ragStatus === 'indexing' ? ragProgress || 'Indexing…' :
+                'Not indexed'
+              }
+            />
           </button>
         </div>
 
@@ -1620,17 +2019,41 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     {msg.role === 'assistant' && msg.citations?.size > 0 && (
                       <div className="pdfapp-sources">
                         <span className="pdfapp-sources-label">Sources</span>
-                        {[...msg.citations.entries()].map(([n, chunk]) => (
+                        {[...msg.citations.entries()].map(([n, chunk]) => {
+                          const score = chunk.distance != null ? distanceToScore(chunk.distance) : null
+                          const hasNarrow = !!chunk.narrowBbox
+                          return (
+                            <button
+                              key={n}
+                              className={`pdfapp-source-item${activeCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
+                              onClick={() => setActiveCitations(new Map([[n, chunk]]))}
+                              title={hasNarrow ? 'Sentence-level highlight available' : 'Paragraph highlight'}
+                            >
+                              <span className="pdfapp-source-num">[{n}]</span>
+                              <span className="pdfapp-source-page">p.{chunk.page_num}</span>
+                              {score != null && (
+                                <span className={`pdfapp-source-score pdfapp-source-score--${score >= 70 ? 'high' : score >= 40 ? 'mid' : 'low'}`}>
+                                  {score}%
+                                </span>
+                              )}
+                              {hasNarrow && <span className="pdfapp-source-narrow" title="Sentence-level">◈</span>}
+                              <span className="pdfapp-source-excerpt">
+                                {chunk.text.slice(0, 100)}{chunk.text.length > 100 ? '…' : ''}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                    {msg.role === 'assistant' && msg.suggestions?.length > 0 && (
+                      <div className="pdfapp-suggestions">
+                        {msg.suggestions.map((q, si) => (
                           <button
-                            key={n}
-                            className={`pdfapp-source-item${activeCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
-                            onClick={() => setActiveCitations(new Map([[n, chunk]]))}
+                            key={si}
+                            className="pdfapp-suggestion-chip"
+                            onClick={() => setChatInput(q)}
                           >
-                            <span className="pdfapp-source-num">[{n}]</span>
-                            <span className="pdfapp-source-page">p.{chunk.page_num}</span>
-                            <span className="pdfapp-source-excerpt">
-                              {chunk.text.slice(0, 110)}{chunk.text.length > 110 ? '…' : ''}
-                            </span>
+                            {q}
                           </button>
                         ))}
                       </div>
@@ -1712,7 +2135,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     <line x1="16" y1="13" x2="8" y2="13" />
                     <line x1="16" y1="17" x2="8" y2="17" />
                   </svg>
-                  <p>Select an action from the <strong>Analysis</strong> dropdown to analyze this document</p>
+                  <p>Open <strong>LexAgent</strong> to run skills on this document</p>
                   <span className="pdfapp-summary-model">OCR + qwen3.5 cloud via Ollama</span>
                 </div>
               )

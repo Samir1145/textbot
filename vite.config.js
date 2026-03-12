@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: '0.0.0.0',
     proxy: {
       '/api/ollama': {
         target: 'http://localhost:11434',
@@ -15,6 +16,7 @@ export default defineConfig({
       '/api/summaries': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/skill-results': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/rag': { target: 'http://localhost:3001', changeOrigin: true },
+      '/api/cases': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/blobs': {
         target: 'http://localhost:3001',
         changeOrigin: true,

@@ -124,13 +124,13 @@ export async function loadExtraction(docId, { caseId } = {}) {
 // ── Extract text + bbox data from a PDF File and persist ─────────────────
 // Returns { text, isOcr, pages: [{pageNum, chunks: [{text, bbox, sourceWords}]}] }
 // or null if aborted
-export async function extractAndSaveText(docId, file, { onStatus, signal, caseId } = {}) {
+export async function extractAndSaveText(docId, file, { onStatus, signal, caseId, onPartialResult, visiblePages = 5 } = {}) {
   const url = URL.createObjectURL(file)
   let pdf
 
   try {
     onStatus?.('Loading PDF…')
-    const task = pdfjsLib.getDocument({ url })
+    const task = pdfjsLib.getDocument({ url, standardFontDataUrl: '/standard_fonts/', cMapUrl: '/cmaps/', cMapPacked: true })
     if (signal) signal.addEventListener('abort', () => task.destroy(), { once: true })
     pdf = await task.promise
   } finally {
@@ -176,6 +176,14 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
       .map(p => `--- Page ${p.pageNum} ---\n${p.text}`)
       .join('\n\n')
 
+    // Emit first visiblePages early so LexChat can answer before full save completes
+    if (onPartialResult && pages.length > visiblePages) {
+      const partial = pages.slice(0, visiblePages)
+      const partialText = nativePages.slice(0, visiblePages).filter(p => p.text)
+        .map(p => `--- Page ${p.pageNum} ---\n${p.text}`).join('\n\n')
+      if (partialText.trim()) onPartialResult({ text: partialText, pages: partial })
+    }
+
   } else {
     // ── Scanned PDF — render each page and OCR it ──────────────────────────
     isOcr = true
@@ -207,6 +215,13 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
         }))
       const chunks = words.length ? groupIntoParagraphs(words) : []
       ocrResults.push({ pageNum: i, text: data.text.trim(), chunks })
+
+      // Emit partial results progressively so LexChat can answer as OCR completes
+      if (onPartialResult) {
+        const partialPgs = ocrResults.map(p => ({ pageNum: p.pageNum, chunks: p.chunks }))
+        const partialTxt = ocrResults.map(p => `--- Page ${p.pageNum} ---\n${p.text}`).join('\n\n')
+        onPartialResult({ text: partialTxt, pages: partialPgs })
+      }
     }
 
     await worker.terminate()
@@ -222,14 +237,18 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
     throw new Error('No text could be extracted from this PDF.')
   }
 
-  // ── Persist flat text to server (backward compat — no bbox in extraction cache) ──
+  // Persist text + bbox pages (sourceWords stripped to reduce payload size)
   const saveUrl = caseId
     ? `/api/cases/${encodeURIComponent(caseId)}/extractions/${docId}`
     : `/api/extractions/${docId}`
+  const pagesForCache = pages.map(p => ({
+    pageNum: p.pageNum,
+    chunks: p.chunks.map(({ text, bbox }) => ({ text, bbox })),
+  }))
   await fetch(saveUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: fullText, isOcr, createdAt: new Date().toISOString() }),
+    body: JSON.stringify({ text: fullText, isOcr, pages: pagesForCache, createdAt: new Date().toISOString() }),
   })
 
   return { text: fullText, isOcr, pages }

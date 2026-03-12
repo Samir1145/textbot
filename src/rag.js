@@ -31,6 +31,24 @@ export async function clearDocChunks(docId, { caseId } = {}) {
 }
 
 /**
+ * Remove chunks not present in the keep list (stale chunk cleanup after incremental index).
+ * keep: [{ pageNum, chunkIdx }]
+ */
+export async function pruneDocChunks(docId, keep, { caseId } = {}) {
+    try {
+        const res = await fetch('/api/rag/prune-doc', {
+            method: 'POST',
+            headers: JSON_HEADERS,
+            body: JSON.stringify({ docId, keep, caseId }),
+        })
+        if (!res.ok) throw new Error(`Prune error ${res.status}`)
+        return res.json()
+    } catch {
+        return { ok: false, pruned: 0 }
+    }
+}
+
+/**
  * Index a batch of paragraph chunks for a document.
  * chunks: [{ pageNum, chunkIdx, text, bbox }]
  */

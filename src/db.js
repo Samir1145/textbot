@@ -73,14 +73,72 @@ export async function uploadCaseBlob(caseId, docId, name, file) {
 }
 
 export async function loadCaseBlob(caseId, docId, name) {
+    const url = `/api/cases/${encodeURIComponent(caseId)}/blobs/${docId}`
     try {
-        const r = await fetch(`/api/cases/${encodeURIComponent(caseId)}/blobs/${docId}`)
+        // Check browser Cache API first — avoids re-downloading the PDF on every reload
+        if ('caches' in window) {
+            const cache     = await caches.open('textbot-pdfs-v1')
+            const cached    = await cache.match(url)
+            if (cached) {
+                const blob = await cached.blob()
+                return new File([blob], name, { type: 'application/pdf' })
+            }
+        }
+
+        const r = await fetch(url)
         if (!r.ok) return null
+
+        // Persist to cache in the background (don't block the return)
+        if ('caches' in window) {
+            caches.open('textbot-pdfs-v1')
+                .then(cache => cache.put(url, r.clone()))
+                .catch(() => {})
+        }
+
         const blob = await r.blob()
         return new File([blob], name, { type: 'application/pdf' })
     } catch {
         return null
     }
+}
+
+// ── Chat History ──
+
+/**
+ * Load chat messages for a doc. Citations are stored as [[n, chunk], ...] arrays
+ * and restored to Map<number, chunk> on load.
+ */
+export async function loadChatHistory(docId, { caseId } = {}) {
+    if (!caseId) return []
+    try {
+        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/chat/${encodeURIComponent(docId)}`)
+        if (!res.ok) return []
+        const msgs = await res.json()
+        if (!Array.isArray(msgs)) return []
+        return msgs.map(msg => ({
+            role: msg.role,
+            content: msg.content,
+            citations: msg.citations_data
+                ? new Map(msg.citations_data.map(([k, v]) => [k, v]))
+                : undefined,
+        }))
+    } catch {
+        return []
+    }
+}
+
+/**
+ * Persist the full chat message array for a doc.
+ * Citations Map is serialized to [[n, chunk], ...] for JSON storage.
+ */
+export async function saveChatHistory(docId, messages, { caseId } = {}) {
+    if (!caseId) return
+    const serializable = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content,
+        citations_data: msg.citations ? [...msg.citations.entries()] : undefined,
+    }))
+    await postJSON(`/api/cases/${encodeURIComponent(caseId)}/chat/${encodeURIComponent(docId)}`, serializable)
 }
 
 // ── Case Delete ──
