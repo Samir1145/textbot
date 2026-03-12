@@ -721,7 +721,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       setChatLoading(false)
     }
   }, [chatInput, chatLoading, chatMessages, summary, ragStatus, activeDocumentId, caseSearchActive, caseId, addLog])
-  const [lexAgentOpen, setLexAgentOpen] = useState(false)
+  const [lexAgentOpen, setLexAgentOpen] = useState(true)
   const [lexAgentMessages, setLexAgentMessages] = useState([])
   const [lexAgentInput, setLexAgentInput] = useState('')
   const [lexAgentLoading, setLexAgentLoading] = useState(false)
@@ -1284,6 +1284,16 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 <button type="button" className="pdfapp-sb-litigants-btn" onClick={handleAddParty}>
                   + Litigants
                 </button>
+                <button
+                  type="button"
+                  className="pdfapp-sb-collapse-btn"
+                  onClick={() => setSidebarOpen(false)}
+                  title="Collapse sidebar"
+                >
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
               </div>
               <div className="pdfapp-sb-separator" />
             </div>
@@ -1480,19 +1490,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               )}
             </div>
 
-            {/* Footer with collapse button */}
-            <div className="pdfapp-sb-footer">
-              <button
-                type="button"
-                className="pdfapp-sb-collapse-btn"
-                onClick={() => setSidebarOpen(false)}
-                title="Collapse sidebar"
-              >
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-              </button>
-            </div>
 
             <input
               ref={fileInputRef}
@@ -1506,7 +1503,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         ) : (
           <div className="pdfapp-sidebar-icons">
             <button
-              className="pdfapp-sb-icon-btn pdfapp-sb-expand-btn"
+              className="pdfapp-sb-collapse-btn"
               type="button"
               title="Expand sidebar"
               onClick={() => setSidebarOpen(true)}
@@ -1867,7 +1864,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
               </svg>
-              <span>LexAgent</span>
+              <span>Agents</span>
               {lexAgentLoading && <div className="pdfapp-spinner pdfapp-spinner--small" />}
             </div>
 
@@ -1876,7 +1873,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               <div className="pdfapp-lexagent-skills">
                 <p className="pdfapp-lexagent-intro">
                   {lexAgentMessages.length === 0
-                    ? "Hi, I'm LexAgent. Select a skill to analyze this document:"
+                    ? "Select a skill to analyze this document:"
                     : "Run another skill:"}
                 </p>
                 <div className="pdfapp-lexagent-skill-grid">
@@ -1960,40 +1957,18 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
             <>
             <button
               className={`pdfapp-actions-btn${lexAgentOpen ? ' pdfapp-actions-btn--active' : ''}`}
-              onClick={() => { setLexAgentOpen(o => !o); if (lexChatOpen) setLexChatOpen(false) }}
+              onClick={() => setLexAgentOpen(o => !o)}
               disabled={!activeDocumentId || pdfLoading}
-              title="LexAgent — run legal skills and ask follow-up questions"
+              title="Agents — run legal skills and ask follow-up questions"
             >
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
               </svg>
-              LexAgent
+              Agents
             </button>
             </>
           )}
-          <button
-            className={`pdfapp-lexchat-btn ${lexChatOpen ? 'pdfapp-lexchat-btn--active' : ''}`}
-            onClick={() => { setLexChatOpen(o => !o); if (lexAgentOpen) setLexAgentOpen(false) }}
-            title={
-              ragStatus === 'indexed' ? 'LexChat — RAG active (semantic search ready)' :
-              ragStatus === 'indexing' ? ragProgress || 'Indexing document for RAG…' :
-              'LexChat — AI legal assistant'
-            }
-          >
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            LexChat
-            <span
-              className={`pdfapp-rag-status-dot pdfapp-rag-status-dot--${ragStatus ?? 'none'}`}
-              title={
-                ragStatus === 'indexed'  ? 'Indexed — semantic search active' :
-                ragStatus === 'indexing' ? ragProgress || 'Indexing…' :
-                'Not indexed'
-              }
-            />
-          </button>
         </div>
 
         {lexChatOpen ? (
