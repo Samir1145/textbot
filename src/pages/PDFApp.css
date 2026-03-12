@@ -1324,14 +1324,87 @@
   flex-shrink: 0;
 }
 
-.pdfapp-chat-bubble {
+/* Body wrapper — stacks bubble + sources panel in a column */
+.pdfapp-chat-msg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   max-width: 82%;
+  min-width: 0;
+}
+
+.pdfapp-chat-bubble {
   padding: 9px 13px;
   border-radius: 12px;
   font-size: 0.84rem;
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* ── Sources panel ─────────────────────────────────────────────────── */
+.pdfapp-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pdfapp-sources-label {
+  font-size: 0.63rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+  padding: 0 2px 2px;
+}
+
+.pdfapp-source-item {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms, border-color 120ms;
+  overflow: hidden;
+}
+
+.pdfapp-source-item:hover {
+  background: var(--bg-3);
+  border-color: var(--border);
+}
+
+.pdfapp-source-item--active {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.pdfapp-source-num {
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #60a5fa;
+  font-family: 'SF Mono', 'Fira Code', monospace, system-ui;
+  flex-shrink: 0;
+}
+
+.pdfapp-source-page {
+  font-size: 0.63rem;
+  color: var(--text-dim);
+  font-family: 'SF Mono', 'Fira Code', monospace, system-ui;
+  flex-shrink: 0;
+}
+
+.pdfapp-source-excerpt {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .pdfapp-chat-msg--user .pdfapp-chat-bubble {

@@ -452,6 +452,7 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     setChatMessages(prev => [...prev, userMsg])
     setChatInput('')
     setChatLoading(true)
+    setActiveCitations(new Map()) // clear previous highlights
 
     if (chatAbortRef.current) chatAbortRef.current.abort()
     const controller = new AbortController()
@@ -1612,8 +1613,28 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   {msg.role === 'assistant' && (
                     <div className="pdfapp-chat-avatar">L</div>
                   )}
-                  <div className="pdfapp-chat-bubble">
-                    {renderMessageContent(msg, i === chatMessages.length - 1)}
+                  <div className="pdfapp-chat-msg-body">
+                    <div className="pdfapp-chat-bubble">
+                      {renderMessageContent(msg, i === chatMessages.length - 1)}
+                    </div>
+                    {msg.role === 'assistant' && msg.citations?.size > 0 && (
+                      <div className="pdfapp-sources">
+                        <span className="pdfapp-sources-label">Sources</span>
+                        {[...msg.citations.entries()].map(([n, chunk]) => (
+                          <button
+                            key={n}
+                            className={`pdfapp-source-item${activeCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
+                            onClick={() => setActiveCitations(new Map([[n, chunk]]))}
+                          >
+                            <span className="pdfapp-source-num">[{n}]</span>
+                            <span className="pdfapp-source-page">p.{chunk.page_num}</span>
+                            <span className="pdfapp-source-excerpt">
+                              {chunk.text.slice(0, 110)}{chunk.text.length > 110 ? '…' : ''}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
