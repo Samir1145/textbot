@@ -1,0 +1,122 @@
+FORM NO. 26J
+[See section 194-I and rule 37]
+Annual return of deduction of tax from rent, under section 206 of the Income-tax, Act 1961, for the year ending 31st March,……………..
+
+(a)   Tax Deduction Account Number|||||||||||
+|||||||||||
+        (b)   Permanent Account Number|||||||||||
+||||||||||||||||||
+2.    Details of the person responsible for paying any income by way of rent:|
+        (a)   Name /Designation||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+        (b)   Address||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Flat/Door/Block No.||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Name of premises/Building||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Road/Street/Lane||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                  Area/Locality||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Town/City/District||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                   State||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Pin Code|||||||
+|||||||
+|||||||
+©	Has address of the person responsible for paying any income by way of 	  Tick	 as applicable Yes           No.
+	rent changed since submitting the last return
+
+
+
+
+
+
+
+Details of rent credited/paid under section 194G and tax deducted thereon :
+Payee|Gross amount of rent credited/ paid during the year|Total amount of rent credited/ paid on which no tax deducted|Total amount of rent credited/ paid on which no tax deducted|Total amount of tax deducted|
+||Amount (Rs.)|Number of payments||Income-tax (Rs.)|Surcharge (Rs.)|Total 
+(Rs.)|
+|(1)|(2)|(3)|(4)|(5)|(6)|(7)|
+1. Companies||||||||
+2. person other than companies||||||||
+    Total||||||||
+
+Details of tax deducted and paid to the credit of the Central Government :
+By or on behalf of Central Government:
+Sl. No.|Amount of deducted|Transfer Voucher Number|Date of Transfer Voucher|
+(1)|(2)|(3)|(4)|
+||||
+||||
+||||
+||||
+Total||||
+
+(b)	By person responsible for paying other than Central Government
+Sl. No.|Challan Number|Date of payment|Amount of tax paid|Name and address of the bank|
+(1)|(2)|(3)|(4)|(5)|
+|||||
+|||||
+|||||
+|||||
+Total|||
+
+
+
+
+
+
+
+Details of rent credited/paid during the year and of tax deducted at source at the prescribed rates in force :
+(a)	In the case of companies:
+Sl. No.|Permanent Account Number (PAN)|Name of company|Address of the company|Amount of rent credited or paid, 
+(Rs.)|Date on which rent credited or paid whichever is earlier|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of Central Government|Tax deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the company|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+Total|||||
+
+      (b)	In the case of  person/payee other than companies:
+Sl. No.|Permanent Account Number (PAN)|Name of person/ payee|Address of the person/ payee|Amount of rent credited or paid, 
+(Rs.)|Date on which amount of rent credited or paid whichever is earlier|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of Central Government|Tax deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the person/ payee|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+Total|||||
+
+
+
+
+Details of rent credited/paid during the year and of tax deducted at source at a lower rate or no tax deducted in accordance with section 197:
+(a)	In the case of companies:
+  Sl. No.|Permanent Account Number (PAN)|Name of company|Address of the company|Amount of rent credited /paid, 
+(Rs.)|Date on which amount of rent credited or paid whichever is earlier|Rate of deduction of tax 
+(%)|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of Central Government|Assessing Officer’s Certificate Reference Number|Tax deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the company|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|(12)|(13)|
+|||||||||||||
+|||||||||||||
+|||||||||||||
+Total||||||
+
+In the case of person/payees other than companies:
+  Sl. No.|Permanent Account Number (PAN)|Name of person/ payee|Address of the person/ payee|Amount of rent  credited or paid whichever is earlier 
+(Rs.)|Date on which amount of rent credited or paid whichever is earlier|Rate of deduction of tax 
+(%)|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of Central Government|Assessing Officer’s Certificate Reference Number|Tax deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the person/ payee|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|(12)|(13)|
+|||||||||||||
+|||||||||||||
+|||||||||||||
+Total|||||||
+
+Verification
+I, ………………………………………………………….., certify that all the particulars furnished above are correct and complete.
+Place:				Name and signature of the responsible for deducting tax at source……………………………………………………
+Date:										Designation: …………………………..		

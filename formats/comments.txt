@@ -1,0 +1,13 @@
+~~NOTOC~~
+
+======Comments=====
+
+<form>
+action pagemod :odr_processes:data add_comment
+fieldset "Write new comment"
+textbox  "Name" /^((?!<\/nowiki>).)*$/
+email "Email (optional)" /^((?!<\/nowiki>).)*$/ !
+textarea "Comment" /^((?!<\/nowiki>).|\n)*$/
+submit
+</form>
+

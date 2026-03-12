@@ -1,0 +1,15 @@
+^ Category ^ Title ^
+| trust-wakf-society | [[legal_formats:trust-wakf-society:appointment_of_a_new_trustee|Appointment Of A New Trustee]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:declaration_of_a_trust_for_running_a_school|Declaration Of A Trust For Running A School]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:deed_of_revocation_of_trust|Deed Of Revocation Of Trust]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:deed_of_trust_for_prize_to_be_awarded_to_brilliant_students|Deed Of Trust For Prize To Be Awarded To Brilliant Students]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:deed_wakf_alal_aulad|Deed Wakf Alal Aulad]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:disclaimer_by_trustee|Disclaimer By Trustee]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:endowment_for_establishing_a_hindu_temple|Endowment For Establishing A Hindu Temple]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:form_of_memorandum_of_association_of_non_profit_making_company|Form Of Memorandum Of Association Of Non Profit Making Company]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:form_of_notice_to_be_given_by_the_promoters_of_now_profit_making_company|Form Of Notice To Be Given By The Promoters Of Now Profit Making Company]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:memorandum_of_association_with_regulations_of_a_society_to_be_registered_under_the_societies_registration_act|Memorandum Of Association With Regulations Of A Society To Be Registered Under The Societies Registration Act]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:short_form_of_disclaimer_of_trust_to_be_endorsed_on_deed_of_trus|Short Form Of Disclaimer Of Trust To Be Endorsed On Deed Of Trus]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:trust_deed_for_establishing_a_temple|Trust Deed For Establishing A Temple]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:trust_deed_for_providing_medical_facilities_to_poor_persons|Trust Deed For Providing Medical Facilities To Poor Persons]] |
+| trust-wakf-society | [[legal_formats:trust-wakf-society:wakf_for_public_purposes|Wakf For Public Purposes]] |

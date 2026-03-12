@@ -1,0 +1,93 @@
+^ Category ^ Title ^
+| agreement | [[legal_formats:agreement:agreement_admiting_the_minor_to_the_benefit_of_partnership|Agreement Admiting The Minor To The Benefit Of Partnership]] |
+| agreement | [[legal_formats:agreement:agreement_appointing_broker_for_sale_of_a_shop_along_with_stock_in_trade_remaining_unsold|Agreement Appointing Broker For Sale Of A Shop Along With Stock In Trade Remaining Unsold]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_company_and_a_caterer_for_running_a_canteen|Agreement Between A Company And A Caterer For Running A Canteen]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_company_and_a_contractor_for_construction_of_body_of_the_compaints_staff_buses|Agreement Between A Company And A Contractor For Construction Of Body Of The Compaints Staff Buses]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_company_and_an_advertising_agency|Agreement Between A Company And An Advertising Agency]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_company_and_its_branch_manager|Agreement Between A Company And Its Branch Manager]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_company_and_manager|Agreement Between A Company And Manager]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_company_and_security_service_company|Agreement Between A Company And Security Service Company]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_company_and_sole_selling_agents|Agreement Between A Company And Sole Selling Agents]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_indian_publisher_and_a_foreign_publisher|Agreement Between A Indian Publisher And A Foreign Publisher]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_manufacturer_and_selling_agent|Agreement Between A Manufacturer And Selling Agent]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_minor_for_the_partnership|Agreement Between A Minor For The Partnership]] |
+| agreement | [[legal_formats:agreement:agreement_between_a_newspaper_publisher_and_an_advertising_agency|Agreement Between A Newspaper Publisher And An Advertising Agency]] |
+| agreement | [[legal_formats:agreement:agreement_between_an_owner_and_advertisers|Agreement Between An Owner And Advertisers]] |
+| agreement | [[legal_formats:agreement:agreement_between_an_owner_and_an_architect_for_construction_of_a_building|Agreement Between An Owner And An Architect For Construction Of A Building]] |
+| agreement | [[legal_formats:agreement:agreement_between_builder_and_a_broker_for_selling|Agreement Between Builder And A Broker For Selling]] |
+| agreement | [[legal_formats:agreement:agreement_between_building_owner_and_an_artist|Agreement Between Building Owner And An Artist]] |
+| agreement | [[legal_formats:agreement:agreement_between_cinema_owner_and_a_company|Agreement Between Cinema Owner And A Company]] |
+| agreement | [[legal_formats:agreement:agreement_between_manufacturer_and_commission_agent|Agreement Between Manufacturer And Commission Agent]] |
+| agreement | [[legal_formats:agreement:agreement_between_manufacturer_and_sole_selling_agents_with_canvassing_rights|Agreement Between Manufacturer And Sole Selling Agents With Canvassing Rights]] |
+| agreement | [[legal_formats:agreement:agreement_between_owners_and_labour_contractor_for_supply_of_labour|Agreement Between Owners And Labour Contractor For Supply Of Labour]] |
+| agreement | [[legal_formats:agreement:agreement_between_publisher_and_author_on_royalty_basis|Agreement Between Publisher And Author On Royalty Basis]] |
+| agreement | [[legal_formats:agreement:agreement_between_the_computer_consultant_and_programmer_for_grant_of_copyright_in_computer_software|Agreement Between The Computer Consultant And Programmer For Grant Of Copyright In Computer Software]] |
+| agreement | [[legal_formats:agreement:agreement_for_appointment_of_a_broker_for_selling_a_house|Agreement For Appointment Of A Broker For Selling A House]] |
+| agreement | [[legal_formats:agreement:agreement_for_appointment_of_a_sole_selling_agent_for_a_specific_territory_by_a_public_limited_company|Agreement For Appointment Of A Sole Selling Agent For A Specific Territory By A Public Limited Company]] |
+| agreement | [[legal_formats:agreement:agreement_for_appointment_of_sole_selling_agent_by_manufacturing_company|Agreement For Appointment Of Sole Selling Agent By Manufacturing Company]] |
+| agreement | [[legal_formats:agreement:agreement_for_building_lease|Agreement For Building Lease]] |
+| agreement | [[legal_formats:agreement:agreement_for_building_where_owner_supplies_plot_and_all_materials|Agreement For Building Where Owner Supplies Plot And All Materials]] |
+| agreement | [[legal_formats:agreement:agreement_for_building_where_owner_supplies_plot_of_land_only|Agreement For Building Where Owner Supplies Plot Of Land Only]] |
+| agreement | [[legal_formats:agreement:agreement_for_compromise_between_the_employer_and_workman_for_payment_of_compensation|Agreement For Compromise Between The Employer And Workman For Payment Of Compensation]] |
+| agreement | [[legal_formats:agreement:agreement_for_construction_of_building_between_the_owners_and_the_contractors_on_turnkey_basis|Agreement For Construction Of Building Between The Owners And The Contractors On Turnkey Basis]] |
+| agreement | [[legal_formats:agreement:agreement_for_development_of_entire_existing_property_owned_by_a_coop_housing_society|Agreement For Development Of Entire Existing Property Owned By A Coop Housing Society]] |
+| agreement | [[legal_formats:agreement:agreement_for_hire|Agreement For Hire]] |
+| agreement | [[legal_formats:agreement:agreement_for_hire_of_machinery|Agreement For Hire Of Machinery]] |
+| agreement | [[legal_formats:agreement:agreement_for_hire_of_washing_machine|Agreement For Hire Of Washing Machine]] |
+| agreement | [[legal_formats:agreement:agreement_for_hire_purchase_of_a_motor_vehicle|Agreement For Hire Purchase Of A Motor Vehicle]] |
+| agreement | [[legal_formats:agreement:agreement_for_hire_purchase_of_furniture|Agreement For Hire Purchase Of Furniture]] |
+| agreement | [[legal_formats:agreement:agreement_for_hire_purchase_of_vcr|Agreement For Hire Purchase Of Vcr]] |
+| agreement | [[legal_formats:agreement:agreement_for_hirepurchase_of_a_car|Agreement For Hirepurchase Of A Car]] |
+| agreement | [[legal_formats:agreement:agreement_for_hirepurchase_of_a_car_through_a_finance_company|Agreement For Hirepurchase Of A Car Through A Finance Company]] |
+| agreement | [[legal_formats:agreement:agreement_for_letting_furnished_dwelling_house_or_flat_on_short_period_tenancy|Agreement For Letting Furnished Dwelling House Or Flat On Short Period Tenancy]] |
+| agreement | [[legal_formats:agreement:agreement_for_providing_permanent_alternate_accommodation_to_the_tenant_on_ownership_basis_in_lieu_of_tenanted_premises_by_a_developer|Agreement For Providing Permanent Alternate Accommodation To The Tenant On Ownership Basis In Lieu Of Tenanted Premises By A Developer]] |
+| agreement | [[legal_formats:agreement:agreement_for_reference_to_arbitration_between_partners|Agreement For Reference To Arbitration Between Partners]] |
+| agreement | [[legal_formats:agreement:agreement_for_reference_to_three_arbitrators|Agreement For Reference To Three Arbitrators]] |
+| agreement | [[legal_formats:agreement:agreement_for_reference_to_two_arbitrators|Agreement For Reference To Two Arbitrators]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_for_purchase_of_a_plot_for_constructing_flats|Agreement For Sale For Purchase Of A Plot For Constructing Flats]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of|Agreement For Sale Of]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_a_house|Agreement For Sale Of A House]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_a_house_when_purchase_money_is_to_be_paid_in_instalments|Agreement For Sale Of A House When Purchase Money Is To Be Paid In Instalments]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_an_apartment|Agreement For Sale Of An Apartment]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_flat_by_a_flat_purchaser_when_cooperative_society_has_not_been_formed|Agreement For Sale Of Flat By A Flat Purchaser When Cooperative Society Has Not Been Formed]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_freehold_property|Agreement For Sale Of Freehold Property]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_future_goods|Agreement For Sale Of Future Goods]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_goods_c_i_f_basis|Agreement For Sale Of Goods C I F Basis]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_goods_f_o_b_basis|Agreement For Sale Of Goods F O B Basis]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_goods_under_the_buyers_trade_mark|Agreement For Sale Of Goods Under The Buyers Trade Mark]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_immovable_property|Agreement For Sale Of Immovable Property]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_leasehold_property|Agreement For Sale Of Leasehold Property]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_mortgaged_house|Agreement For Sale Of Mortgaged House]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_ready_goods|Agreement For Sale Of Ready Goods]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_shares_of_a_private_limited_company|Agreement For Sale Of Shares Of A Private Limited Company]] |
+| agreement | [[legal_formats:agreement:agreement_for_sale_of_technical_equipment|Agreement For Sale Of Technical Equipment]] |
+| agreement | [[legal_formats:agreement:agreement_for_the_appointment_of_exclusive_agent_to_sell_goods_in_foreign_country_on_commission|Agreement For The Appointment Of Exclusive Agent To Sell Goods In Foreign Country On Commission]] |
+| agreement | [[legal_formats:agreement:agreement_for_transfer_of_development_right_tdr|Agreement For Transfer Of Development Right Tdr]] |
+| agreement | [[legal_formats:agreement:agreement_for_transfer_of_development_rights|Agreement For Transfer Of Development Rights]] |
+| agreement | [[legal_formats:agreement:agreement_for_transfer_of_tenancy_whereby_incoming_tenant_is_paying_the_consideration_to_the_transferor_to_acquire_the_alternate_accommodation_on_ownership_basis_for_the_outgoing_tenant|Agreement For Transfer Of Tenancy Whereby Incoming Tenant Is Paying The Consideration To The Transferor To Acquire The Alternate Accommodation On Ownership Basis For The Outgoing Tenant]] |
+| agreement | [[legal_formats:agreement:agreement_for_underwriting_shares_of_a_company|Agreement For Underwriting Shares Of A Company]] |
+| agreement | [[legal_formats:agreement:agreement_for_underwriting_shares_with_a_right_to_underwriter_to_arrange_sub_underwriting|Agreement For Underwriting Shares With A Right To Underwriter To Arrange Sub Underwriting]] |
+| agreement | [[legal_formats:agreement:agreement_form_between_owner_and_a_builder_for_construction|Agreement Form Between Owner And A Builder For Construction]] |
+| agreement | [[legal_formats:agreement:agreement_form_between_owner_and_a_builder_for_construction_of_the_building|Agreement Form Between Owner And A Builder For Construction Of The Building]] |
+| agreement | [[legal_formats:agreement:agreement_introducing_a_new_partner_in_the_existing_partnership|Agreement Introducing A New Partner In The Existing Partnership]] |
+| agreement | [[legal_formats:agreement:agreement_modifying_the_partnership_deed|Agreement Modifying The Partnership Deed]] |
+| agreement | [[legal_formats:agreement:agreement_of_assignment_of_the_copyright_in_a_book_to_the_publishers_by_the_legal_heirs_of_the_author|Agreement Of Assignment Of The Copyright In A Book To The Publishers By The Legal Heirs Of The Author]] |
+| agreement | [[legal_formats:agreement:agreement_of_business_services|Agreement Of Business Services]] |
+| agreement | [[legal_formats:agreement:agreement_of_hire_purchase_of_a_motor_truck|Agreement Of Hire Purchase Of A Motor Truck]] |
+| agreement | [[legal_formats:agreement:agreement_of_hirepurhcase|Agreement Of Hirepurhcase]] |
+| agreement | [[legal_formats:agreement:agreement_of_leave_and_licence|Agreement Of Leave And Licence]] |
+| agreement | [[legal_formats:agreement:agreement_of_project_management|Agreement Of Project Management]] |
+| agreement | [[legal_formats:agreement:agreement_of_reference_between_members_of_huf|Agreement Of Reference Between Members Of Huf]] |
+| agreement | [[legal_formats:agreement:agreement_of_reference_to_a_common_arbitrator|Agreement Of Reference To A Common Arbitrator]] |
+| agreement | [[legal_formats:agreement:agreement_of_reference_to_two_arbitrators|Agreement Of Reference To Two Arbitrators]] |
+| agreement | [[legal_formats:agreement:agreement_of_sole_selling_agency_by_a_public_limited_company|Agreement Of Sole Selling Agency By A Public Limited Company]] |
+| agreement | [[legal_formats:agreement:agreement_of_tenancy|Agreement Of Tenancy]] |
+| agreement | [[legal_formats:agreement:agreement_of_transfer_of_tenancy|Agreement Of Transfer Of Tenancy]] |
+| agreement | [[legal_formats:agreement:agreement_reducing_the_rate_of_interest_in_mortgage_deed|Agreement Reducing The Rate Of Interest In Mortgage Deed]] |
+| agreement | [[legal_formats:agreement:agreement_to_demolish_the_structure_clear_the_site_and_to_construct_new_building_on_the_plot|Agreement To Demolish The Structure Clear The Site And To Construct New Building On The Plot]] |
+| agreement | [[legal_formats:agreement:agreement_to_refer_despute_to_one_arbitrator_usual_form|Agreement To Refer Despute To One Arbitrator Usual Form]] |
+| agreement | [[legal_formats:agreement:agreement_to_refer_dispute_to_one_arbitrator_short_form|Agreement To Refer Dispute To One Arbitrator Short Form]] |
+| agreement | [[legal_formats:agreement:agreement_to_state_a_case_for_court_s_opinion|Agreement To State A Case For Court S Opinion]] |
+| agreement | [[legal_formats:agreement:agreement_to_underwrite_debenture_stock|Agreement To Underwrite Debenture Stock]] |
+| agreement | [[legal_formats:agreement:agreement_to_underwrite_debentures_to_be_issued_by_a_company|Agreement To Underwrite Debentures To Be Issued By A Company]] |
+| agreement | [[legal_formats:agreement:agreement_with_the_government_for_acquisition_of_land|Agreement With The Government For Acquisition Of Land]] |

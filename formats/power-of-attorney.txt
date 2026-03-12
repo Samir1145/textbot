@@ -1,0 +1,70 @@
+^ Category ^ Title ^
+| power-of-attorney | [[legal_formats:power-of-attorney:appointing_substituted_power_of_attorney|Appointing Substituted Power Of Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:deed_of_revocation_of_power_of_attorney|Deed Of Revocation Of Power Of Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:detailed_general_power_of_attorney|Detailed General Power Of Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:detailed_general_power_of_attorney_to_all_to_whom_these_presents_shall_come|Detailed General Power Of Attorney To All To Whom These Presents Shall Come]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:general_power_of_attorney|General Power Of Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:general_power_of_attorney_by_a_person_going_abroad_to_authorise_all_acts_on_his_behalf|General Power Of Attorney By A Person Going Abroad To Authorise All Acts On His Behalf]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:general_power_of_attorney_by_a_woman_partner|General Power Of Attorney By A Woman Partner]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:general_power_of_attorney_by_company_to_its_agent|General Power Of Attorney By Company To Its Agent]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:irrevocable_power_of_attorney|Irrevocable Power Of Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:perpetual_lease_of_a_land|Perpetual Lease Of A Land]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_a_company_to_its_branch_manager|Power Of Attorney By A Company To Its Branch Manager]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_a_partnership_firm|Power Of Attorney By A Partnership Firm]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_a_partnership_firm_1|Power Of Attorney By A Partnership Firm 1]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_a_partnership_firm_in_favour_of_firms_manager|Power Of Attorney By A Partnership Firm In Favour Of Firms Manager]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_all_partners_of_the_firm|Power Of Attorney By All Partners Of The Firm]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_all_partners_of_the_firm_ratifying_the_powers_given_by_a_partner_for_the_firm|Power Of Attorney By All Partners Of The Firm Ratifying The Powers Given By A Partner For The Firm]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_landlords_in_favour_of_developers|Power Of Attorney By Landlords In Favour Of Developers]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_the_partners_of_a_firm_to_one_of_them|Power Of Attorney By The Partners Of A Firm To One Of Them]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_the_promoters_of_the_company_for_submission_of_memorandum_and_articles_of_association_before|Power Of Attorney By The Promoters Of The Company For Submission Of Memorandum And Articles Of Association Before]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_by_the_promoters_of_the_company_for_submission_of_memorandum_and_articles_of_association_before_the_registrar_of_companies|Power Of Attorney By The Promoters Of The Company For Submission Of Memorandum And Articles Of Association Before The Registrar Of Companies]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_development_of_property|Power Of Attorney For Development Of Property]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_development_of_property_by_and_in_favour_of_developers|Power Of Attorney For Development Of Property By And In Favour Of Developers]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_development_of_property_by_the_owner|Power Of Attorney For Development Of Property By The Owner]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_development_of_the_property|Power Of Attorney For Development Of The Property]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_executing_sale_deed|Power Of Attorney For Executing Sale Deed]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_execution_and_presentation|Power Of Attorney For Execution And Presentation]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_execution_and_presentation_before_subregistrar|Power Of Attorney For Execution And Presentation Before Subregistrar]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_obtaining_letters_of_administration|Power Of Attorney For Obtaining Letters Of Administration]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_for_sanction_of_building_plans_etc|Power Of Attorney For Sanction Of Building Plans Etc]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_granting_additional_powers_to_an_attorney|Power Of Attorney Granting Additional Powers To An Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_in_a_court_case|Power Of Attorney In A Court Case]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_in_a_court_case_2|Power Of Attorney In A Court Case 2]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_in_a_court_case_another_form|Power Of Attorney In A Court Case Another Form]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_in_a_court_case_another_form_1|Power Of Attorney In A Court Case Another Form 1]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_adopt_and_defend_legal_proceedings|Power Of Attorney To Adopt And Defend Legal Proceedings]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_an_advocate_in_a_court_case_vakalatnama|Power Of Attorney To An Advocate In A Court Case Vakalatnama]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_collect_debts|Power Of Attorney To Collect Debts]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_execute_a_deed_of_sale|Power Of Attorney To Execute A Deed Of Sale]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_execute_a_document|Power Of Attorney To Execute A Document]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_look_after_immovable_property_and_to_recover_rent_etc|Power Of Attorney To Look After Immovable Property And To Recover Rent Etc]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_obtain_letters_of_administration|Power Of Attorney To Obtain Letters Of Administration]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_prepare_a_layout_sell_plots|Power Of Attorney To Prepare A Layout Sell Plots]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_prepare_a_layout_sell_plots_1|Power Of Attorney To Prepare A Layout Sell Plots 1]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_present_deed_of_family_arrangement|Power Of Attorney To Present Deed Of Family Arrangement]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_present_deed_of_family_arrangement_before_registrar|Power Of Attorney To Present Deed Of Family Arrangement Before Registrar]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_raise_moneys_and_mortgage_property|Power Of Attorney To Raise Moneys And Mortgage Property]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_raise_moneys_and_mortgage_property_1|Power Of Attorney To Raise Moneys And Mortgage Property 1]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_raise_moneys_and_mortgage_property_2|Power Of Attorney To Raise Moneys And Mortgage Property 2]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_recover_debts|Power Of Attorney To Recover Debts]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_recover_rents|Power Of Attorney To Recover Rents]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_of_attorney_to_sell_shares|Power Of Attorney To Sell Shares]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:power_to_attorney_to_present_documents_for_registration|Power To Attorney To Present Documents For Registration]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:powers_of_attorney_special_to_conduct_particular_case_pending_in_a_particular_court|Powers Of Attorney Special To Conduct Particular Case Pending In A Particular Court]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:replacement_of_attorney|Replacement Of Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:revocation_of_the_power_of_attorney|Revocation Of The Power Of Attorney]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_for_a_court_case|Special Power Of Attorney For A Court Case]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_for_admitting_execution|Special Power Of Attorney For Admitting Execution]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_for_concluding_one_transaction|Special Power Of Attorney For Concluding One Transaction]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_in_favour_of_two_persons_to_execute_bond|Special Power Of Attorney In Favour Of Two Persons To Execute Bond]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_in_favour_of_two_persons_to_execute_sale_deed|Special Power Of Attorney In Favour Of Two Persons To Execute Sale Deed]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_in_incometax_case|Special Power Of Attorney In Incometax Case]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_in_incometax_case_1|Special Power Of Attorney In Incometax Case 1]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_in_respect_of_a_flat_in_cooperative_housing_society|Special Power Of Attorney In Respect Of A Flat In Cooperative Housing Society]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_in_sales_tax_proceedings|Special Power Of Attorney In Sales Tax Proceedings]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_only_for_admitting_execution_of_document_already_executed_before|Special Power Of Attorney Only For Admitting Execution Of Document Already Executed Before]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_to_conduct_sales_tax_proceedings|Special Power Of Attorney To Conduct Sales Tax Proceedings]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_to_executive_sale_deed|Special Power Of Attorney To Executive Sale Deed]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:special_power_of_attorney_to_present_document_for_registration|Special Power Of Attorney To Present Document For Registration]] |
+| power-of-attorney | [[legal_formats:power-of-attorney:substituted_power_of_attorney|Substituted Power Of Attorney]] |

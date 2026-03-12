@@ -1,0 +1,147 @@
+DNA FINGERPRINTING EXAMINATION
+1. What is DNA?
+DNA (Deoxyribonucleic acid), the chemical basis of life that complexes with proteins to form the chromosomes. Structurally, DNA is a double helix-two thread like long strand of genetic material spiraled around each other. DNA is a polymer of deoxyribonucleotides composed of Base [Adenine (A), Thymine (T), Guanine (G), Cytosine (C)], Sugar and a Phosphate. The sequential arrangement of the individual nucleotides is responsible for giving uniqueness to any individual living form, be it humans, animals, plants, or microbes.
+2. What is DNA fingerprinting?
+It is a technique, by which an individual can be identified at molecular level. With the advancement of science and technology STR analysis has become very popular in forensic laboratories. Scientists have chosen repeating sequences in the DNA, which are present in all individuals on different chromosomes, and are known to vary from individual to individual except in identical twins. These are used as genetic markers to identify the individual.
+3. What is the use of DNA fingerprinting technology?
+DNA fingerprinting technology has made it possible to identify the source of biological samples found at scenes of crime. This will resolve disputes of maternity /paternity, identification of mutilated remains, identification of rape/ murder, identification of missing child, exchange of babies in hospital wards, forensic wildlife, protection of farmers rights and biodiversity. This remarkable technology provides exclusion as well as positive identification with virtually 100% precision.
+4. Are the latent fingerprint and DNA fingerprinting the same?
+No. They are different. Latent fingerprint is the identification of the individual by the impression of the fingers. DNA fingerprinting is the identification of an individual by the genetic markers, which are present on chromosomes.
+5. Is there any chance of DNA profile being the same among the individuals related or non-related?
+DNA profile of an individual is unique. It can never be identical even in biologically related individuals except for the identical (monozygotic) twins.
+6. What are the samples required for DNA fingerprinting examination?
+Any biological material such as a drop of blood, saliva, semen, and any body part such as bones, tissue, skull, teeth, hair with root etc found at the scene of crime.
+7. What are the samples required for establishing maternity/paternity/parentage?
+Blood samples of mother, disputed child and alleged father.
+Blood samples (2-3 ml) can be collected in the sterile blood collection material (EDTA vials) being sent by us, in the presence of Hon'ble Court authorities. These samples should be sent in ice in a thermos flask either by a messenger or through courier, so as to reach CDFD within 72 hours after collection.
+8. What are the samples required for establishing identity of the deceased?
+Any body part of the deceased found at the scene of crime along with the blood samples of the blood relatives of the deceased (viz., parents, children).
+9. What are the samples required for establishing identity of rape/rapist?
+Blood/semen stained clothes, garments, swabs, slides etc. of the victim and the accused.
+10. What are the preservatives to be used in collecting and forwarding samples?
+The following procedure has to be followed to forward the exhibits duly packed and sealed:
+Teeth, Hair with root, Bones (intact)*|:|Wrapped with a dry paper or cloth
+* Complete burnt bones and ash are not useful for analysis|
+Seminal swabs|:|The dry cotton swab should be placed in a clean dry glass vial/bottle|
+Muscle tissues|:|About 100 gm of muscle tissue should be sent in a clean glass bottle/plastic container with 0.9% DNS (normal saline sold in medical shops) on ice or in crystal salt (sodium chloride) as a preservative.
+Tissue samples should not be preserved in formalin.|
+Bloodstains|:|Wrapped with a dry paper or cloth|
+ 
+ 
+  
+All the samples should be properly collected and sealed and sent to CDFD under certification along with specimen seal for comparison. The samples should reach CDFD between 10:00 am to 5:00 pm on any working day (Monday to Friday).
+11. What are the charges for DNA fingerprinting test?
+1. Rs.5,000/- for each blood sample/person
+2. Rs.10,000/- for each forensic exhibit analyzed
+3. Extra 10.20% (w.e.f. 15/07/2004) service charge as levied by Government of India
+12. What is the mode of payment of charges?
+Through a crossed demand draft drawn in favour of Director, CDFD payable at Hyderabad.
+13. What are the forms to be submitted along with the samples?
+(1) A Forwarding note to forward the exhibits (can be downloaded Forwarding Note from our web site).
+FORWARDING NOTE
+[In all cases where DNA fingerprinting examination of any biological material is required, a copy of this form duly filled-in, should accompany the material objects]
+ 
+Case/Crime/FIR/MC/OP/OS:|Hon’ble Court:|
+Under Section:|District:|
+Police station:|State:|
+ 
+ 
+ 
+
+
+Nature of Crime
+[If required, attach separate sheet(s) covering nature, history and other relevant details]_______________________________________________________________________
+______________________________________________________________________
+List of the Exhibits and storage medium being sent for DNA Fingerprinting Analysis
+[Attach separate sheet (s), if required]
+____________________________________________________________________________________________________________________________________________
+Purpose of Examination
+[Attach separate sheet (s), if required]
+DNA fingerprinting analysis is required for establishing __________________________________________________________________
+__________________________________________________________________
+Signature, Name and Designation of the
+Investigating Officer with date & official seal
+CERTIFICATE OF AUTHORITY
+Certified that the Director, Center for DNA Fingerprinting and Diagnostics (CDFD), Hyderabad or his nominee in DNA Fingerprinting Laboratory is being authorized to examine the exhibits/material objects forwarded, pertaining to Case No._______________ of _________________________PS/Hon’ble Court and to utilize the exhibits fully or partially for the purpose of DNA fingerprinting analysis.
+Signature, Name & Designation of the
+Forwarding Authority with date & official seal
+(To whom the final report would be sent)
+(2) Identification form with two passport size photographs duly attested, one should be pasted on the space provided and the other stapled (can be downloaded Identification form from our web site).
+IDENTIFICATION FORM N0.
+(Fill all the columns & strike out whichever is not applicable)
+(1) Name : ______________________________________________
+(2) Father’s/Guardian’s/Husband’s Name : ______________________________________________
+(3) Age : Years/Months/Days
+(4) Gender [Tick the appropriate] : Male Female
+(5) Caste & Origin of State : ______________________________________________
+(6) Address : ______________________________________________ [Write legibly] : ______________________________________________ : ___________________________Pin ________________
+(7) Visible Genetic Abnormalities if any [specify] : ______________________________________________
+(8) Description of sample [Mention Sample] : ______________________________________________ (Viz.. Blood/ Buccal Swab and others…)
+(9) Date of sample collection : ______________________________________________
+(10) Case/Crime/FIR/MC/OP/OS No. : ______________________________________________
+(11) Police Station / Hon’ble Court : ______________________________________________ [Any other specify]
+DECLARATION BY DONOR / GUARDIAN
+I, __________________________ Son/Daughter/Wife/Guardian of Kum/Master of _____________________ hereby declare that the blood is given with my consent to CDFD for DNA fingerprinting. The blood is mine/is of my child and I/child did not receive a blood transfusion within last three months.
+(Explained in vernacular)
+__________________________________________
+(Signature / Thumb Impression of Donor/Guardian)
+____ ml of blood sample is collected in the presence of the following witnesses:
+(1) Name: _________________________ Signature: _________________________
+(2) Name: _________________________ Signature: _________________________
+(3) Name: _________________________ Signature: _________________________
+(4) Name: _________________________ Signature: _________________________
+[For CDFD use only]
+CDFD File No. : ____________ Sample received on : ___________________
+Sample No : __________ Received by : ___________________
+Report No: CDFD/dfp/200___/_________Dated______
+Examined by : ___________________ Assisted by : ___________________
+ 
+(3) Valid proof of identity of the messenger.
+PROCEDURES FOR COLLECTION & FORWARDING OF SAMPLES FOR DNA FINGERPRINTING ANALYSIS
+DNA fingerprinting technology today has made it possible to identify the source of biological samples found at scenes of crime and also to resolve disputes of paternity and maternity. The DNA fingerprinting Laboratory of CDFD provides services to various investigating agencies to resolve cases of maternity / paternity disputes, identification of rape / murder, identification of mutilated remains, identification of missing child, exchange of babies in hospital wards and forensic wildlife. In order to disseminate information to the investigating officers/judicial authorities/medical officers about the process of collection and forwarding of samples for DNA fingerprinting analysis, this leaflet has been prepared. The procedures described are simple, time tested and most suitable for Indian conditions. The samples should be collected in the way prescribed below and sent to CDFD.
+For the establishment of maternity/paternity, we require the blood samples of the mother, child and the putative father.
+For the identification of rapist in rape cases, we require the forensic exhibits (viz., garments, vaginal swabs, slides) along with the blood samples of the accused and victim.
+For the identification of deceased, we require the blood samples of the nearest relations (viz., mother, father, husband, wife and children) along with the material objects relevant to the case.
+The blood samples (2-3 ml) can be collected in the sterile blood collection material (EDTA vials) being sent by us, in the presence of Hon’ble Court authorities. These samples should be sent in ice in a thermos flask either by a messenger or through courier, so as to reach CDFD within 72 hours after collection.
+The forensic exhibits should be sent as mentioned below:
+Teeth, Hair with root Bones (intact)*|:|Wrapped with a dry paper or cloth
+* Complete burnt bones and ash are not useful for analysis|
+Seminal swabs|:|The dry cotton swab should be placed in a clean dry glass vial/bottle|
+Muscle tissues|:|About 100 gm of muscle tissue should be sent in a clean glass bottle/plastic container with 0.9% DNS (normal saline sold in medical shops) on ice or in a crystal salt (sodium chloride) as a preservative. Tissue samples should not be preserved in formalin.|
+Bloodstains|:|Wrapped with a dry paper or cloth|
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+All the samples should be properly collected & sealed and sent to CDFD under certification along with specimen seal for comparison. The samples should reach CDFD between 10:00 am to 5:00 pm on any working day (Monday to Friday).
+On request, necessary blood collection material (sterile vials with anticoagulant, syringes, needles) and prescribed formats (identification forms and forwarding note) will be provided by CDFD to the concerned authorities.
+The prescribed formats need to be submitted duly filled-in along with the samples. An extra attested passport size photograph of each individual whose blood samples are being forwarded, should be sent along with the identification form.
+The charges for the DNA fingerprinting analysis for each blood sample is Rs.5,000/- (Rupees five thousand only). For each analyzed non-blood sample (viz., body fluid stains, teeth, bones, hairs and postmortem tissues etc), it is Rs.10,000/- (Rupees ten thousand only). In addition to these analysis charges, a service charge @ 8% as levied by Government of India has also to be paid. Payment has to be paid in advance, in the form of a crossed demand draft drawn in favour of “Director, CDFD” payable at Hyderabad.
+The DNA typing report will be submitted on receipt of the payment and fulfilling of all the official formalities.
+The following conditions have to be fulfilled for the appearance of the expert for deposing evidence in the Court:
+1. Personal security of the expert has to be ensured from the time of his arrival until his departure.
+2. AC 2 tier train fare (air, in case the sector is not connected by train) and DA would be paid as per Government of India rules and entitlement.
+3. The expert should be escorted from and to the railway station/airport and accommodated in a guesthouse or the best available hotel.
+4. The payment is to be made by the forwarding agencies to the expert before after his departure from the Hon’ble Court
+CDFD may kindly be provided with a copy of the Judgement of the Hon’ble Court, if any, pertaining to the case.
+Please note that no telephonic enquiries will be entertained regarding case report.
+14. How do we accept the cases?
+Cases should be forwarded either by the Hon'ble Court/ Police Officer of the rank of Inspector of Police or above.
+15. Does CDFD accept private cases?
+No. Only cases referred by law enforcement agencies or a court of law are accepted at CDFD for DNA fingerprinting.
+16. Does CDFD accept cases to establish biological relationship for kidney transplantation purposes, being forwarded by the hospital authorities?
+No. CDFD does not accept cases to establish biological relationship for kidney transplantation purposes forwarded by the hospital authorities.
+17. How long does it take for the analysis and submission of reports?
+Samples will be analyzed on priority basis. With the present work load at CDFD, reports for establishing paternity/maternity/biological relationship could take 15-30 days or more and rape/identity may be 30-60 days or more.
+18. Does CDFD provide a copy of the report to the individuals?
+No. The report is only submitted to the forwarding authority, in a sealed cover.
+19. Does CDFD defend its reports in Hon'ble Courts?
+Yes. However, the CDFD expert has to be paid TA/DA as per rules of CDFD in addition to providing security to the DNA examiner.
+20. If there are any other related questions where can I get the answers?
+Please send your queries if any by e-mail to dfp@cdfd.org.in addressing it to Director, CDFD, Hyderabad-76.
+

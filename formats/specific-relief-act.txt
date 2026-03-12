@@ -1,0 +1,7 @@
+^ Category ^ Title ^
+| specific-relief-act | [[legal_formats:specific-relief-act:suit_for_reinstatement_by_specific_performance_and_arrears_of_back_wages_or_salary|Suit For Reinstatement By Specific Performance And Arrears Of Back Wages Or Salary]] |
+| specific-relief-act | [[legal_formats:specific-relief-act:suit_for_specific_performance|Suit For Specific Performance]] |
+| specific-relief-act | [[legal_formats:specific-relief-act:suit_for_specific_performance_for_purchase_of_land_by_vendee_for_damages|Suit For Specific Performance For Purchase Of Land By Vendee For Damages]] |
+| specific-relief-act | [[legal_formats:specific-relief-act:suit_for_specific_performance_of_agreement_to_sell|Suit For Specific Performance Of Agreement To Sell]] |
+| specific-relief-act | [[legal_formats:specific-relief-act:suit_for_specific_performance_of_purchasing_land|Suit For Specific Performance Of Purchasing Land]] |
+| specific-relief-act | [[legal_formats:specific-relief-act:suit_for_specific_performance_to_sell_goods_agreed_to_be_sold|Suit For Specific Performance To Sell Goods Agreed To Be Sold]] |

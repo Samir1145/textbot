@@ -1,0 +1,16 @@
+^ Category ^ Title ^
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:affidavit_cumdeclaration_by_director|Affidavit Cumdeclaration By Director]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:agreement_between_a_finance_company_and_the_consultant_for_conducting_survey_for_the_consideration_of_proposal_for_the_construction_of_airport|Agreement Between A Finance Company And The Consultant For Conducting Survey For The Consideration Of Proposal For The Construction Of Airport]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:agreement_for_pledge_of_shares|Agreement For Pledge Of Shares]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:deed_of_guarantee|Deed Of Guarantee]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:deed_of_hypothecmion|Deed Of Hypothecmion]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:foreign_currency_loan_agreement|Foreign Currency Loan Agreement]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:indenture_of_mqrtgage|Indenture Of Mqrtgage]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:inter_creditor_agreement|Inter Creditor Agreement]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:letter_of_declaration_and_undertaking|Letter Of Declaration And Undertaking]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:letter_of_undertaking_from_wholetime_directors_holding_office_of_profit_regarding_payment_of_commissiowcompensation_etc|Letter Of Undertaking From Wholetime Directors Holding Office Of Profit Regarding Payment Of Commissiowcompensation Etc]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:project_agreement_for_the_construction_of_a_bridge|Project Agreement For The Construction Of A Bridge]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:subscription_agreement|Subscription Agreement]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:transfer_deed_transferring_the_project_to_the_government|Transfer Deed Transferring The Project To The Government]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:trust_and_retention_agreement|Trust And Retention Agreement]] |
+| infrastructure-development-and-financing | [[legal_formats:infrastructure-development-and-financing:trusteeship_agreement|Trusteeship Agreement]] |

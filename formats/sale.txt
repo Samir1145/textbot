@@ -1,0 +1,24 @@
+^ Category ^ Title ^
+| sale | [[legal_formats:sale:agreement_for_sale_for_purchase_of_a_plot_for_constructing_flats|Agreement For Sale For Purchase Of A Plot For Constructing Flats]] |
+| sale | [[legal_formats:sale:agreement_for_sale_of_a_house|Agreement For Sale Of A House]] |
+| sale | [[legal_formats:sale:agreement_for_sale_of_a_house_when_purchase_money_is_to_be_paid_in_instalments|Agreement For Sale Of A House When Purchase Money Is To Be Paid In Instalments]] |
+| sale | [[legal_formats:sale:agreement_for_sale_of_an_apartment|Agreement For Sale Of An Apartment]] |
+| sale | [[legal_formats:sale:agreement_for_sale_of_flat_by_a_flat_purchaser_when_co_operative_society_has_not_been_formed_and_flat_is_not_ready|Agreement For Sale Of Flat By A Flat Purchaser When Co Operative Society Has Not Been Formed And Flat Is Not Ready]] |
+| sale | [[legal_formats:sale:agreement_for_sale_of_mortgaged_house|Agreement For Sale Of Mortgaged House]] |
+| sale | [[legal_formats:sale:agreement_for_transfer_of_development_rights|Agreement For Transfer Of Development Rights]] |
+| sale | [[legal_formats:sale:deed_of_apartment|Deed Of Apartment]] |
+| sale | [[legal_formats:sale:development_agreement_by_the_landlords_in_favour_of_a_builder|Development Agreement By The Landlords In Favour Of A Builder]] |
+| sale | [[legal_formats:sale:form_of_declaration_by_the_sole_owner_or_owners_of_the_land_for_submitting_the_land_and_buildings_under_maharashtra_apartment_ownership_act_1970|Form Of Declaration By The Sole Owner Or Owners Of The Land For Submitting The Land And Buildings Under Maharashtra Apartment Ownership Act 1970]] |
+| sale | [[legal_formats:sale:package_deal_agreement_for_sale_of_flats_in_bulk_to_a_purchaser|Package Deal Agreement For Sale Of Flats In Bulk To A Purchaser]] |
+| sale | [[legal_formats:sale:reouisition_of_the_vendor_s_title_to_the_property|Reouisition Of The Vendor S Title To The Property]] |
+| sale | [[legal_formats:sale:sale_by_official_liquidator_of_the_company|Sale By Official Liquidator Of The Company]] |
+| sale | [[legal_formats:sale:sale_by_the_manager_of_the_estate_of_a_lunatic|Sale By The Manager Of The Estate Of A Lunatic]] |
+| sale | [[legal_formats:sale:sale_deed_by_liquidator_in_the_voluntary_winding_up|Sale Deed By Liquidator In The Voluntary Winding Up]] |
+| sale | [[legal_formats:sale:sale_deed_by_liquidator_in_the_voluntary_winding_up_of_the_company|Sale Deed By Liquidator In The Voluntary Winding Up Of The Company]] |
+| sale | [[legal_formats:sale:sale_deed_in_respect_of_leasehold_land|Sale Deed In Respect Of Leasehold Land]] |
+| sale | [[legal_formats:sale:sale_deed_of_a_house|Sale Deed Of A House]] |
+| sale | [[legal_formats:sale:sale_deed_of_land_with_buildings|Sale Deed Of Land With Buildings]] |
+| sale | [[legal_formats:sale:sale_of_a_house_by_an_executor_appointed_under_a_will|Sale Of A House By An Executor Appointed Under A Will]] |
+| sale | [[legal_formats:sale:sale_of_property_to_various_purchasers_as_tenants_incommon|Sale Of Property To Various Purchasers As Tenants Incommon]] |
+| sale | [[legal_formats:sale:sale_of_property_to_various_purchasers_in_different_portions|Sale Of Property To Various Purchasers In Different Portions]] |
+| sale | [[legal_formats:sale:statement_of_transfer_of_immovable_property_for_obtaining_no_objection_certificate_from_appropriate_authority_income_tax_department|Statement Of Transfer Of Immovable Property For Obtaining No Objection Certificate From Appropriate Authority Income Tax Department]] |

@@ -1,0 +1,25 @@
+| **Agreement:** A formal contract outlining mutual rights and obligations between parties. || **Application:** A written request submitted to an authority seeking specific relief or approval.|
+| **Appointment:** A document designating an individual to a specific role or position. || **Apprenticeship:** An agreement defining training terms between an employer and trainee. |
+| **Arbitration:** A document establishing terms for resolving disputes outside court. || **Assignment:** Transfers rights, interests, or obligations from one party to another. |
+| **Banking:** Legal formats for loans, guarantees, securities, and financial transactions. || **Bond:** A binding instrument for repayment or performance of an obligation. |
+| **Civil Pleadings:** Documents initiating or responding to civil court proceedings. || **Classification of Offences:** Legal categorization of crimes by nature and severity. |
+| **Company:** Corporate documents including incorporation, resolutions, and filings. || **Composition Deed:** Agreement between debtor and creditors for debt settlement. |
+| **Consumer Protection Act:** Legal formats for consumer complaints and redressal. || **Conveyancing:** Documents for transferring ownership or interest in property. |
+| **Copyright:** Legal instruments protecting creative and intellectual works. || **Criminal Pleading:** Formats for complaints, charge-sheets, and defense statements. |
+| **Easements:** Documents granting or recognizing usage rights over another’s land. || **Exchange:** Deeds transferring ownership of properties mutually between parties. |
+| **Franchisee:** Agreement outlining rights and obligations in a business franchise. || **Gift:** A deed transferring property voluntarily without consideration. |
+| **Guarantee:** A commitment ensuring fulfillment of another’s obligation. || **Hire Purchase:** Agreement allowing asset use with eventual ownership on payment. |
+| **Income Tax:** Formats for declarations, appeals, and compliance under tax law. || **Indemnity:** Contract protecting one party against potential financial loss. |
+| **Information Technology:** Legal documents for digital contracts, data, and cyber laws. || **Infrastructure:** Agreements related to development and operation of public assets. |
+| **Labour:** Formats for employment, wages, disputes, and compliance matters. || **Lease Financing:** Documents for leasing assets or financing their acquisition. |
+| **Matrimonial:** Legal formats for marriage, divorce, maintenance, and custody. || **Medical Form:** Documents for consent, liability, and medical reporting. |
+| **Memorandum of Understanding:** Preliminary agreement outlining intent for cooperation. || **Miscellaneous Deeds:** Other legal instruments not covered under specific heads. |
+| **Mortgage Pledge Hypothecation:** Security documents for loans against assets. || **Motor Vehicle Act:** Legal forms for claims, licenses, and transport regulation. |
+| **Negotiable Instrument:** Formats for promissory notes, bills, and cheques. || **Notice:** Formal communication asserting rights or demanding action. |
+| **Partition:** Deeds dividing property among co-owners or heirs. || **Partnership:** Agreements defining partners’ rights, duties, and profit sharing. |
+| **Petition:** Formal written plea to a court or authority seeking relief. || **Plaint and Written Statement:** Initial claim and defense documents in civil suits. |
+| **Pleadings:** Written submissions presenting claims and defenses in court. || **Power of Attorney:** Authorizes another person to act on one’s behalf legally. |
+| **Principle:** Foundational legal concepts or doctrines guiding interpretation. || **Release:** Document relinquishing rights, claims, or interests voluntarily. |
+| **Rent:** Agreements specifying terms of tenancy and property occupation. || **Sale:** Deed transferring ownership of property for consideration. |
+| **Specific Relief Act:** Legal formats for enforcement of rights and contracts. || **Trust Wakf Society:** Documents creating or governing trusts, wakfs, and societies. |
+| **Vakalatnama:** Authorization for an advocate to represent a client in court. || **Will:** Legal declaration of a person’s wishes regarding property after death. |

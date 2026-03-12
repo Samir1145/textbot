@@ -1,0 +1,189 @@
+^ Category ^ Title ^
+| income-tax | [[legal_formats:income-tax:1form_no_ioccad|1Form No Ioccad]] |
+| income-tax | [[legal_formats:income-tax:application_for_information_under_section_42b_of_the_wealthtax_act_1957|Application For Information Under Section 42B Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:application_for_registration_of_a_firm_for_the_purposes_of_the_incometax_act_1961|Application For Registration Of A Firm For The Purposes Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:application_for_registration_of_charitable_or_religious_trust_or_institution_under_section_12_aa_of_income_tax_act_1961|Application For Registration Of Charitable Or Religious Trust Or Institution Under Section 12 Aa Of Income Tax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:audit_report_under_section_80hh_of_the_incometax_act_1961|Audit Report Under Section 80Hh Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:audit_report_under_section_80hha_of_the_incometax_act_1961|Audit Report Under Section 80Hha Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:audit_report_under_section_80hhba_of_the_incometax_act_1961|Audit Report Under Section 80Hhba Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:audit_report_under_section_80j_of_the_incometax_act_1961|Audit Report Under Section 80J Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:certificate_of_foreign_inward_remittance|Certificate Of Foreign Inward Remittance]] |
+| income-tax | [[legal_formats:income-tax:declaration_under_section_1847_of_the_incometax_act_1961_for_continuation_of_registration|Declaration Under Section 1847 Of The Incometax Act 1961 For Continuation Of Registration]] |
+| income-tax | [[legal_formats:income-tax:declaration_under_section_18c1_of_the_wealthtax_act_1957|Declaration Under Section 18C1 Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:exemption_certificate_under_proviso_to_section_2301_of_the_incometax_act_1961|Exemption Certificate Under Proviso To Section 2301 Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:form10_i_certificate_of_prescribed_authority_for_the_purposes_of_section_80ddb|Form10 I Certificate Of Prescribed Authority For The Purposes Of Section 80Ddb]] |
+| income-tax | [[legal_formats:income-tax:form1_1|Form1 1]] |
+| income-tax | [[legal_formats:income-tax:form_012|Form 012]] |
+| income-tax | [[legal_formats:income-tax:form_10_g|Form 10 G]] |
+| income-tax | [[legal_formats:income-tax:form_10ba_declaration_to_be_filed_by_the_assessee_claiming_deduction_under_section_80gg|Form 10Ba Declaration To Be Filed By The Assessee Claiming Deduction Under Section 80Gg]] |
+| income-tax | [[legal_formats:income-tax:form_11_application_for_registration_of_a_firm_for_the_purposes_of_the_incometax_act_1961|Form 11 Application For Registration Of A Firm For The Purposes Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:form_13_a|Form 13 A]] |
+| income-tax | [[legal_formats:income-tax:form_13_c|Form 13 C]] |
+| income-tax | [[legal_formats:income-tax:form_15_aa|Form 15 Aa]] |
+| income-tax | [[legal_formats:income-tax:form_15_g|Form 15 G]] |
+| income-tax | [[legal_formats:income-tax:form_16|Form 16]] |
+| income-tax | [[legal_formats:income-tax:form_31|Form 31]] |
+| income-tax | [[legal_formats:income-tax:form_a|Form A]] |
+| income-tax | [[legal_formats:income-tax:form_b|Form B]] |
+| income-tax | [[legal_formats:income-tax:form_ba|Form Ba]] |
+| income-tax | [[legal_formats:income-tax:form_c_notice_of_demand_under_section_30_of_the_wealth_tax_act_1975|Form C Notice Of Demand Under Section 30 Of The Wealth Tax Act 1975]] |
+| income-tax | [[legal_formats:income-tax:form_db_declaration_under_section_18c1_of_the_wealthtax_act|Form Db Declaration Under Section 18C1 Of The Wealthtax Act]] |
+| income-tax | [[legal_formats:income-tax:form_for_furnishing_information_under_section_42b_of_the_wealthtax_act_1957|Form For Furnishing Information Under Section 42B Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_for_furnishing_nonavailability_of_information_under_section_42b_of_the_wealthtax_act_1957|Form For Furnishing Nonavailability Of Information Under Section 42B Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_for_furnishing_the_details_under_section_2301a_of_the_incometax_act_1961|Form For Furnishing The Details Under Section 2301A Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:form_l_refusal_to_supply_information_under_section_42b_of_the_wealthtax_act_1957|Form L Refusal To Supply Information Under Section 42B Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_m1_warrant_of_authorisation_under_proviso_to_subsection_1_of_section_37a_or_the_wealthtax_act_1957|Form M1 Warrant Of Authorisation Under Proviso To Subsection 1 Of Section 37A Or The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_m3_warrant_of_authorisation_under_subsection_1_of_section_37b_of_the_wealthtax_act_1957|Form M3 Warrant Of Authorisation Under Subsection 1 Of Section 37B Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_m_2_warrant_of_authorisation_under_subsection_2_of_section_37a_of_the_wealthtax_act_1957|Form M 2 Warrant Of Authorisation Under Subsection 2 Of Section 37A Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_m_warrant_of_authorisation_under_section_37a_or_the_wealthtax_act_1957|Form M Warrant Of Authorisation Under Section 37A Or The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_n_application_for_registration_as_a_valuer_under_section_34ab_of_the_wealthtax_act_1957|Form N Application For Registration As A Valuer Under Section 34Ab Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ccab_under_section_80_hhc|Form No 10Ccab Under Section 80 Hhc]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ccae|Form No 10Ccae]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ccaf|Form No 10Ccaf]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ccag|Form No 10Ccag]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ccah|Form No 10Ccah]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ccai|Form No 10Ccai]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ccc|Form No 10Ccc]] |
+| income-tax | [[legal_formats:income-tax:form_no_10e|Form No 10E]] |
+| income-tax | [[legal_formats:income-tax:form_no_10f_application_for_approval_of_agreement_under_section_80o_of_the_incometax_act_1961_relating_to_deduction_in_respect_of_royalties_etc_from_certain_foreign_enterprises|Form No 10F Application For Approval Of Agreement Under Section 80O Of The Incometax Act 1961 Relating To Deduction In Respect Of Royalties Etc From Certain Foreign Enterprises]] |
+| income-tax | [[legal_formats:income-tax:form_no_10ha|Form No 10Ha]] |
+| income-tax | [[legal_formats:income-tax:form_no_12a|Form No 12A]] |
+| income-tax | [[legal_formats:income-tax:form_no_12ba|Form No 12Ba]] |
+| income-tax | [[legal_formats:income-tax:form_no_12c|Form No 12C]] |
+| income-tax | [[legal_formats:income-tax:form_no_13_d|Form No 13 D]] |
+| income-tax | [[legal_formats:income-tax:form_no_13_e|Form No 13 E]] |
+| income-tax | [[legal_formats:income-tax:form_no_15_certificate_under_section_1971_of_the_incometax_act_1961_relating_to_deduction_of_tax_from_dividends|Form No 15 Certificate Under Section 1971 Of The Incometax Act 1961 Relating To Deduction Of Tax From Dividends]] |
+| income-tax | [[legal_formats:income-tax:form_no_15_d|Form No 15 D]] |
+| income-tax | [[legal_formats:income-tax:form_no_15_f|Form No 15 F]] |
+| income-tax | [[legal_formats:income-tax:form_no_15c|Form No 15C]] |
+| income-tax | [[legal_formats:income-tax:form_no_15h|Form No 15H]] |
+| income-tax | [[legal_formats:income-tax:form_no_22|Form No 22]] |
+| income-tax | [[legal_formats:income-tax:form_no_24|Form No 24]] |
+| income-tax | [[legal_formats:income-tax:form_no_25|Form No 25]] |
+| income-tax | [[legal_formats:income-tax:form_no_26|Form No 26]] |
+| income-tax | [[legal_formats:income-tax:form_no_26_a|Form No 26 A]] |
+| income-tax | [[legal_formats:income-tax:form_no_26_c_annual_return_of_deduction_of_tax_from_payments_made_to_contractors_or_subcontractors_under_section_296_of_the_incometax_1961|Form No 26 C Annual Return Of Deduction Of Tax From Payments Made To Contractors Or Subcontractors Under Section 296 Of The Incometax 1961]] |
+| income-tax | [[legal_formats:income-tax:form_no_26_d_annual_return_of_deduction_of_tax_from_insurance_commission_under_section_206_of_the_incometax_act_1961|Form No 26 D Annual Return Of Deduction Of Tax From Insurance Commission Under Section 206 Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:form_no_26b|Form No 26B]] |
+| income-tax | [[legal_formats:income-tax:form_no_26bb|Form No 26Bb]] |
+| income-tax | [[legal_formats:income-tax:form_no_26f|Form No 26F]] |
+| income-tax | [[legal_formats:income-tax:form_no_26g|Form No 26G]] |
+| income-tax | [[legal_formats:income-tax:form_no_26h|Form No 26H]] |
+| income-tax | [[legal_formats:income-tax:form_no_26i|Form No 26I]] |
+| income-tax | [[legal_formats:income-tax:form_no_26j|Form No 26J]] |
+| income-tax | [[legal_formats:income-tax:form_no_26k|Form No 26K]] |
+| income-tax | [[legal_formats:income-tax:form_no_27|Form No 27]] |
+| income-tax | [[legal_formats:income-tax:form_no_27_e|Form No 27 E]] |
+| income-tax | [[legal_formats:income-tax:form_no_27a|Form No 27A]] |
+| income-tax | [[legal_formats:income-tax:form_no_27b|Form No 27B]] |
+| income-tax | [[legal_formats:income-tax:form_no_27c|Form No 27C]] |
+| income-tax | [[legal_formats:income-tax:form_no_27ea|Form No 27Ea]] |
+| income-tax | [[legal_formats:income-tax:form_no_27eb|Form No 27Eb]] |
+| income-tax | [[legal_formats:income-tax:form_no_27ec|Form No 27Ec]] |
+| income-tax | [[legal_formats:income-tax:form_no_27ed|Form No 27Ed]] |
+| income-tax | [[legal_formats:income-tax:form_no_27f|Form No 27F]] |
+| income-tax | [[legal_formats:income-tax:form_no_27g|Form No 27G]] |
+| income-tax | [[legal_formats:income-tax:form_no_28|Form No 28]] |
+| income-tax | [[legal_formats:income-tax:form_no_2b|Form No 2B]] |
+| income-tax | [[legal_formats:income-tax:form_no_30|Form No 30]] |
+| income-tax | [[legal_formats:income-tax:form_no_32|Form No 32]] |
+| income-tax | [[legal_formats:income-tax:form_no_34a|Form No 34A]] |
+| income-tax | [[legal_formats:income-tax:form_no_34d|Form No 34D]] |
+| income-tax | [[legal_formats:income-tax:form_no_34e|Form No 34E]] |
+| income-tax | [[legal_formats:income-tax:form_no_35|Form No 35]] |
+| income-tax | [[legal_formats:income-tax:form_no_36|Form No 36]] |
+| income-tax | [[legal_formats:income-tax:form_no_36a|Form No 36A]] |
+| income-tax | [[legal_formats:income-tax:form_no_37|Form No 37]] |
+| income-tax | [[legal_formats:income-tax:form_no_37ee|Form No 37Ee]] |
+| income-tax | [[legal_formats:income-tax:form_no_37f|Form No 37F]] |
+| income-tax | [[legal_formats:income-tax:form_no_37g|Form No 37G]] |
+| income-tax | [[legal_formats:income-tax:form_no_37h|Form No 37H]] |
+| income-tax | [[legal_formats:income-tax:form_no_38|Form No 38]] |
+| income-tax | [[legal_formats:income-tax:form_no_39|Form No 39]] |
+| income-tax | [[legal_formats:income-tax:form_no_3aa|Form No 3Aa]] |
+| income-tax | [[legal_formats:income-tax:form_no_3ab|Form No 3Ab]] |
+| income-tax | [[legal_formats:income-tax:form_no_3ac|Form No 3Ac]] |
+| income-tax | [[legal_formats:income-tax:form_no_3ad|Form No 3Ad]] |
+| income-tax | [[legal_formats:income-tax:form_no_3b|Form No 3B]] |
+| income-tax | [[legal_formats:income-tax:form_no_3ba|Form No 3Ba]] |
+| income-tax | [[legal_formats:income-tax:form_no_3c|Form No 3C]] |
+| income-tax | [[legal_formats:income-tax:form_no_3ca|Form No 3Ca]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cb|Form No 3Cb]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cc|Form No 3Cc]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cd|Form No 3Cd]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cea|Form No 3Cea]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cf|Form No 3Cf]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cg|Form No 3Cg]] |
+| income-tax | [[legal_formats:income-tax:form_no_3ci|Form No 3Ci]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cj|Form No 3Cj]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cl|Form No 3Cl]] |
+| income-tax | [[legal_formats:income-tax:form_no_3cm|Form No 3Cm]] |
+| income-tax | [[legal_formats:income-tax:form_no_40|Form No 40]] |
+| income-tax | [[legal_formats:income-tax:form_no_40a|Form No 40A]] |
+| income-tax | [[legal_formats:income-tax:form_no_40b|Form No 40B]] |
+| income-tax | [[legal_formats:income-tax:form_no_42|Form No 42]] |
+| income-tax | [[legal_formats:income-tax:form_no_43|Form No 43]] |
+| income-tax | [[legal_formats:income-tax:form_no_44|Form No 44]] |
+| income-tax | [[legal_formats:income-tax:form_no_45|Form No 45]] |
+| income-tax | [[legal_formats:income-tax:form_no_45a|Form No 45A]] |
+| income-tax | [[legal_formats:income-tax:form_no_45c|Form No 45C]] |
+| income-tax | [[legal_formats:income-tax:form_no_45d|Form No 45D]] |
+| income-tax | [[legal_formats:income-tax:form_no_46|Form No 46]] |
+| income-tax | [[legal_formats:income-tax:form_no_47|Form No 47]] |
+| income-tax | [[legal_formats:income-tax:form_no_48|Form No 48]] |
+| income-tax | [[legal_formats:income-tax:form_no_49|Form No 49]] |
+| income-tax | [[legal_formats:income-tax:form_no_49_a_form_of_application_for_allotment_of_permanent_account_number_under_section_139a_of_the_incometax_act_1961|Form No 49 A Form Of Application For Allotment Of Permanent Account Number Under Section 139A Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:form_no_49b|Form No 49B]] |
+| income-tax | [[legal_formats:income-tax:form_no_4_notice_of_commencement_of_planting_replanting_tea_bushes|Form No 4 Notice Of Commencement Of Planting Replanting Tea Bushes]] |
+| income-tax | [[legal_formats:income-tax:form_no_4a|Form No 4A]] |
+| income-tax | [[legal_formats:income-tax:form_no_52a|Form No 52A]] |
+| income-tax | [[legal_formats:income-tax:form_no_54|Form No 54]] |
+| income-tax | [[legal_formats:income-tax:form_no_56|Form No 56]] |
+| income-tax | [[legal_formats:income-tax:form_no_56_g_report_under_section_iob_of_the_income_tax_act_1961|Form No 56 G Report Under Section Iob Of The Income Tax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:form_no_56a|Form No 56A]] |
+| income-tax | [[legal_formats:income-tax:form_no_56aa|Form No 56Aa]] |
+| income-tax | [[legal_formats:income-tax:form_no_56b|Form No 56B]] |
+| income-tax | [[legal_formats:income-tax:form_no_56ba|Form No 56Ba]] |
+| income-tax | [[legal_formats:income-tax:form_no_56c|Form No 56C]] |
+| income-tax | [[legal_formats:income-tax:form_no_56ca|Form No 56Ca]] |
+| income-tax | [[legal_formats:income-tax:form_no_56d|Form No 56D]] |
+| income-tax | [[legal_formats:income-tax:form_no_56e|Form No 56E]] |
+| income-tax | [[legal_formats:income-tax:form_no_56f|Form No 56F]] |
+| income-tax | [[legal_formats:income-tax:form_no_57|Form No 57]] |
+| income-tax | [[legal_formats:income-tax:form_no_58a|Form No 58A]] |
+| income-tax | [[legal_formats:income-tax:form_no_58b|Form No 58B]] |
+| income-tax | [[legal_formats:income-tax:form_no_59|Form No 59]] |
+| income-tax | [[legal_formats:income-tax:form_no_59a|Form No 59A]] |
+| income-tax | [[legal_formats:income-tax:form_no_60|Form No 60]] |
+| income-tax | [[legal_formats:income-tax:form_no_61|Form No 61]] |
+| income-tax | [[legal_formats:income-tax:form_no_63|Form No 63]] |
+| income-tax | [[legal_formats:income-tax:form_no_64|Form No 64]] |
+| income-tax | [[legal_formats:income-tax:form_no_65|Form No 65]] |
+| income-tax | [[legal_formats:income-tax:form_no_6b|Form No 6B]] |
+| income-tax | [[legal_formats:income-tax:form_no_8|Form No 8]] |
+| income-tax | [[legal_formats:income-tax:form_no_9|Form No 9]] |
+| income-tax | [[legal_formats:income-tax:form_o1|Form O1]] |
+| income-tax | [[legal_formats:income-tax:form_o10|Form O10]] |
+| income-tax | [[legal_formats:income-tax:form_o11|Form O11]] |
+| income-tax | [[legal_formats:income-tax:form_o2|Form O2]] |
+| income-tax | [[legal_formats:income-tax:form_o4|Form O4]] |
+| income-tax | [[legal_formats:income-tax:form_o5|Form O5]] |
+| income-tax | [[legal_formats:income-tax:form_o7|Form O7]] |
+| income-tax | [[legal_formats:income-tax:form_o8|Form O8]] |
+| income-tax | [[legal_formats:income-tax:form_o8a|Form O8A]] |
+| income-tax | [[legal_formats:income-tax:form_o9|Form O9]] |
+| income-tax | [[legal_formats:income-tax:form_of_appeal_to_the_appellate_tribunal_under_subsection_1_or_subsection_2_of_section_24_or_subsection_26_of_the_wealthtax_act_1957|Form Of Appeal To The Appellate Tribunal Under Subsection 1 Or Subsection 2 Of Section 24 Or Subsection 26 Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_of_appeal_to_the_deputy_commissioner_appeals_and_commissioner_of_wealthtax_appeals_under_section_23_of_the_wealthtax_act_1957|Form Of Appeal To The Deputy Commissioner Appeals And Commissioner Of Wealthtax Appeals Under Section 23 Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_of_application_for_obtaining_an_advance_ruling_under_section_245q1_of_the_incometax_act_1961|Form Of Application For Obtaining An Advance Ruling Under Section 245Q1 Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:form_of_application_for_settlement_of_cases_under_section_22c1_of_wealthtax_act_1957|Form Of Application For Settlement Of Cases Under Section 22C1 Of Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_of_memorandum_of_crossobjections_to_the_appellate_tribunal_under_subsection_2a_of_section_24_of_the_wealthtax_act_1957|Form Of Memorandum Of Crossobjections To The Appellate Tribunal Under Subsection 2A Of Section 24 Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:form_of_reference_application_under_subsection_1_of_section_27_of_the_wealthtax_act_1957|Form Of Reference Application Under Subsection 1 Of Section 27 Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:from_no_3ch|From No 3Ch]] |
+| income-tax | [[legal_formats:income-tax:from_no_3ck|From No 3Ck]] |
+| income-tax | [[legal_formats:income-tax:from_of_application_for_settlement_of_cases_under_section_245c1_of_the_incometax_act|From Of Application For Settlement Of Cases Under Section 245C1 Of The Incometax Act]] |
+| income-tax | [[legal_formats:income-tax:naya_saral|Naya Saral]] |
+| income-tax | [[legal_formats:income-tax:no_15_i|No 15 I]] |
+| income-tax | [[legal_formats:income-tax:noobjection_certificate_for_a_person_not_domiciled_in_india_under_section_2301|Noobjection Certificate For A Person Not Domiciled In India Under Section 2301]] |
+| income-tax | [[legal_formats:income-tax:notice_of_demand_under_section_30_of_the_wealthtax_act_1957|Notice Of Demand Under Section 30 Of The Wealthtax Act 1957]] |
+| income-tax | [[legal_formats:income-tax:report_under_secion_80hhc480hhc4a_of_the_incometax_act_1961|Report Under Secion 80Hhc480Hhc4A Of The Incometax Act 1961]] |
+| income-tax | [[legal_formats:income-tax:report_under_section_80jjaa_of_the_incometax_act_1961|Report Under Section 80Jjaa Of The Incometax Act 1961]] |

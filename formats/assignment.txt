@@ -1,0 +1,20 @@
+^ Category ^ Title ^
+| assignment | [[legal_formats:assignment:assignment_of_a_decree|Assignment Of A Decree]] |
+| assignment | [[legal_formats:assignment:assignment_of_business_debts|Assignment Of Business Debts]] |
+| assignment | [[legal_formats:assignment:assignment_of_business_with_goodwill_and_tenancy_rights|Assignment Of Business With Goodwill And Tenancy Rights]] |
+| assignment | [[legal_formats:assignment:assignment_of_copyright|Assignment Of Copyright]] |
+| assignment | [[legal_formats:assignment:assignment_of_lease|Assignment Of Lease]] |
+| assignment | [[legal_formats:assignment:assignment_of_partnership_firmgçös_business_to_the_private_limited_company|Assignment Of Partnership Firmgçös Business To The Private Limited Company]] |
+| assignment | [[legal_formats:assignment:assignment_of_patent|Assignment Of Patent]] |
+| assignment | [[legal_formats:assignment:assignment_of_policy_of_life_insurance|Assignment Of Policy Of Life Insurance]] |
+| assignment | [[legal_formats:assignment:assignment_of_policy_of_life_insurance_for_love_and_affection|Assignment Of Policy Of Life Insurance For Love And Affection]] |
+| assignment | [[legal_formats:assignment:assignment_of_rents|Assignment Of Rents]] |
+| assignment | [[legal_formats:assignment:assignment_of_shares_in_a_public_limited_company|Assignment Of Shares In A Public Limited Company]] |
+| assignment | [[legal_formats:assignment:assignment_of_simple_contract_debts|Assignment Of Simple Contract Debts]] |
+| assignment | [[legal_formats:assignment:assignment_of_trademarks|Assignment Of Trademarks]] |
+| assignment | [[legal_formats:assignment:assignmentof_a_bond_debt|Assignmentof A Bond Debt]] |
+| assignment | [[legal_formats:assignment:deed_of_assignment_of_a_bond_debt|Deed Of Assignment Of A Bond Debt]] |
+| assignment | [[legal_formats:assignment:notice_of_assignment_of_policy|Notice Of Assignment Of Policy]] |
+| assignment | [[legal_formats:assignment:notice_of_transfer_of_debt_by_assignee|Notice Of Transfer Of Debt By Assignee]] |
+| assignment | [[legal_formats:assignment:notice_of_transfer_of_debt_to_debtor|Notice Of Transfer Of Debt To Debtor]] |
+| assignment | [[legal_formats:assignment:partial_assignment|Partial Assignment]] |

@@ -1,0 +1,184 @@
+FORM NO. 2B
+[See sub-rule (1A) of rule 12 of the Income-tax Rules, 1962]
+RETURN OF INCOME FOR BLOCK ASSESSMENT
+Receipt No. ………………………….					Date …………………………………
+
+PART I
+GENERAL INFORMATION
+
+||
+1.     DATE OF WHICH THE LAST SEARCH WARRANT WAS EXECUTED/REQUISITION U/S 132A MADE
+|2.   PAN/GIR NO.|
+ |||-|||-|1|9|9||||||||||||
+||
+||
+3.    WARD/CIRCLE/SPECIAL RANGE||
+|||||||||||||||||||||||||
+||
+||
+4.    BLOCK PERIOD|5.   STATUS|
+FORM|||||||||||||||||||||
+||||||||||||||||||||
+TO||||||||||||||||||||
+||
+
+1.  Strike out whichever is not applicable.
+2.  Status : Select the appropriate code number:
+	(a)   Individual 									01
+	(b)   Hindu undivided family (other than that mentioned below)				02
+	(c)   Hindu undivided family  having any member with total income of the previous year 
+	        exceeding the maximum amount not chargeable to tax					03
+	(d)   Unregistered firm (URF)								04
+	(e)   Registered firm/firm other than the one engaged in profession 				05
+	(f)   Registered firm/firm engaged in profession						06
+	(g)  Association of persons (AOP)							07
+	(h)  Association of persons (Trusts)							08
+	(I)   Body of individuals (BOI)								09
+	(j)   Artificial juridical person								10
+	(k)  Co-operative Society 								11
+	(l)   A domestic company in which the public are substantially interested 			12
+	(m)  A domestic company which is not a company in which the public ate substantially 
+	         interested									13
+	(n)   A company other than a domestic company 						15
+	(o)   Local authority									16
+
+6. NAME (LAST NAME, FIRST NAME AND MIDDLE NAME)||
+|||||||||||||||||||||
+7.  DATE OF BIRTH / INCORPORATION / FORMATION/I|8.  SEX
+(MALE-M, FEMALE-F)|
+|||||||||||
+9.  RESIDENTIAL ADDRESS||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+PIN|||||||TELEPHONE
+|||||||||
+10.  OFFICE ADDRESS||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+PIN|||||||TELEPHONE
+|||||||||
+11.  FATHER’S NAME (LAST NAME, FIRST NAME AND MIDDLE NAME)||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+||
+12.   FURNISH DETAILS ALONG WITH VALUE (IN PUPEES) AS ON DATE OF SEARCH OR SEIZURE/REQUISITION (PREMISES-WISE):||
+|Found|Seized|
+(a) Cash|||
+(b) Jewelry|||
+(c) Other valuables|||
+|||
+13. ADDRESSES OF THE PLACES WHERE BUSINESS IS CONDUCTED INCLUDING THOSE OF BRANCHES, GODOWNS, ETC.|
+|||
+
+PART II
+COMPUTATION OF TOTAL UNDISCLOSED INCOME
+previous year (chronologically)|Assessment year|Total income including undisclosed income computed u/s 158BB|Returned /Assessed as on the date of search/requisition|
+||Total income (Rs.)|Losses|Total income (Rs.)|Losses|
+|||Source|Amount (RS.)||Source|Amount (RS.)|
+1st 
+(earliest)||||||||
+2nd||||||||
+3rd||||||||
+4th||||||||
+5th||||||||
+6th||||||||
+7th||||||||
+8th||||||||
+9th||||||||
+10th||||||||
+11th
+(last)||||||||
+Total
+|(A)|(B)|(C)|(D)|
+
+Total undisclosed income for the block period + [(A) - (C) ] + [(D) -(B) ] + Rs. ...........................................
+
+PART III
+(Fill in separate sheet for each of the assessment years relevant to the precious years falling within the block period)
+TOTAL INCOME AND LOSS OF THE ASSESSMENT YEAR 19 .... - .....
+1.   Previous year
+2.  Residential status 
+3.   Whether a return of income was furnished before the search /requisition         Yes/No.
+4.   If a return was filed :-
+	(I)  Date of filing the return 
+	(ii)  Ward/circle/special range where the return was filed
+	(iii)  Returned total income
+	(iv)  Brought forward loss/unabsorbed depreciation, if any, shown adjusted in the return :
+		Under section :					Amount:
+	(v)   Amount of loss/depreciation remaining unadjusted after computation in the income:
+		Under section : 					Amount :
+	(vi)   Date of assessment 
+	(vii)  Assessed total income
+
+COMPUTATION OF TOTAL INCOME AND LOSS
+Head of income|Total income including undisclosed income computed under section 158BB|Returned/assessed as on the date of search/requisition |
+(1)|(2)|(3)|
+SALARIES|||
+INTEREST ON SECURITIES
+(If applicable)|||
+INCOME FROM HOUSE PROPERTY|||
+
+(1)|(2)|(3)|
+PROFITS AND GAINS OF BUSINESS OF PROFESSION |||
+CAPITAL gains:
+SHORT-TERM
+LONG-TERM|||
+INCOME FROM OTHER SOURCES|||
+GROSS TOTAL INCOME|||
+LESS : DEDUCTION UNDER
+CHAPTER VI-A
+Under section.................
+Under section ................
+Under section ................|||
+TOTAL  INCOME |||
+CURRENT YEAR’S LOSS
+REMAINING UNADJUSTED AFTER
+COMPUTATION OF TOTAL INCOME|Source                          Amount|Source                         Amount|
+
+If there is any difference between the figures of column (2) and that of column (3) for any row, please explain how it arose
+
+
+PART IV
+STATEMENT OF TAX PAID
+
+1.   Tax payable on undisclosed income of the clock period		Rs. ......................
+2.   Tax paid on undisclosed income before filing the return (attach challan)
+	Date of payment ......................				Rs. ......................
+3.   Balance amount payable					Rs. ......................
+
+PART V
+LIST OF DOCUMENTS/STATEMENTS ATTACHED
+Sl No.|Nature of document/statement |Sl. No. |Nature of document/statement |
+
+
+
+
+
+
+
+
+
+
+
+
+
+||||
+
+
+Verification
+I, .................................................................................................................. (name in full and block  letters) son/ daughter of name of father) solemnly declare that to the best of my knowledge and belief, the information given in this return and statements accompanying it is correct and complete and that the amount of total income and other particulars shown therein are truly stated and related to the previous years falling within the block period from ....................... 19 .......... to - ............... 19 ................
+I further solemnly declare that during the said previous years:-
+(a)      no other income accrued or arose to or was received by me from any asset held in my name or in the name of any other person;
+(b)      there is no other income, including income of nay other person, in respect of which I am chargeable  to tax under the income-tax act 1961.
+I further solemnly declare that during the said precious years -
+(a) no other accrued or arose to or was received by the person for and on whose behalf this return is furnished/the person in respect of whose total income I am assessable from any asset held in the name of the person for and on whose behalf this return is furnished/ the name of the person in respect of whose total income I am assessable, or in the name of another other person;
+(b)   there is no other income including income of any other person in respect of which the said person is chargeable to tax under the Income-tax Act, 1961.
+I further declare that I am making this return in  my capacity as  .................................. and I am competent to make this return and verify it.
+
+Place ...............................						.................................................................
+Date ................................ 							(Name and signature)

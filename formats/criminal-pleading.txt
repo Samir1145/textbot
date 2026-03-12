@@ -1,0 +1,128 @@
+^ Category ^ Title ^
+| criminal-pleading | [[legal_formats:criminal-pleading:affidavit_1|Affidavit 1]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:affidavit_in_anticipatory_bail_application|Affidavit In Anticipatory Bail Application]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:anticipatory_bail_application_under_section_438_crpc|Anticipatory Bail Application Under Section 438 Crpc]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_by_an_accused_to_surrender_in_the_court|Application By An Accused To Surrender In The Court]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_anticipatory_bail_before_high_court|Application For Anticipatory Bail Before High Court]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_anticipatory_bail_before_sessions_judge|Application For Anticipatory Bail Before Sessions Judge]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_anticipatory_bail_before_the_high_court|Application For Anticipatory Bail Before The High Court]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_anticipatory_bail_under_section_438_of_the_criminal_procedure_code_1973|Application For Anticipatory Bail Under Section 438 Of The Criminal Procedure Code 1973]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_bail_before_high_court_under_section_439_cr_pc|Application For Bail Before High Court Under Section 439 Cr Pc]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_condonation_of_delay_in_filing_the_application_for_revision_before_the_hon_ble_high_court_courtsessions_court|Application For Condonation Of Delay In Filing The Application For Revision Before The Hon Ble High Court Courtsessions Court]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_converting_petition_under_section_482_cr_p_c_into_a_writ_petition|Application For Converting Petition Under Section 482 Cr P C Into A Writ Petition]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_drawing_up_proceedings_under_section_110_cr_p_c|Application For Drawing Up Proceedings Under Section 110 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_exemption_from_personal_appearance_of_complainant|Application For Exemption From Personal Appearance Of Complainant]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_furnishing_security_for_payment_of_fine_under_section_424_cr_p_c|Application For Furnishing Security For Payment Of Fine Under Section 424 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_gaining_time_to_produce_witnesses|Application For Gaining Time To Produce Witnesses]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_obtaining_the_copies_of_the_judgment_etc_under_section_363|Application For Obtaining The Copies Of The Judgment Etc Under Section 363]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_tendering_apology_in_contempt_proceedings_under_section_348_cr_p_c|Application For Tendering Apology In Contempt Proceedings Under Section 348 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_the_extension_of_the_stay_order|Application For The Extension Of The Stay Order]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_for_the_withdrawal_of_the_complaint_under_section_257_cr_p_c|Application For The Withdrawal Of The Complaint Under Section 257 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_section_1163_cr_p_c|Application Section 1163 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_u_s_389_cr_p_c|Application U S 389 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_u_s_5_cr_p_c|Application U S 5 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_u_s_94_cr_p_c|Application U S 94 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_u_s_97_cr_p_c|Application U S 97 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_sectiob_317_cr_p_c|Application Under Sectiob 317 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_107_cr_p_c|Application Under Section 107 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_121_cr_p_c|Application Under Section 121 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_125_cr_p_c|Application Under Section 125 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_125_on_behalf_of_the_minor|Application Under Section 125 On Behalf Of The Minor]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_144_cr_p_c_for_immediate_order_in_cases_of_apprehended_danger|Application Under Section 144 Cr P C For Immediate Order In Cases Of Apprehended Danger]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_145_cr_p_c|Application Under Section 145 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_145_cr_p_c_1|Application Under Section 145 Cr P C 1]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_205_cr_p_c|Application Under Section 205 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_356_cr_p_c|Application Under Section 356 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_3891_of_code_of_criminal_procedure_on_behalf_of_appellant_pending_appeal_release_of_appellant_on_bail|Application Under Section 3891 Of Code Of Criminal Procedure On Behalf Of Appellant Pending Appeal Release Of Appellant On Bail]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_482_of_criminal_procedure_code_for_seeking_exemption_for_not_filing_the_certified_true_copies_of_annexures|Application Under Section 482 Of Criminal Procedure Code For Seeking Exemption For Not Filing The Certified True Copies Of Annexures]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_84_cr_p_c_an_objection_against_attachment_of_property_against_when_proceeding_under_section_8283_cr_p_c_had_been_initiated|Application Under Section 84 Cr P C An Objection Against Attachment Of Property Against When Proceeding Under Section 8283 Cr P C Had Been Initiated]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:application_under_section_98_cr_p_c|Application Under Section 98 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bail_application_u_s_389_cr_p_c|Bail Application U S 389 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bail_bond|Bail Bond]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bail_petition|Bail Petition]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bail_petition_before_a_magistrate_during_police_enquiry_under_sec_437_cr_pc|Bail Petition Before A Magistrate During Police Enquiry Under Sec 437 Cr Pc]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bail_petition_before_a_magistrate_in_a_pending_case_under_section_437_cr_pc|Bail Petition Before A Magistrate In A Pending Case Under Section 437 Cr Pc]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bail_petition_gçö_petition_for_bail_under_section_389_of_code_of_criminal_procedure_1973|Bail Petition Gçö Petition For Bail Under Section 389 Of Code Of Criminal Procedure 1973]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bond_and_bailbond_after_arrest_under_a_warrant|Bond And Bailbond After Arrest Under A Warrant]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bond_and_bailbond_for_attendance_before_officer_in_charge_of_police_station_or_court|Bond And Bailbond For Attendance Before Officer In Charge Of Police Station Or Court]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bond_and_bailbond_on_a_preliminary_inquiry_before_a_police_officer|Bond And Bailbond On A Preliminary Inquiry Before A Police Officer]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bond_for_appearance_of_offender_released_pending_realisation_of_fine|Bond For Appearance Of Offender Released Pending Realisation Of Fine]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bond_for_good_behaviour|Bond For Good Behaviour]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bond_to_keep_the_peace|Bond To Keep The Peace]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:bond_to_prosecute_or_give_evidence|Bond To Prosecute Or Give Evidence]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:charges_1|Charges 1]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_appeal|Criminal Appeal]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_appeal_1|Criminal Appeal 1]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_complaint|Criminal Complaint]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_complaint_u_s_500_506_read_with_sec_34_of_the_indian_penal_code|Criminal Complaint U S 500 506 Read With Sec 34 Of The Indian Penal Code]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_complaint_u_ss_323_504_r_w_sec_34_of_the_indian_penal_code|Criminal Complaint U Ss 323 504 R W Sec 34 Of The Indian Penal Code]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_complaint_under_section_138_of_the_negotiable_instruments_act_section_420_of_the_indian_penal_code|Criminal Complaint Under Section 138 Of The Negotiable Instruments Act Section 420 Of The Indian Penal Code]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_complaint_under_section_323_324_504_506_read_with_sec_34_of_the_indian_penal_code|Criminal Complaint Under Section 323 324 504 506 Read With Sec 34 Of The Indian Penal Code]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_complaint_under_section_494_read_with_sec_34_of_the_indian_penal_code|Criminal Complaint Under Section 494 Read With Sec 34 Of The Indian Penal Code]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_complaint_under_section_498a_read_with_sec_34_of_the_indian_penal_code|Criminal Complaint Under Section 498A Read With Sec 34 Of The Indian Penal Code]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:criminal_revision_before_high_court_under_sections_397_and_401_of_cr_p_c|Criminal Revision Before High Court Under Sections 397 And 401 Of Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:draft_of_appointment_of_enquiry_officer|Draft Of Appointment Of Enquiry Officer]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:draft_of_charge_sheet|Draft Of Charge Sheet]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:draft_of_enquiry_proceeding_recording|Draft Of Enquiry Proceeding Recording]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:draft_of_suspension_letter|Draft Of Suspension Letter]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:form1_1|Form1 1]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:habeas_corpus|Habeas Corpus]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:injunction_to_prove_against_imminent_danger_pending_inquiry|Injunction To Prove Against Imminent Danger Pending Inquiry]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:magistrategçös_notice_and_preemptory_order|Magistrategçös Notice And Preemptory Order]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:magistrategçös_or_judgegçös_warrant_of_commitment_of_witness_refusing_to_answer_or_to_produce_document|Magistrategçös Or Judgegçös Warrant Of Commitment Of Witness Refusing To Answer Or To Produce Document]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:magistrategçös_order_declaring_party_entitled_to_retain_possession_of_land_etc_in_dispute|Magistrategçös Order Declaring Party Entitled To Retain Possession Of Land Etc In Dispute]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:magistrategçös_order_prohibiting_the_doing_of_anything_on_land_or_water|Magistrategçös Order Prohibiting The Doing Of Anything On Land Or Water]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:magistrategçös_order_prohibiting_the_repetition_etc_of_a_nuisance|Magistrategçös Order Prohibiting The Repetition Etc Of A Nuisance]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:magistrategçös_order_to_prevent_obstruction_riot_etc|Magistrategçös Order To Prevent Obstruction Riot Etc]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:notice_of_commitment_by_magistrate_to_public_prosecutor|Notice Of Commitment By Magistrate To Public Prosecutor]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:notice_to_surety_of_forfeiture_of_bond_for_good_behaviour|Notice To Surety Of Forfeiture Of Bond For Good Behaviour]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:notice_to_surety_on_breach_of_a_bond|Notice To Surety On Breach Of A Bond]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:notice_to_the_principal_of_forfeiture_of_bond_to_keep_the_peace|Notice To The Principal Of Forfeiture Of Bond To Keep The Peace]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:offences_under_section_406_and_section_420_read_with_section_120b_of_the_indian_penal_code|Offences Under Section 406 And Section 420 Read With Section 120B Of The Indian Penal Code]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:order_authorising_an_attachment_by_the_district_magistrate_or_collector|Order Authorising An Attachment By The District Magistrate Or Collector]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:order_for_the_removal_of_nuisances|Order For The Removal Of Nuisances]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:order_of_attachment_to_compel_the_appearance_of_a_person_accused|Order Of Attachment To Compel The Appearance Of A Person Accused]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:order_of_attachment_to_compel_the_attendance_of_a_witness|Order Of Attachment To Compel The Attendance Of A Witness]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:order_requiring_production_in_court_of_person_in_prison_for_answering_to_charge_of_offence|Order Requiring Production In Court Of Person In Prison For Answering To Charge Of Offence]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:order_requiring_production_in_court_of_person_in_prison_for_giving_evidence|Order Requiring Production In Court Of Person In Prison For Giving Evidence]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:petition_under_section_107_cr_p_c|Petition Under Section 107 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:petition_under_section_320_cr_p_c|Petition Under Section 320 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:proclamation_requiring_the_appearance_of_a_person_accused|Proclamation Requiring The Appearance Of A Person Accused]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:proclamation_requiring_the_attendance_of_a_witness|Proclamation Requiring The Attendance Of A Witness]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:revision_petition_under_section_397_of_code_of_criminal_procedure|Revision Petition Under Section 397 Of Code Of Criminal Procedure]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:special_summons_to_a_person_accused_of_a_petty_offence|Special Summons To A Person Accused Of A Petty Offence]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:stay_application_in_writ_petition|Stay Application In Writ Petition]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:summons_on_information_of_a_probable_breach_of_the_peace|Summons On Information Of A Probable Breach Of The Peace]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:summons_to_an_accused_person|Summons To An Accused Person]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:summons_to_witness|Summons To Witness]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:surrender_application_by_accused|Surrender Application By Accused]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_after_a_commutation_of_a_sentence|Warrant After A Commutation Of A Sentence]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_for_recovery_of_fine|Warrant For Recovery Of Fine]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_in_the_first_instance_to_bring_up_a_witness|Warrant In The First Instance To Bring Up A Witness]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_arrest|Warrant Of Arrest]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_attachment_against_a_surety|Warrant Of Attachment Against A Surety]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_attachment_and_sale_on_forfeiture_of_bond_for_good_behaviour|Warrant Of Attachment And Sale On Forfeiture Of Bond For Good Behaviour]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_attachment_in_the_case_of_a_dispute_as_to_the_possession_of_land_etc|Warrant Of Attachment In The Case Of A Dispute As To The Possession Of Land Etc]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_attachment_to_enforce_a_bond|Warrant Of Attachment To Enforce A Bond]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_commitment_in_certain_cases_of_contempt_when_a_fine_is_imposed|Warrant Of Commitment In Certain Cases Of Contempt When A Fine Is Imposed]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_commitment_of_the_surety_of_an_accused_person_admitted_to_bail|Warrant Of Commitment Of The Surety Of An Accused Person Admitted To Bail]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_commitment_on_a_sentence_of_imprisonment_of_fine_if_passed_by_a_court|Warrant Of Commitment On A Sentence Of Imprisonment Of Fine If Passed By A Court]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_commitment_on_failure_to_find_security_for_good_behaviour|Warrant Of Commitment On Failure To Find Security For Good Behaviour]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_commitment_on_failure_to_find_security_to_keep_the_peace|Warrant Of Commitment On Failure To Find Security To Keep The Peace]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_commitment_under_sentence_of_death|Warrant Of Commitment Under Sentence Of Death]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_execution_of_a_sentence_of_death|Warrant Of Execution Of A Sentence Of Death]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_imprisonment_on_breach_of_a_bond_to_keep_the_peace|Warrant Of Imprisonment On Breach Of A Bond To Keep The Peace]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_imprisonment_on_failure_to_pay_compensation|Warrant Of Imprisonment On Failure To Pay Compensation]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_imprisonment_on_failure_to_pay_maintenance|Warrant Of Imprisonment On Failure To Pay Maintenance]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_of_imprisonment_on_forfeiture_of_bond_for_good_behaviour|Warrant Of Imprisonment On Forfeiture Of Bond For Good Behaviour]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_to_attach_the_property_of_the_principal_on_breach_of_a_bond_to_keep_the_peace|Warrant To Attach The Property Of The Principal On Breach Of A Bond To Keep The Peace]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_to_discharge_a_person_imprisoned_on_failure_to_give_security|Warrant To Discharge A Person Imprisoned On Failure To Give Security]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_to_enforce_the_payment_of_maintenance_by_attachment_and_sale|Warrant To Enforce The Payment Of Maintenance By Attachment And Sale]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_to_levy_a_fine_by_attachment_and_sale|Warrant To Levy A Fine By Attachment And Sale]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_to_search_after_information_of_a_particular_offence|Warrant To Search After Information Of A Particular Offence]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:warrant_to_search_suspected_place_of_deposit|Warrant To Search Suspected Place Of Deposit]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:withdrawal_of_prosecution_by_the_public_prosecutor_application_for_under_section_321_cr_p_c|Withdrawal Of Prosecution By The Public Prosecutor Application For Under Section 321 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:writ_appeal_misc_petition_under_section_151_of_c_p_c|Writ Appeal Misc Petition Under Section 151 Of C P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:written_statement_gçö_vis_145_cr_p_c|Written Statement Gçö Vis 145 Cr P C]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:written_statement_of_the_defendanttenant_in_an_eviction_suit|Written Statement Of The Defendanttenant In An Eviction Suit]] |
+| criminal-pleading | [[legal_formats:criminal-pleading:written_statement_of_the_defendanttenant_in_an_eviction_suit_in_the_court_of_the_small_causes_judge|Written Statement Of The Defendanttenant In An Eviction Suit In The Court Of The Small Causes Judge]] |

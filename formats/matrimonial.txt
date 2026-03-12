@@ -1,0 +1,37 @@
+^ Category ^ Title ^
+| matrimonial | [[legal_formats:matrimonial:a_written_statement_of_the_opponent_husband_in_a_maintenance_application|A Written Statement Of The Opponent Husband In A Maintenance Application]] |
+| matrimonial | [[legal_formats:matrimonial:agreement_for_maintenance_of_wife_and_daughter|Agreement For Maintenance Of Wife And Daughter]] |
+| matrimonial | [[legal_formats:matrimonial:agreement_of_maintenance_between_husband_and_wife_not_being_a_separation_agreement|Agreement Of Maintenance Between Husband And Wife Not Being A Separation Agreement]] |
+| matrimonial | [[legal_formats:matrimonial:an_application_for_maintenance_under_section_125_of_the_criminal_procedure_code_1973_for_wife|An Application For Maintenance Under Section 125 Of The Criminal Procedure Code 1973 For Wife]] |
+| matrimonial | [[legal_formats:matrimonial:application_for_alimony_pendente_lite|Application For Alimony Pendente Lite]] |
+| matrimonial | [[legal_formats:matrimonial:application_under_order_6_rule_17_read_with_section_151_cpc|Application Under Order 6 Rule 17 Read With Section 151 Cpc]] |
+| matrimonial | [[legal_formats:matrimonial:application_under_section_13b2_of_the_hindu_marriage_act_for_dissolution_of_marriage_by_decree_of_divorce_with_mutual_consent|Application Under Section 13B2 Of The Hindu Marriage Act For Dissolution Of Marriage By Decree Of Divorce With Mutual Consent]] |
+| matrimonial | [[legal_formats:matrimonial:application_under_section_151_cpc_for_waiving_off_condoning_period_of_six_months_for_moving_second_motion_under_section_13b2_of_hindu_marriage_act|Application Under Section 151 Cpc For Waiving Off Condoning Period Of Six Months For Moving Second Motion Under Section 13B2 Of Hindu Marriage Act]] |
+| matrimonial | [[legal_formats:matrimonial:deed_of_family_settlement|Deed Of Family Settlement]] |
+| matrimonial | [[legal_formats:matrimonial:deed_of_separation_between_husband_and_wife|Deed Of Separation Between Husband And Wife]] |
+| matrimonial | [[legal_formats:matrimonial:deed_of_separation_between_husband_and_wife_the_wife_being_provided_for_maintenance|Deed Of Separation Between Husband And Wife The Wife Being Provided For Maintenance]] |
+| matrimonial | [[legal_formats:matrimonial:deed_of_separation_between_husband_and_wife_where_there_has_been_a_marriage_settlement|Deed Of Separation Between Husband And Wife Where There Has Been A Marriage Settlement]] |
+| matrimonial | [[legal_formats:matrimonial:deed_of_separation_between_husband_and_wife_with_a_trustee_wife_to_have_custody_of_child|Deed Of Separation Between Husband And Wife With A Trustee Wife To Have Custody Of Child]] |
+| matrimonial | [[legal_formats:matrimonial:form_of_petition_for_restitution_of_conjugal_rights_under_s_9_of_the_hindu_marriage_act_1955|Form Of Petition For Restitution Of Conjugal Rights Under S 9 Of The Hindu Marriage Act 1955]] |
+| matrimonial | [[legal_formats:matrimonial:maintenance_charge_deed|Maintenance Charge Deed]] |
+| matrimonial | [[legal_formats:matrimonial:petition_by_a_guardian_of_minor_child_for_maintenance_against_father_under_section_125_cr_pc|Petition By A Guardian Of Minor Child For Maintenance Against Father Under Section 125 Cr Pc]] |
+| matrimonial | [[legal_formats:matrimonial:petition_by_husband_for_dissolution_of_marriage_with_damages_against_corespondent_by_reason_of_adultery|Petition By Husband For Dissolution Of Marriage With Damages Against Corespondent By Reason Of Adultery]] |
+| matrimonial | [[legal_formats:matrimonial:petition_by_wife_for_enforcing_maintenance_allowance_ordered_by_court_under_section_128_cr_pc|Petition By Wife For Enforcing Maintenance Allowance Ordered By Court Under Section 128 Cr Pc]] |
+| matrimonial | [[legal_formats:matrimonial:petition_by_wife_for_judicial_separation_on_the_grounds_of_her_husband_s_adultery|Petition By Wife For Judicial Separation On The Grounds Of Her Husband S Adultery]] |
+| matrimonial | [[legal_formats:matrimonial:petition_by_wife_under_section_125_cr_pc_for_maintenance|Petition By Wife Under Section 125 Cr Pc For Maintenance]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_a_decree_of_nullity_of_marriage|Petition For A Decree Of Nullity Of Marriage]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_a_judicial_separation_by_reason_of_cruelty|Petition For A Judicial Separation By Reason Of Cruelty]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_decree_of_nullity_of_marriage|Petition For Decree Of Nullity Of Marriage]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_dissolution_of_marriage|Petition For Dissolution Of Marriage]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_divorce|Petition For Divorce]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_divorce_by_mutual_consent|Petition For Divorce By Mutual Consent]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_divorce_under_special_marriage_act|Petition For Divorce Under Special Marriage Act]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_judicial_separation|Petition For Judicial Separation]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_judicial_separation_special_marriage_act|Petition For Judicial Separation Special Marriage Act]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_registration_of_marriage|Petition For Registration Of Marriage]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_restitution_of_conjugal_rights|Petition For Restitution Of Conjugal Rights]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_reversal_of_decree_of_separation|Petition For Reversal Of Decree Of Separation]] |
+| matrimonial | [[legal_formats:matrimonial:petition_for_the_annulment_of_a_marriage|Petition For The Annulment Of A Marriage]] |
+| matrimonial | [[legal_formats:matrimonial:service_law|Service Law]] |
+| matrimonial | [[legal_formats:matrimonial:suit_for_dower_after_dissolution_of_marriage|Suit For Dower After Dissolution Of Marriage]] |
+| matrimonial | [[legal_formats:matrimonial:suit_for_dower_by_legal_representatives_of_the_wife_against_the_legal_representatives_of_the_deceased_husband|Suit For Dower By Legal Representatives Of The Wife Against The Legal Representatives Of The Deceased Husband]] |

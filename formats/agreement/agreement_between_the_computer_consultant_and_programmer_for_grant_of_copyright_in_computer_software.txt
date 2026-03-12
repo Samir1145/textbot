@@ -1,0 +1,29 @@
+AGREEMENT BETWEEN THE COMPUTER CONSULTANT AND PROGRAMMER FOR GRANT OF COPYRIGHT IN COMPUTER SOFTWARE
+THIS AGREEMENT made at………………on this………………day of................20…………. between X Y Computers, a partnership firm registered under the Partnership Act, 1932 and having its place of business at 	who are hereinafter referred to as "the consultants", (which expression shall, unless it be repugnant to the context or meaning be deemed to mean and include every partner for the time being of the said firm, the survivor or survivors or the legal  representatives, executors or administrators of the last survivor) of the ONE PART and Shri X, son of Shri Y resident of ................... hereinafter referred to as "the Programmer", (which expression shall, unless it be repugnant to the context or meaning be deemed to mean and include his legal heirs, executors or administrators) of the OTHER PART.
+ 
+WHEREAS the consultants have requested the programmer to develop the computer software as per the specifications described in the Schedule hereunder written which shall hereinafter be referred to as "the said software"; and
+ 
+WHEREAS the Programmer has agreed thereto on the terms and conditions herein set forth:
+ 
+ 
+NOW THIS AGREEMENT WITNESSES:
+ 
+(1) That in consideration of the payment of Rs ………………made on the execution of this Agreement (the receipt whereof is hereby acknowledged) and of the premises and the payments of the sums as hereinafter mentioned, the Programmer has agreed to write the said software as per the specifications described in the Schedule hereunder written.
+ 
+(2) The programmer shall deliver to the consultants the said software not later than……………… day of………………If the programmer fails to do so, the consultants may serve a notice to programmer to deliver the completed software to the consultants within a stated period, not less than a fortnight and if the programmer fails to comply with the said notice, the consultants may terminate this agreement whereupon the programmer shall refund to the consultants all amounts paid to him by the consultants and to return all books of reference supplied by them to the programmer. The consultants shall also be entitled to recover the part of the software and notes prepared by the programmer, provided however that if the software be completed more than half of the total work, the programmer shall be entitled to half of the total sum payable to the programmer under this Agreement for parting with the said software.
+ 
+(3) The consultants will pay a sum of Rs . ………………when approximately half the said software is ready and a further sum of Rs ………………shall be paid on the delivery of the said software complete in all respects.
+ 
+(4) The consultants will provide to the programmer personal computer, books, compendiums and other material required by him for the preparation of the said software. If the consultants are not able to supply any book or any other material required by the programmer for the preparation of the said software within a period of three days from the date of receipt of request from the programmer, the programmer may purchase the said book or material and the consultants will reimburse to the programmer the cost of the said books/material purchased by him.
+ 
+(5) The programmer assures the consultants that the said software will not infringe or violate the copyright of any other person. The programmer hereby indemnify and keep the consultants indemnified against all claims, demands, damages or loss or cost which the consultants may sustain by reason of any claim that the said software infringes the copyright or property right of another. If any action or proceeding is instituted or prosecuted against the consultants in this behalf, the programmer will promptly assist and incur all expenditure in defending the consultants. If the programmer makes default in this respect, the consultants may make such defence or admit such claim or confess judgment as it may be advised by counsel and the costs, 	charges or fines incurred or imposed therein together with costs of any recovery thereof shall be paid by the programmer.
+ 
+(6) On payment of all sums payable to the programmer under this Agreement, the copyright in the said software shall vest in the consultants.
+ 
+IN WITNESS WHEREOF the parties aforementioned have executed this Agreement on the date and year first above mentioned.
+ 
+WITNESSES	
+
+	1	Signed and delivered by X Y Computers, the within named consultants by their 			partner Shri……………… 
+2.	Signed and delivered by X the within named Programmer
+

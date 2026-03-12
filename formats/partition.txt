@@ -1,0 +1,15 @@
+^ Category ^ Title ^
+| partition | [[legal_formats:partition:confirmation_of_partition_already_made_by_the_members_of_joint_hindu_family|Confirmation Of Partition Already Made By The Members Of Joint Hindu Family]] |
+| partition | [[legal_formats:partition:deed_evidencing_oral_partition|Deed Evidencing Oral Partition]] |
+| partition | [[legal_formats:partition:deed_of_partial_partition_by_one_member_from_the_other_members_of_joint_hindu_family|Deed Of Partial Partition By One Member From The Other Members Of Joint Hindu Family]] |
+| partition | [[legal_formats:partition:deed_of_partial_partition_dividing_the_joint_family_business_only_while_other_properties_remaining_joint|Deed Of Partial Partition Dividing The Joint Family Business Only While Other Properties Remaining Joint]] |
+| partition | [[legal_formats:partition:deed_of_partial_partition_of_hindu_undivide_family_property_in_respect_of_certain_property_only_while_the_rest_of_hindu_undivided_family_continues_to_be_joint|Deed Of Partial Partition Of Hindu Undivide Family Property In Respect Of Certain Property Only While The Rest Of Hindu Undivided Family Continues To Be Joint]] |
+| partition | [[legal_formats:partition:deed_of_partition|Deed Of Partition]] |
+| partition | [[legal_formats:partition:deed_of_partition_between_coowners|Deed Of Partition Between Coowners]] |
+| partition | [[legal_formats:partition:deed_of_partition_between_members_of_a_joint_hindu_family|Deed Of Partition Between Members Of A Joint Hindu Family]] |
+| partition | [[legal_formats:partition:deed_of_partition_between_two_tenants_in_common|Deed Of Partition Between Two Tenants In Common]] |
+| partition | [[legal_formats:partition:deed_of_partition_between_two_tenantsincommon|Deed Of Partition Between Two Tenantsincommon]] |
+| partition | [[legal_formats:partition:deed_of_partition_dividing_the_joint_family_business_only_while_other_properties_remaining_joint|Deed Of Partition Dividing The Joint Family Business Only While Other Properties Remaining Joint]] |
+| partition | [[legal_formats:partition:deed_of_partition_with_a_cash_payment_for_equalisation|Deed Of Partition With A Cash Payment For Equalisation]] |
+| partition | [[legal_formats:partition:partition_deed|Partition Deed]] |
+| partition | [[legal_formats:partition:partition_of_leasehold_property|Partition Of Leasehold Property]] |

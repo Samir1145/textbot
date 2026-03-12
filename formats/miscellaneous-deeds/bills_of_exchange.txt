@@ -1,0 +1,32 @@
+Bills of Exchange
+
+Bill of Exchange payable on Demand
+	 Date	 Place of issue	 Due date	 Amount in 
+				figures
+			ON DEMAND 
+To,
+X Y Z,
+(Full address)
+On Demand pay to PQR or to the Order of PQR the sum of 
+Rs. ________________/- (Rupees ____________________________ only) for value received by Cash/Cheque No. _______________ dated __________________ drawn on/as per our Invoice No. ________________ dated ____________ for goods sold and delivered to you.
+I accept the above;
+
+	XYZ	ABC
+	(Full name, description and	(Full name, description and address
+	address of the Acceptor)	of the Drawer)
+	Acceptor 	Drawer
+
+Bill of Exchange payable on due date
+	 Date	 Place of issue	 Due date	 Amount in 
+				figures
+			
+To,
+X Y Z,
+(Full address)
+On the above due date, pay to PQR or to the Order of PQR the sum of Rs. ________________/- (Rupees ____________________________ only) for value received by Cash/Cheque No. _______________ dated __________________ drawn on/as per our Invoice No. ________________ dated _____________ for goods sold and delivered to you.
+We accept the above;
+
+	XYZ	ABC
+	(Full name, description and	(Full name, description and address
+	address of the Acceptor)	of the Drawer)
+	Acceptor 	Drawer

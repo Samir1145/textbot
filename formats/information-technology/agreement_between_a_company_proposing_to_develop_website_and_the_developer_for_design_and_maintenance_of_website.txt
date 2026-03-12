@@ -1,0 +1,44 @@
+AGREEMENT BETWEEN A COMPANY PROPOSING TO DEVELOP WEBSITE AND THE DEVELOPER FOR DESIGN AND MAINTENANCE OF WEBSITE
+
+ THIS AGREEMENT made at………………..on this………………..day of..........2000 between Galaxy Co. Ltd., a company incorporated under the Companies Act,1956 and having its registered office ........... .........(hereinafter referred to as the "Galaxy" which expression shall, unless repugnant to the context or meaning thereof, be deemed to includes its Successors and Assigns) of the ONE PART and ALPHA Website Developer Co. Ltd., a company incorporated under the Companies Act, 1956 and having its registered office ..................... (hereinafter referred to as the "Alpha" which expression shall, unless repugnant to the context or meaning thereof, be deemed to includes its Successors and Assigns) of the OTHER PART.
+ 
+WHEREAS
+ 
+(1)The Galaxy is interested to develop a World Website on Internet for furnishing information of its products and for advertising for the products of other companies/manufacturers/vendors.
+
+(2)The Alpha is a company having professional knowledge and experience of developing and maintenance of websites
+
+(3)The Alpha has offered to develop and maintain Website for Galaxy, which the Galaxy has agreed on the terms and conditions mentioned hereafter
+ 
+NOW IT IS HEREBY AGREED BETWEEN THE PARTIES AS UNDER:
+ 
+1.The Galaxy is engaging Alpha as an independent contractor for the specific project of developing and maintaining a World Website to be	installed on the Galaxy's web space on an Internet Service Provider's (ISP) computer. The Galaxy authorizes Alpha to access the account and authorizes the ISP to provide Alpha with "write permission" for the Galaxy's web page directory, cgi-bin directory and any other directories or programmes which need to be accessed for this project. The Galaxy also authorizes Alpha to publicize their completed WorldWebsite to web search engines, as well as other  Web Directories and Indexes.
+ 
+2. The Alpha will provide the following services in the Website to be developed for Galaxy.
+(a)	E-Mail/Phone consultation (Upto 3 hours marketing and Web Design consultation. Telephone 	long distance charges are to be paid by Galaxy in addition to the rates payable to Alpha under 	clause 	of this Agreement).
+(b)	Providing text of 50 web pages containing 200 words of each page. (The 200 words per page 	approximate maximum, if not supplied via diskette. Web pages of more than 1,00,000 words of 	text may be subject to additional fees, especially if they require a great deal of formatting).
+(c)	Link to external pages upto an average of 2.5 per page.
+(d)	Masthead graphic on first page (Simple custom graphic incorporating Galaxy's 	logo).Top-of-page graphic for all pages in the Website, colour full lines and bullets, and 	coloured and textured background. Minor manipulation of graphics Le. enlargement, reduction, 	etc.
+(e)	Photo and other miscellaneous graphic. The images will be supplied by Galaxy or Alpha (The 	photo and graphic will be upto an average of 1.3 included per page in standard websites and 	regular on line store pages, in addition to masthead and top-of page graphic. The colour 	originals larger than 5" x 8" will be charged extra). Installation of Web pages on the Galaxy's 	ISP host computer
+(g)	Minor updates and changes to existing Web pages for 1 year (This updating and changes only 	include upto one hour per page total, subject to the limits outlined below. Additional changes 	will be charged at hourly rate).
+(h)	Site publicity to at least a dozen major Web search engines, such as Yahoo, Hot Mail, Alta 	Vista, InfoSeek, WebCrawler, Lycos, HotBot, etc.
+(i)	E-Mail response link on each web page to any e-mail address as desired by Galaxy Feedback 	or guest book form. (The Basic CGI programme upto 20 fields included. If the Galaxy's ISP 	does not use a Unix Operating System, the Alpha will have to incur extra charges which will be 	reimbursable by Galaxy).
+(k)	Image Map for internal navigation.
+ 
+3. The Galaxy will supply the contents of the Web Pages and will  be executed by Alpha as specified by the Galaxy.
+	
+ 
+4. The parties agree that they will work together to complete the website in a timely manner. The Alpha agrees to complete the website not later than The Galaxy will supply the complete text and graphics contents for the website within 14 days of signing of this agreement.
+ 
+ 
+5. The fee for the services described in this contract will be Rs. 10,00,000, which will be payable as under
+Rs. 1,00,000 on the execution of these presents
+Rs. 4,00,000 within one month of these presents
+	Rs. 5,00,000 on the completion of the job
+The payment of Rs. 5,00,000 shall be paid after the construction of web pages according to the Galaxy's original written specifications
+The above fee includes upto 50 web pages. The graphics or photos beyond the allowed average of 1.3 per Web page shall be charged at an additional Rs.1,000 each. Transparencies will be charged extra @ Rs.1,200 each. If the Galaxy requests "Custom Graphic Package" the said job will be billed at the hourly rate specified below.
+In case the Galaxy has not secured Web space on an ISP computer by the time the Web pages are completed, the Web pages may be delivered to the Galaxy on diskette or attached to an e-mail message. The advertising the pages to Web search engines and updating will be done after the receipt of the payment by the Alpha. If the Galaxy does not supply the text and graphics contents of all Web pages within six weeks of the execution of this agreement, the entire amount of the contract will become due and payable. If the Galaxy does not submit complete text and graphics contents within one month after signing of this agreement, an additional continuation fee of 10% of the total agreed price will also be assessed each month until the Website is advertisement or agreement is terminated
+ 
+6. This Agreement includes maintenance of Web pages for a period of one year upto an average of one hour per regular page, including updating links and making minor changes to a sentence or paragraph. The maintenance does not include removing nearly all the text from a page and replacing it with new text. If the Galaxy or an agent other than the Alpha attempts updating the Alpha's pages, time to repair Web pages will be assessed at the hourly rate, and is not included as part of the updating tie. The one year maintenance period commences from the date of execution of this Agreement. The changes requested by the Galaxy beyond those limits will be billed at the hourly rate of Rs. 250. The hourly rates shall also be payable for the work authorized beyond the maximums specified above for such services as
+
+

@@ -1,0 +1,298 @@
+FORM BA
+|
+RETURN OF NET WEALTH
+||
+|||
+WEALTH-TAX ACT, 1957||[For individuals/Hindu undivided   families/companies]||Receipt No
+Date.|
+
+[SEE RULE 3(1)(b)]|||||
+|||
+|||
+ORIGINAL/REVISED U/S 16(4)(I)/17|ASSESSMENT YEAR|
+||
+|||19|||-||||
+||
+|VALUATION DATE|
+||
+||3|1|-||3|19|||
+||
+||
+DATE OF FILING OF ORIGINAL RETURN|PAN/GIR.NO./WARD/ CIRCLA/RANGE|
+||
+||||||||||||-|||19||||||||||||||
+|||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||
+STATUS|||||||||||||||||||||||||
+||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+RECIDENTIAL STATUS|||||||||||||||||||||||
+||||||||||||||||||||||||||
+||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+NAME (SURNAME FIRST IN THE CASE OF INDIVIDUAL/ KARTA ONLY)
+(IN BLOCK LETTERS)
+|||||||||||
+||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+RESIDENTIAL ADDRESS/REGISTERED OFFICE IN THE CASE OF COMPANY (IN BLOCK LETTERS)
+|||||||||||
+||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+TELEPHON||||||||PIN|||||||||||||||||
+||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+OFFICE ADDRESS (IN BLOCK LETTERS)|||||||||||
+||||||||||||||||||||||||||
+||||||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+TELEPHON||||||||PIN|||||||||||||||||
+||||||||||||||||||||||||||
+Please indicate :
+||
+||In the case of individual/karta, are you a citizen of India? |Yes/No|
+||Is this your first wealth –tax assessment?|Yes/No|
+||Are you assessed to income tax?|Yes/No|
+||Have you filed return of income/gift for the same assessment year?
+Return of income 
+Return of gift(s)
+If answer to(d) is yes, on what date(s) and with which Ward/Circle/Range
+Return of income
+
+Return of gift(s)
+
+|
+
+Yes/No
+Yes/No|
+||Is this return being filed as a legal representative? |Yes/No|
+||In the case of Hindu undivided family :-
+Does the HUF have at least one member whose net wealth is assessable for this assessment year?
+Has a partition taken place after 31st December, 1978 among the member of the HUF?|
+Yes/No
+
+Yes/No|
+||Have any assets, as in section (2)(ea) of the W. T. Act, 1957, which were shown in the return of the net wealth for the immediately preceding assessment year been excluded from this return? If answer to (g) is Yes, attach to the Return particulars regarding the date and manner of their disposal and the consideration therefor itemwise, if any?|Yes/No|
+||Have you claimed any Double Taxation Relief?
+Under agreement with foreign countries
+In respect of country with which no agreement exists?
+NAME OF THE COUNTRY
+|
+Yes/No
+Yes/No|
+
+PART I
+COMPUTAION OF NET WEALTH INCLUDING NET WEALTH OF OHTER PERSONS INCLUDIBLE IN ASSESSEE’S NET WEALTH ON VALUATION DATE
+
+IMMOVABLE PROPERTY
+
+Description and situation |Value as per Schedule III|Debts owned and incurred in relation to the asset|Net amount
+[(b) –(c)]|
+||||
+||Rs.||Rs.||Rs.|
+||Rs.||Rs.||Rs.|
+||Rs.||Rs.||Rs.|
+||Rs.||Rs.||Rs.|
+||Rs.||Rs.||Rs.|
+|||||||
+Aggregate value of immovable property [i.e. total of 1(d) above ]  ||
+||
+IMMOVABLE PROPERTY
+
+
+Description and situation |Value as per Schedule III|Debts owned and incurred in relation to the asset|Net amount
+[(b) –(c)]|
+||||
+Motor cars (other than those used by the assessee in the business of running them on hire or as stock-in-trade).|||||||||
+||||Rs.||Rs.||Rs.|
+||||Rs.||Rs.||Rs.|
+||||Rs.||Rs.||Rs.|
+||||Rs.||Rs.||Rs.|
+||||||||Total||Rs.|
+
+Precious metals||Weight|||||||
+||Gross|Net|||||||
+(1) Gold||||||Rs.||Rs.||Rs.|
+(2) Silver||||||Rs.||Rs.||Rs.|
+(3) Platinum||||||Rs.||Rs.||Rs.|
+(4) Others||||||Rs.||Rs.||Rs.|
+||||||||Total||Rs.|
+
+Jewellery|||||||||||
+(1) Gold|||||||||||
+Ornaments||||||Rs.||Rs.||Rs.|
+(2) Silver Ornaments||||||
+Rs.||
+Rs.||
+Rs.|
+(3) Ornament made by platinum or any other precious metal or nay alloy thereof||||||
+
+
+
+
+
+Rs.||
+
+
+
+
+
+Rs.||
+
+
+
+
+
+Rs.|
+(4) Precious or semi-precious stones||||||
+
+
+Rs.||
+
+
+Rs.||
+
+
+Rs.|
+(5) Furniture, utensils or any other article made of gold, silver, platinum or any other precious metal||||||
+
+
+
+
+
+
+
+
+Rs.||
+
+
+
+
+
+
+
+
+Rs.||
+
+
+
+
+
+
+
+
+Rs.|
+||||||||Total||Rs.|
+|||||||||||
+Yachts, Boats and Aircrafts (other than those used by the assessee for  commercial purposes) (enumerate each item separately)|||||||||||
+||||Rs.||Rs.||Rs.|
+||||Rs.||Rs.||Rs.|
+||||Rs.||Rs.||Rs.|
+||||Rs.||Rs.||Rs. |
+||||||Total||Rs.|
+Cash in hand||||||||Rs.|
+AGGREGATE VALUE OF IMMOVABLE PROPERTY [i.e. Grand total of totals of items(i)(d) to (v)(d) above]|
+|||||||||
+INTEREST HELD IN THE ASSETS OF A FIRM OR ASSOCIATION OF PERSONS (AOP) AS A PARTNER OR MEMBER THEREOF :|
+Description||||Value as per schedule III||Debts owed and incurred in relation to the asset||Net amount 
+[(b)-(c)]|
+(a)||||(b)||(c)||(d)|
+|Firm (Name and address)|||||||||
+|||||Rs.||Rs.||Rs.|
+|||||Rs.||Rs.||Rs.|
+|||||Rs.||Rs.||Rs.|
+|||||Rs.||Rs.||Rs. |
+|||||||Total||Rs.|
+||||||||||
+|AOP (Name and address)|||||||||
+|||||Rs.||Rs.||Rs.|
+|||||Rs.||Rs.||Rs.|
+|||||Rs.||Rs.||Rs.|
+ |||||Rs.||Rs.||Rs. |
+|||||||Total||Rs.|
+||||||||||
+|Aggregate value of interest held in the assets of firm or AOP as a partner or member thereof [i.e. Grand total of totals of items 1(i)(d) and 1(ii)(d) above]||||
+|||||||Total||Rs.|
+D. STATEMENT OF NET WEALTH|||||||
+|Aggregate value of immovable property [Item No. A.2]||Rs.|
+|Aggregate value of immovable property [Item No. B.2]||Rs.|
+|Aggregate value of interest in assets held in a firm or AOP as partner or member thereof [Item No. C.2]||
+Rs.|
+|Net wealth (A+B+C)||Rs.|
+|Net wealth (as rounded  off to the nearest multiple of hundred rupees)(in words)
+|||
+|Value of asset included in 2 above being the asset of any other person ||Rs.|
+|Name and relationship of such person(s)|||
+|
+PART II|
+STATEMENT OF TAXES|
+|
+|Tax on net wealth |Rs.|||||
+|Add : Interest on late filling of return|Rs.|||||
+|Total tax and interest payable (i.e. 1+2)|||||Rs.|
+|||||||
+|Less : Tax and interest, if any, paid on self- assessment [Attach challan(s)]||Tax Rs.||Interest Rs.||
+|||||||
+|||||Total Rs. ||
+|Date of payment|||||||||
+|||-|||19||||||||||
+|Name of the Bank/Branch|||||
+||||||
+|Tax/interest payable or refund due (3-4)||||||||
+Rs.|
+
+PART III
+INFORMATION WHERE ASSESSEE IS A PARTNER OR MEMBER OF A FIRM/AOP
+
+|Sl  No. |Name(s) of other partners/Members|Share of profit Ratio|Value of interest in the assets of the concern|
+|(a)|(b)|(c)|(d)|
+Firm AOP|||||
+
+PART IV
+ASSETS CLAIMED EXEMPT
+
+Description of asset|Amount (Rs.)|Reasons for claim|
+(a)
+(b)
+(c)
+(d)
+(e)
+|||
+
+PART V
+LIST OF DOUMENTS/STATEMENTS ATTACHED
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+|
+
+Verification
+
+I, 						Son/Daughter/Wife of Shri
+	[Name in block letters]						[Name of father/husband]*
+Solemnly declare that to the best of my knowledge and belief, hte information given in this return and the annexures and statements accompanying it is correct and complete, that the amount of net wealth and other particulars shown are truly stated and related to the valuation date relevant to the assessment year commencing on 1st April, 19 
+I further solemnly declare that					*I
+					the person for and on whose behalf this return furnished 
+the person in respect of whose net wealth I am assessable had no other asset belonging to 
+     *me				*my
+		either in  			name or in the name of any other person which is 
+the said person		the said person’s
+							*my
+required to be taken into consideration in computing 	the said person	
+net wealth on the said valuation date.
+It had no other assets belonging to it which is required to be taken into consideration in computing its net wealth as on the said valuation date.
+I further declare that I am maing this return in my capacity as 				(designation in the case of company/HUF) of 			and that I am competent to make this return and verify it .
+Date 
+Place:										Signature
+
+Important:
+Before signing the verification, the signatory should satisfy himself that this return is correct and complete in every respect. Any person making a false statement in this return shall be liable to prosecution under section 35D of the Wealth-tax Act, 1957 and on conviction be punishable:-
+In a case where the tax sought to be evaded exceeds one lakh rupees, with rigorous imprisonment for term which shall not be less than six months but which may extend to seven years and with fine:
+In any other case, with rigorous imprisonment for a term which shall not be less than three months but which may extend to three years and with fine.
+* Strike out whichever is not applicable.

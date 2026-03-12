@@ -1,0 +1,103 @@
+'FORM NO. 26
+(See sections 193, 194, 194A, 194B, 194BB, 194C, 194D, 194EE, 194F, 194G, 194H, 194-I, 194J, 194K and rule 37)
+Annual Return of deduction of tax under section 206 of I.T. Act, 1961 in respect of all payments other than "Salaries" for the year ending 31st March..............
+1. Particulars of the person making deduction of tax
+(a) Name
+(b) Address : Flat / Door/ Block No.
+    Name of Premises / Building/
+    Road / Street / Lane
+    Area / Locality /
+    Town / District / City
+ PIN
+State
+(c) Tax Deduction Account Number
+(d) Permanent Account Number
+2.* Has address of the person making deduction of tax changed
+ Tick as applicable Yes No
+3. Status as defined within the meaning of section 204 read with rule 30 Tick as applicable Central Govt. Others
+4. (a) Please tick  the boxes below indicating the section and type of payment (other than "Salaries") made during the year from which tax was required to be deducted at
+source by you under the Income Tax Act, 1961
+193 194 194A 194B 194BB 194C 194D 194EE 194F 194G 194H 194I 194J 194K
+(b) Please furnish information in separate Annexures as per the enclosed proforma for each type of payment indicated in item (a) above. viz, interest, rent, commission etc.
+S .  No .
+ Am o un t   D ed u ct e d Tr an s f e r V o u ch e r  /  C h a ll a n  N o .  g i ve n  b y  B a n k D a t e  o f   Tra n sf e r  V o u ch e r  /    C h a ll a n
+ Ba n k B ra n ch   Co d e
+ S e ct io n  C o d e
+(0 9 5 )
+ (0 9 7 )
+ ( 0 98 )
+ (0 9 9 )
+(1 0 0 )
+(0 9 6 )
+T ot al
+N o t e  -  W he r e    de d u ct i o n  i s  ma d e   by  o r  o n  b e h a lf   o f  t h e  G o ve rn m e nt   t o  g i ve   pa r t ic ul a rs  o f   t ra n sf e r  vo u ch e rs ;  o t h e r  d ed u ct o r s  t o  g iv e  p a rt i cu l a rs  o f  c h al l an   n o .  re g a rd i ng   d e po s it   in t o
+b a nk .
+VERIFICATION
+I, _________________________________________________________, hereby certify that all the particulars furnished above are correct and complete.
+Place :
+ Signature of person responsible for deducting tax at source _____________________________________________________________________
+Name and designation of person responsible for deducting tax at source __________________________________________________________
+Date :
+___________________
+* If address has changed give changed address in column 1(b)
+5. Details of tax deducted and paid to the credit of the Central Government
+
+
+
+Annexure -
+Details of............................................................1 paid / credited during the financial year and of tax deducted at source under section2    of Income-tax Act, 1961 :-
+ Ch a lla n
+Nam e   a nd   A d dr e ss  o f  De d u cte e   (A d dr e ss
+ Am ou n t  o f
+ Da te  o n  wh i ch
+ R at e   at
+ D a t e  o n   w h ic h   t ax
+ D a t e   o n  w h i ch   t a x
+Ded uc te e
+ P e rm an e nt   A cco u n t  N u m be r
+ B a n k B ra n ch   Co d e
+A mo u n t   of   t a x
+n um b er  g iv en
+d ed u c t ed
+ne e d  n o t  b e   gi ve n  i f  P A N  i s  me n t io n e d)
+pa y me n t  ( R s. )
+a mo u nt   pa id /
+w hic h
+d e d u ct e d
+p ai d  t o   t he   cre d it   o f
+(PA N )  o f  d e d uc t ee
+C o de 3
+b y  b a n k
+( R s. )
+cr e di t e d
+t a x
+C en t ra l  Go v er nm e n t  4
+d e d u ct e d
+( 2)
+ ( 3) ( 4 ) ( 5) (6 ) ( 7 ) ( 8) (9 ) (1 0 ) (1 1 )
+(1 )
+Notes  : -
+1  Please state the nature of payment viz. interest, rent, contract payment etc.
+2  Please use separate Annexures for deductions made under different Sections.
+3  Please enter Deductee Code  01 for companies, 02 for 'other than companies'.
+4  Where deduction is made by or on behalf of the Government , transfer voucher number may be entered in column (9).
+5  Write 'A' if the 'lower deduction' or 'no deduction' is on account of a certificate under Section 197.
+   Write B if no deduction is on account of declaration under section 197A.
+6  If necessary, please use additional sheets to give full details of payment in the above format. Please also give running serial number to all pages.
+Signature of person responsible for deducting tax at source____________________________________________________________________________
+Name and designation of person responsible for deducting tax at source_________________________________________________________________';
+
+
+
+ Annexure -
+Details of............................................................1 paid / credited during the financial year and of tax deducted at source under section2    of Income-tax Act, 1961 :-
+ Rea so n fo r  non-
+D a t e  o f   f u rn i sh in g
+ded uc ti on /
+Ta x  D ed u ct i on
+lower  d educ ti on
+C e rt i f i ca t e
+if   an y5
+(1 2 ) (1 3 )
+Signature of person responsible for deducting tax at source____________________________________________________________________________
+Name and designation of person responsible for deducting tax at source_________________________________________________________________';

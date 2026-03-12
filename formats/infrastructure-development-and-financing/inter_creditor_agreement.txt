@@ -1,0 +1,399 @@
+INTER CREDITOR AGREEMENT
+
+THIS INTER CREDITOR AGREEMENT, dated the…………………day of…………………2001, amongst XYZ Finance Company Limited, ("XYZF"), a company registered under the Companies Act, 1956, as Lender and Guarantor,  Power finance Corporation Limited, (“PFC"), a company registered under the Companies Act, 1956, ABC Bank (“ABC”)a banking company within the meaning of the Banking Regulation Act, 1949, as Lender and Guarantor, STR Development Bank ('STRB"), a company registered under the Companies Act, 1956 as Lender and Guarantor, AAA Insurance and Finance Company" Ltd., ("AAA"), a company registered under the Companies Act,1956 as Lendor, BBB Insurance Company Ltd., (“BBB"), a company registered under the Companies Act, 1956 Lender, The JKL Bank Limited ("JKL"), a banking company registered under the Companies Act, 1956, as Lender, DEF Bank ("DEF"), a banking company organised and existing under the laws of India as Lender and Guarantor, GHI Bank Limited, ("GHI"), a banking company within the meaning of the Banking Regulation Act, 1949, and The XYZ Finance Company Limited, acting as Security Trustee for the Lenders and Guarantors, (which expression shall, unless it be repugnant to the subject or context thereof, be deemed to include its successors and assigns);
+ 
+WHEREAS
+ 
+(A) Pursuant to the Loan Agreements as defined herein, between ABC Power Generation Company Limited, ("Borrower"), a public company incorporated under the Companies Act, 1956 and the Lenders, whose names are set out in Schedule hereto, the Lenders have agreed, inter afia, subject to the terms and conditions contained therein, to lend and advance to the Borrower or subscribe to non convertible debentures issued by the Borrower, amounts upto those set out against their respective names in Schedule hereunder written (hereinafter collectively referred to as "the Loan" or "the Loans' more particularly defined herein).
+ 
+(B) Pursuant to Guarantee Agreements, as defined herein between the Borrower, the Guarantors and the Counter  Guarantors (collectively referred to as the “Guarantors"), the Guarantors have agreed to guarantee or counter guarantee certain payment obligations of the Borrower to the extent set out against their respective names in Schedule I hereto (hereinafter collectively referred to as "the Guarantee Assistance") to The Export-Import Bank of Hong Kong (hereinafter referred to as "HKEXIM Bank") In terms of the HK-EXIM Loan Agreement, dated 26-11-2000.
+ 
+(C) XYZF has been appointed Security Trustee (Lead Institution) on behalf of the other Subscription, Agreement Lenders, Subscribers and the Guarantors.
+ 
+(D) As security for its payment obligations under the -Loan Agreements and the Guarantee Agreements, the Borrower has created Security in favour of the Secured Creditors and the parties hereto have agreed to enter into this Agreement for the purpose of co-ordinating their Security interests and the exercise of their rights, powers and remedies under the Security Documents.
+ 
+NOW THEREFORE, the parties hereto agree as follow .
+ 
+Definitions and Interpretation
+ 
+Definitions
+ 
+Wherever used in this Agreement_ unless the context otherwise requires, the following terms have the following. meanings (and. terms which are not defined in this Agreement shall, unless the context otherwise requires, have the same meaning as in the Loan Agreements, Subscription Agreement and Guarantee Agreements)
+ 
+"Borrower's Banks" shall mean the banks or other financial institutions providing working capital facilities to the Borrower from time to time.
+ 
+"Business Day" means a day on which the office of the Secured Party is open for business.
+ 
+"Dollars" shall mean the lawful currency of the United States of America.
+ 
+"FC Loans" means the Loans, in the aggregate, as is contracted by the FC Lenders to be made in Foreign Currency and the principal and interest on which is to be paid in terms of the FC Loan Agreements.
+ 
+"Enforcement" means, with respect to all or any portion of the Security, a sale, execution pursuant to any proceedings for sale or any other disposition of the Security or applicable portion thereof in connection with an Enforcement Action.
+ 
+"Enforcement Action" shall have the meaning ascribed to it In section 3.2 hereof.
+ 
+"Events of Default" has the 'meaning ascribed thereto in. the Loan Agreements, Subscription Agreement and the Guarantee Agreements.
+ 
+"FC Loan Agreements" mean each of the following Loan Agreements:
+ 
+(a) Loan Agreement between the Borrower and XYZF, dated 26-11-2000;
+(b) Loan Agreement between the Borrower and STPD, dated 5-12-2000;
+(c) Loan Agreement between the Borrower and ABC, dated 5-12-2000; and
+(d) Loan Agreement between the Borrower and PFC, dated 4-12-2000.
+ 
+"Financing Documents" means the Loan Agreements, the Subscription Agreement, the Guarantee Agreements and the Trust and Retention Agreement; etc.
+ 
+"Guarantee Agreements" mean each of the following agreements:
+ 
+1 .Guarantee Agreement between the Borrower and The XYZ Finance Company Limited. dated 26-11-2000.
+2.Guarantee Agreement between the Borrower and ABC Bank, dated 5-12-2000.
+3.Guarantee Agreement between the Borrower and STR Development Bank, dated 5-12-2000.
+4.Guarantee Agreement between the Borrower and GH1 Bank Limited, dated 30-11-2000.
+5.Guarantee Agreement between the Borrower and DEF Bank, doe.02.42,-2000.
+ 
+"Insurance Proceeds" mean all monies payable under, and all claims. arising out of, any insurance policy in effect and held by or for the benefit of the Borrower.
+ 
+"Lenders" mean the Rupee Lenders and the FC Lenders.
+ 
+"Loans" means the Rupee Loans and the FC Loans.
+ 
+"Loan Agreements" shall mean the Rupee Loan Agreements, Subscription Agreement and the FC Loan Agreements.
+ 
+"Rupee Lenders" means each of the Lenders providing Rupee Loans and the Subscriber to Non-Convertible Debentures.
+ 
+"Rupee Loans" means the Loans, in the aggregate, as is contracted by the Rupee Lenders to be made in Rupees, the NCDS to be subscribed by the Subscriber and the principal and interest on which is to be paid in terms of the Rupee Loan Agreements.
+ 
+"Rupee Loan Agreements" means each of the following Loan Agreements.
+ 
+1 .Loan Agreement between Power Finance Corporation and the Borrower, dated 4-12-2000;
+2.Loan Agreement between BBB Insurance and Finance Company Ltd. and the Borrower, dated 1-12-2000;
+3.Loan Agreement between The AAA Finance and Insurance Company Ltd. and the Borrower, dated 1-12-2000;
+4.Loan Agreement between DEF Bank and the Borrower, dated 2-12-2000; and
+5.Loan Agreement between The JKL Bank Limited and the Borrower, dated 2-12-2000.
+ 
+"Notice of Default" means a notice issued under section 3.2 accelerating amounts outstanding under the Loan Agreements, Subscription Agreement and the Guarantee Agreements, declaring all amounts thereunder to be due and payable forthwith.
+ 
+"Project" means the development, construction, financing and operation of a combined cycle power project of an Installed capacity approximating………………….MW at………………….Industrial Development Area, District ………………….In the State of Maharashtra. The plant comprises two gas turbine units of approximately………………….MW each and a steam turbine of approximately………….MW.
+ 
+"Rupees" and the abbreviation Rs. shall mean the lawful currency of the Republic of India.
+ 
+"Secured Creditors" means the Rupee Lenders, FC Lenders, Subscribers to NCDs and the Guarantors.
+ 
+"Secured, Obligations" means the Borrowees payment obligations to the Secured Creditors.
+ 
+"Security" means the security created under the Security Documents.
+ 
+"Security Documents" shall mean the agreements entered into between the Borrower and the Security Trustee for creation of Security.
+ 
+"Security Trustee" means The XYZ Finance Company Ltd. acting as Security Trustee for the all Lenders and the Guarantor (including XYZF).
+ 
+"Subscriber" shall mean The XYZ Finance Company Ltd. (XYZF).
+ 
+"Subscription Agreement" means the Agreement between the Borrower and The XYZ Finance Company Ltd. dated 26-11-2000.
+ 
+"Trust and Retention Agreement" means the Trust and Retention. Agreement to be entered into between the Borrower, the Security Trustee and the Bank of Baroda and IndusInd Bank as Account Banks.
+ 
+"Working Capital Loan" shall have the meaning ascribed to it in section 4 hereof.
+ 
+"Working Capital Lenders" means banks or financial institutions providing working capital facilities to the Borrower.
+ 
+Interpretation
+ 
+In this, Agreement, unless the context otherwise requires:
+ 
+(i)	the singular includes the plural and vice versa and reference, to any gender includes a reference to all other genders;
+(ii)	references to the words "include" or "including" shall be construed without limitation;
+(iii)	references to this Agreement or to any other agreement or any deed or other instrument shall be construed as a 	reference to such agreement, deed or other instrument as the same may from time to time be amended, varied supplemented or novated; and
+(iv)	a reference to any person shall include a reference to its successors and permitted assignees.
+ 
+Rights against Borrower Not Affected
+ 
+Nothing herein is intended to modify or impair any of the rights of any of the Secured Creditors against the Borrower under the Financing Documents and/or the Security Documents.
+ 
+General principles
+ 
+Application of monies
+ 
+Notwithstanding anything contained herein, any compensation moneys received from requisition or acquisition of the Security or any part thereof and/or any moneys or amounts received on account of nationalisation and/or take over of the management of the assets and/or undertaking of the Borrower or any part thereof and/or any other realisation from or out of the Security or any part thereof by enforcement of one or more of the. Security or by taking recourse to any special legislation for recovery of dues as may be applicable or otherwise howsoever shall be available for distribution amongst the Secured Creditors to the extent and manner provided in clause 2.06:
+ 
+Insurance Policies
+ 
+During the subsistence of any of the Security, all insurance policies in respect of the Security which are taken out by the Borrower in the joint names of the Borrower and the Security Trustee with an insurance company or companies In such manner and for such value and against such risks as may, be determined, by the Secured Creditors in accordance with the Financing Documents shall be held and retained by the Security Trustee in its custody for the mutual benefit of the Secured Creditors and the same shall be made available in accordance with the Security Documents by the Security Trustee to other Secured. Creditors whenever required by them or any of them against their/its, accountable receipt for the same.
+ 
+Title Deeds and Security Documents
+ 
+All the title deeds and documents relating to the Security shall be held and retained by Security Trustee in its custody for the mutual benefit of the Secured Creditors. The Security Trustee shall as and when required by them or one or more of them, make available to the mi the said title deeds and documents against their/its accountable receipt or furnish copies thereof.
+ 
+Suits against Borrower
+ 
+Without prejudice to section 3.6(b), all the Secured Creditors collectively shall be entitled, in the event of non-payment of dues by the Borrower in accordance with the Finance Documents or for a breach of the provisions thereof including by the Borrower, to bring a suit, or other legal proceeding or to instruct the Security Trustee to take any steps for enforcement of the Security created in Its their respective favour or otherwise for realisation of its respective debts owed to the Secured Creditors from the Borrower and in the event of the institution of any such suit or other legal proceeding, the Secured Creditor so instituting shall join in the other or others of them as are or is not willing to join as party plaintiffs or plain, tiff as party defendants or defendant in such suit or other legal proceeding.
+ 
+Consultation
+ 
+Prior to taking any action for enforcement of any of the Security in accordance with Article III, each of the Secured Creditors concerned shall duly inform the other or others of the same and each of them shall also consult and co-operate with the others in respect of all matters pertaining to the Security in accordance with Article III hereunder.,
+ 
+Application of monies
+ 
+(1) Notwithstanding anything to the contrary contained in or by virtue of or arising from or implied by the Security or the Security Documents, all moneys available for distribution, as mentioned in section 2.01 hereof, shall be applied with all convenient despatch in the manner hereinafter provided:
+ 
+(a)	firstly, there shall be paid out of such moneys or provisions made thereat for the costs, charges, expenses 	incurred by the Security Trustee for and incidental to the enforcement of the Security and/or realisation or receipt of such. moneys;
+(b)	secondly, the balance of such moneys shall:­
+(i)	in the event of the moneys so available for distribution being sufficient to pay to each of them the full amount of the debt due, to each of the Secured Creditors respectively be applied towards payment of each of the Secured Creditors;
+(ii)	in the event of the moneys available for distribution being insufficient to pay to each of the Secured Creditors, the full amount of the debt due to each of the Secured Creditors respectively, be applied pan passu as nearly as may be practicable, towards, payment to each of them without any preference or priority whatsoever:
+Provided, that the amount distributable to each of the Secured Creditors shall bear to the total distributable amount the same proportion, which the outstanding amounts of the debt due, to each of such Secured Creditors bears to the aggregate of the outstanding amounts of the debts due to all the Secured Creditors under the Security;.
+(iii)	thirdly, the surplus, if any, out of such. moneys shall be paid to the person or persons entitled thereto.
+ 
+(2) Any payment made to each of the Secured Creditors In accordance with the provisions of this clause shall be in satisfaction of its respective debt under Its relative Security, subject to section 3.06(b) as between such Secured Creditors and the Borrower, such Secured Creditors shall be entitled to enforce their rights under their relative Security against the Borrower.
+ 
+(3) It  any Secured Creditors receive such money as aforesaid the same shall be forthwith placed and kept until required for appropriation hereunder, In a separate bank account to be maintained for the purpose, with a schedule bank, on proper terms as to interest and otherwise. Such Secured Creditors shall also submit to the other, Secured Creditors at the end. of every month a statement of account with respect to the amount realised by it from the enforcement of the Security and its application. Such Secured Creditors shall also submit to the other Secured Creditors every month a report dealing with other important matters connected with or affecting the Security and the enforcement thereof or affecting the interest of the Secured Creditors.
+ 
+(4) The aforesaid provisions shall take effect between the Secured Creditors and the persons claiming through them and without prejudice to any rights they or any of them may, have against the Borrower.
+ 
+	Sharing of certain expenses
+ 
+During the subsistence of the Security, all expenditure incurred by the Secured Creditors or any of them towards payment of insurance premium or in connection with preservation of the Security shall be shared by the Secured  Creditor's on a pro rata basis. The amounts to be shared as such by each of the Secured Creditors, shall bear to the total expenditure the same proportion which the outstanding amounts of the debt due to each of such Secured Creditor bears to the aggregate of the outstanding amount of the debt due to all such Secured Creditors under the Security.
+ 
+Consultation
+ 
+General consultation
+ 
+The Secured Creditors agree that (i) they shall afford each other a reasonable opportunity to exchange views before taking any action that could affect the Borrower, the Project or, the Security and (ii) they shall, from time to time, consult with each. other with respect. to the progress of the, Project and the affairs of the Borrower in general.- In addition, unless and Borrower until the Secured Obligations shall have been fully paid to the appropriate Secured Creditor, the, Secured Creditors shall consult with each other regarding the operation of the Project and the Security and the ultimate disposition thereof following an Enforcement in the event of the Security Trustee, Debenture Trustee or a receiver appointed by either of them obtains possession control of the Project or any Security as a, result of the Enforcement. Additionally. unless and until the Secured Obligations shall have been fully paid to the Secured Creditors, or a receiver appointed by either of them, shall on or after acquiring possession control of the Project or any Security shall, upon request from time to time, provide access to the Project and I any such Security and to such reasonable information as may be requested from time to time by any of the other Secured Creditors.
+ 
+Mandatory Notice
+ 
+(a) Subject to the provisions of section 3.04, each Secured Creditor shall give each of the other Secured Creditor 45    (Forty-Five) days prior written notice (a) "Relevant Notice) (with a copy to the Borrower) by letter, cable, telex or facsimile before (t) taking any step or action to accelerate any amount outstanding under any of the Financing  Documents, or (h) commencing to enforce the Security or otherwise exercising any power under any of the Security Documents or with respect to the Security or any portion thereof. Each Relevant Notice shall describe the applicable default and intended Enforcement Action in reasonable detail. During such 45 (Forty-Five) day period following the date of such Relevant Notice, the Secured Creditors shall consult with each other with a view to take a mutually satisfactory common Enforcement Action, in which, case (a) the Secured Creditors shall jointly issue a common Notice of Default to the Borrower and (b) proceed to implement the agreed Enforcement Action pursuant to the Security Documents. If all of the Secured Creditors fail to agree upon a mutually satisfactory common Enforcement Action during such 45 (Forty-Five) day period (which may be extended by agreement among all of the Secured Creditors), the Secured Creditor which issued the Relevant Notice may, proceed to take the Enforcement Action as provided for In section 3.06(b). All proceeds realised from any such Enforcement Action shall be applied in accordance with section 2.07 hereof. In addition to the aforesaid Relevant Notice, upon the occurrence of a missed or late payment under any Financing Documents, the relevant Secured Creditors shall give the other Secured Creditors prompt notice thereof.
+ 
+(b) It is understood and agreed that, In connection with the taking of an Enforcement Action or the issuance of a Notice of Default, or the issuance of any other notice, direction  or other communication or the taking of any other action under this Agreement  the Secured Creditors shall act only through the Security Trustee as the case may be,  each of which is hereby authorised by the Secured Creditors to act on behalf of the Secured Creditors under this Agreement.  Notwithstanding the foregoing, if and to the extent that applicable law requires that a Secured Creditor issues a notice or takes any other action in connection with any matter contemplated in connection with this Agreement (such as the execution of a release, if and to the extent applicable) and such action cannot ,be delegated lawfully to the Security Trustee or as the case may be, then the Secured Creditor shall take such action .
+ 
+Suspension of Disbursement
+ 
+If any Secured Creditor terminates or suspends disbursements to the Borrower under the provisions of any of the Financing Documents, such Secured Creditor shall promptly Inform the other Secured Creditors of such termination or suspension and the reasons therefore If, in the judgment of the Secured Creditor (acting reasonably) taking such action, the reasons therefore, are susceptible to correction, such Secured Creditor shall take into account the views of the other Secured Creditor with regard to effecting such correction and resuming disbursements to the Borrower under such Financing Documents.
+ 
+Reservation of Rights
+ 
+It is understood that nothing contained in section 3.01 or 3.02 above or elsewhere in this Agreement shall modify any of the rights of any Secured Creditor against the Borrower under any of the Financing Documents or the Security Documents.1t is further understood that any Secured Creditor shall be free to disregard the provisions of section 3.01, or 3.02(a) if (t) the Borrower is insolvent or has admitted, in. writing its inability to pay its debts generally as they become due, or any analogous event has occurred, or (h) the Secured Obligations owed to such Secured Creditor are in jeopardy or threat of jeopardy.
+ 
+Notice of Enforcement Action
+ 
+If, in accordance with the provisions of this Article, any Secured Creditor shall take any Enforcement Action, such Secured Creditor shall contemporaneously send to the other Secured Creditors details of such action (as the case may be) and copies of any notices issued In connection therewith.
+ 
+Preference for Joint Action
+ 
+(a) In connection with the notification and consultation procedures described in this Article and the taking of an  Enforcement Action, the Secured Creditors hereby agree to use reasonable efforts to ensure that timely and appropriate action will be taken In all matters connected with the enforcement of the Security, including, without limitation the appointment of a receiver (or receiver and manager or similar official) of the Borrower or of any of, its assets, acceptable to all of, the Secured Creditors with the intent that:­
+ 
+(i)	subject to the provisions herein, the Security shall so far as practicable, be enforced by the same method;
+(ii)	in the case of an, appointment of a receiver (or receiver and, manager or similar official) the same person shall if possible be appointed as such on behalf of the Secured Creditors, but if two or more persons shall be appointed 	they shall, so far as practicable act jointly; and
+(iii)	the sharing of expenses of enforcement of the Security shall be in accordance with section 2.07(i)(a) hereof.
+ 
+(b) Each Secured Creditor hereby confirms that it will only take Enforcement Action under the Security Documents or with respect to the Security by means of issuance of instructions to the Security Trustee (as appropriate) to take such action.
+ 
+(c) Each of the Secured Creditor confirms and agrees that it will take Enforcement Action with respect to the Security held directly in its favour, after complying. with the provisions of this Agreement.
+ 
+No Reliance
+ 
+Notwithstanding any other provision of this Agreement, no Secured Creditor has relied or shall rely on Secured Creditor (i) to Inquire into or verify the accuracy or completeness of any information provided by the Borrower any other Secured Creditor or any Affiliate of any thereof or any other person or made available by , Secured Creditor to other Secured Creditors on or prior to the date hereof or hereafter pursuant to section 3.01; or (ii) to review or evaluate the condition of the Borrower or any Affiliate of any thereof or any other person or the Project. Each Secured Creditor has made its credit decision without reliance on information provided by, or on views expressed by any other Secured Creditor.
+ 
+Additional Loans
+ 
+Working Capital Loan
+ 
+The Secured Creditors acknowledge that, the Borrower has and shall be seeking working capital facilities in connection with the Project to be financed by the Working Capital Lenders (hereinafter referred to as the "Working Capital Loans"). The Secured Creditors hereby consent to such Working Capital Loans and to the creation of security in favour of the Working Capital Lenders, on pari passu basis with the Secured Creditors provided, that the Working Capital Lenders enter into and agree to be bound by this Agreement (including without limitation. The sharing arrangements contained herein), with modifications incorporating any additional terms (as well as such other reasonable modifications as all of the Secured Creditors shall require).
+ 
+ 
+The Security Trustee
+ 
+Authorisation
+ 
+The Lenders, Subscribers and Guarantors hereby appoint and constitute The XYZ Finance Company Ltd., ("XYZP) as Security Trustee hereunder, to act as Security Trustee under the Security Documents. for the purposes, and in accordance with the terms and provisions, set forth herein. XYZF hereby agrees to act as the Security Trustee ,for the Lenders, Subscribers and the Guarantors in respect of the Security Documents. 
+ 
+Authority to Execute and Perform Various Documents
+ 
+The Lenders, Subscribers and the Guarantors hereby authorise and direct and the Security Trustee hereby agrees for the benefit of the Lenders, Subscribers and the Guarantors, (i) to execute and deliver the Security Documents, (ii) to execute and deliver all other documents, agreements, instruments and certificates under the Security Documents to be executed and delivered by the Security Trustee as it shah deem advisable and in the best Interests of the Lenders, Subscribers and this Guarantors, (iii) to take whatever action shall be required to be taken by the Security Trustee by the terms and provisions of the Financing Documents, and subject to the terms and provisions of this Agreement, to exercise its rights and perform its duties and obligations under each of the documents, agreements, instruments and certificates and (iv) subject to the terms and provisions of this Agreement, to take such other action in connection with the foregoing as the Lenders, Subscribes and the Guarantors from time to time direct.
+ 
+Declaration of Trust by the Security Trustee
+ 
+The Security Trustee hereby declares that in relation to the Lenders, Subscribers and  the Guarantors, it will hold all estate, night, title and interest in law and in equity in, and to the Security Documents and all monies received by it whether prior to or as a result of enforcement of the Security, constituted under the Security Documents and the same shall be applied In accordance with section 2.06.
+ 
+Each of the Lenders, Subscribers and the Guarantors:
+ 
+(a) authorise the Security Trustee to act on behalf of each of them; and
+(b) agrees to be bound by the acts,. decisions and, exert so of discretions of the Security trustee.
+ 
+Miscellaneous Provisions
+ 
+Partial In validity and Exercise of Remedies
+ 
+If, at anytime , any provision hereof is or becomes illegal, invalid or unenforceable in any respect, under the law of any jurisdiction, neither the legality, validity or enforceability of the remaining provisions hereof nor the legality, validity or enforceability of such provision under the law of any other jurisdiction shall in any way be affected or, impaired thereby.
+ 
+No Waiver, Cumulative Remedies
+ 
+No failure to exercise, and no delay in exercising any right, power or privilege hereunder, shall operate as a waiver thereof, nor shall any single or partial exercise  of any right, power or privilege hereunder preclude or require any other. All rights, powers and remedies granted to any party hereto and all other agreements, instruments and documents executed in connection with this, Agreement shall be cumulative, may be exercised singly or concurrently and shall not be exclusive of any rights-or remedies provided by law.
+ 
+Benefit of Agreement
+ 
+(a)	This Agreement shall be binding upon and enure for the benefit of each party hereto and its successors and assigns.
+(b)	The Security Trustee shall not assign or transfer all or any of its rights, benefits and obligations hereunder without the written consent of all of the Secured Creditors.
+(c)	Subject to the Financing Documents any of the Secured Creditors may, at any time, assign to any one or more banks or other institutions or other persons to whom such, Secured. Creditor has assigned or transferred all or any part of its rights and obligations under (and in accordance with the terms of) any of the Financing Documents all or, as the case may be, such equivalent part of such Secured Creditor's rights and benefits hereunder, and in that event, any such assignment or , transfer shall be made expressly, subject to the terms and conditions of this Agreement and the ,assignee shall have the same rights and obligations hereunder, as it would have had, if it had been a party hereto.
+Notices
+ 
+(i)	All notices or other communications to be given or made under these presents shall be In writing, shall either be delivered personally or sent by courier, registered or certified mail or facsimile.The address for service of each of the Secured Creditors are as follows:
+ 
+SECURITY TRUSTEE 					ADDRESS OF SERVICE
+The XYZ Finance Company Ltd., (XYZF)			…………………………...
+								…………………………...
+Mumbai
+ 
+SECURED CREDITOR					ADDRESS OF SERVICE
+The XYZ Finance Company Ltd., (XYZF)			…………………………...
+								…………………………...
+								…………………………...
+Power Finance Corporation Limited,				…………………………...
+	New Delhi
+ABC Bank ("ABC”)						…………………………...
+								…………………………...
+Mumbai
+ 
+	STR Development Bank ("STRD)				…………………………...
+Mumbai 400 005
+ 
+AAA Finance & Insurance Company Ltd., (AAA)		…………………………...
+Mumbai 400 020
+ 
+BBB Insurance & Finance Company Ltd., (BBB)		…………………………...
+The JKL Bank Limited, (“JKL")					…………………………...
+								Mumbai 400001
+DEF Bank ("DEF")						DEF Bank,
+	.............................
+	Mumbai
+ 
+(ii)All notices shall be effective upon actual receipt.- Without prejudice to the foregoing, a party giving a notice or  communication by facsimile, shall promptly deliver a copy of such notice or communication personally or by courier or by mail to the addressee of such notice or communication.
+ 
+(ii)Any party, may in writing to other party, change its designated address. Such change shall take effect when all parties have been informed of It. –
+ 
+Amendments
+ 
+Any amendments of any provision of this Agreement shall be in writing and signed by the parties hereto. 
+ 
+Counterparts
+ 
+Sr.|Name of the Lender/Address|RTIJ|FCL|FLG, |Total|
+No.| |NCD| | | |
+1.|The XYZ Finance Company Limited,| | | | |
+ | | |(US$)|US$)| |
+ |Mumbai| | | | |
+2.|STR Development Bank| | | | |
+ |.............................| |(US$)|(US$)| |
+ |Mumbai - 400 005| | | | |
+3.|Power Finance Corporation Limited,| | | | |
+ |............................| |(US$)| | |
+ |New Delhi - 110 001| | | | |
+4.|AAA Finance and Insurance| | | | |
+ |Company Ltd.,| | | | |
+ |.........................
+Mumbai - 400 021| | | | |
+5.|BBB Insurance & Finance Company| | | | |
+ |Ltd.,| | | | |
+ |..............................
+Mumbai - 400 001| | | | |
+6.|ABC Finance Company Ltd.,| | | | |
+ |. .
+Mumbai - 400 001| | | | |
+7.|CDF Insurance Co. Ltd.,| | | | |
+ |. .
+New Delhi - 110 002| | | | |
+8.|National Insurance Company Limited,| | | | |
+ |46-C, J. N. Road,| | | | |
+ |Calcutta - 700 001| | | | |
+9.|United India Insurance Company-| | | | |
+ |Limited,| | | | |
+ |24, Whites Road| | | | |
+ |Chennal - 600 014| | | | |
+10.|Bank of Baroda| | | | |
+ |Khairatabad, Branch| |(US$)|(US$)| |
+ |6-1-84, Secretariat Road| | | | |
+ |Hyderabad - 500 004| | | | |
+This Agreement may be executed in several counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same Agreement.
+ 
+IN WITNESS WHEREOF. the parties hereto have duly executed this Agreement by their duly authorised  representatives as of the day, month and year hereinabove written. 
+ 
+SCHEDULE I
+(PARTICULARS OF THE LENDERS AND LOANS)
+										Rupees in crore) (US$ in Million)
+ 
+ 
+Sr.|Name of the Lender/Address|RTU|FCL|FLG |Total|
+No.| |NCQ| | | |
+11.|Dena Bank| | | | |
+ |2-4-14, 1 st Floor,| | | | |
+ |M. G. Road Branch| | |(US$)| |
+ |Secunderabad - 500 003| | | | |
+12.|Indusind Bank Limited,| | | | |
+ |'Laxmi' 1-8-448, S. P. Road| | | | |
+ |Begumpet,| | |(US$)| |
+ |Secunderabad - 500 003| | | | |
+13.|The Vysya Bank Limited,| | | | |
+ |3-3-798, General Bazar Branch| | | | |
+ |Secunderabad - 500 003| | |(US$)| |
+ |Total (In Rupees)| | | | |
+ |(in US$)| |(US$)|(US$)| |
+ 
+Signed and delivered by the within named XYZ Finance Company Limited, as Lender, by the hand of 
+Mr ....................................
+Its .....................................
+ 
+Signed and delivered by the within named XYZ Finance Company Limited, as Guarantor, by the hand Of
+Mr ......................................
+Its .....................................
+ 
+Signed and delivered by the within named XYZ Finance Company Limited, as Subscriber, by the hand of 
+Mr ...................................... 
+Its ..................................... 
+ 
+Signed and delivered by the within named Power Finance Corporation, as Lender, by the hand of 
+Mr. . .................................... 
+Its .................................... 
+ 
+Signed and delivered by the within named ABC Bank as Lender, by the hand of
+Mr. . .................................... 
+Its ....................................
+ 
+Signed and delivered by the within named ABC Bank,, as Guarantor, by the hand of
+Mr. . .................................... 
+Its ....................................
+ 
+Signed and delivered by the Within named STR Development Bank, as Lender, by the hand of 
+Mr ......................................
+Its ....................................
+ 
+Signed and delivered by the within named STR Development Bank, as Guarantor, by the hand of 
+Mr ...................................... 
+Its .....................................
+ 
+Signed and delivered by the within named, AAA Finance & Insurance Company Limited, as Lender, by the hand of
+Mr ...................................... 
+Its ..................................... 
+ 
+Signed and delivered by the within named BBB Insurance & Finance Company Ltd., as Lender, by the hand of
+Mr. . .................................... 
+Its ....................................
+ 
+Signed and delivered by the within named The JKL Bank Limited, as Lender, by the hand of
+Mr ...................................... 
+Its ...................................... 
+ 
+Signed and delivered by the within named DEF Bank, as Lender, by the hand of
+Mr ...................................... 
+Its ..................................... 
+ 
+Signed and delivered by the within named DEF Bank, as Guarantor, by the hand of
+Mr ...................................... 
+Its ..................................... 
+ 
+Signed and delivered by the within named GHI Bank, as Guarantor, by the hand of
+Mr ...................................... 
+Its ..................................... 
+ 
+Signed and delivered by the within named XYZ Finance Company Limited, as Security Trustee, by the hand of
+Mr ...................................... 
+Its ..................................... 
+

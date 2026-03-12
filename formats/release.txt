@@ -1,0 +1,11 @@
+^ Category ^ Title ^
+| release | [[legal_formats:release:disclaimer_by_members_of_a_joint_hindu_family_in_respect_of_separate_property_of_a_member|Disclaimer By Members Of A Joint Hindu Family In Respect Of Separate Property Of A Member]] |
+| release | [[legal_formats:release:mutual_release_by_coparceners_of_a_joint_hindu_famil|Mutual Release By Coparceners Of A Joint Hindu Famil]] |
+| release | [[legal_formats:release:mutual_release_by_two_persons|Mutual Release By Two Persons]] |
+| release | [[legal_formats:release:release_by_a_legatee_in_favour_of_an_executor|Release By A Legatee In Favour Of An Executor]] |
+| release | [[legal_formats:release:release_of_a_bond_obligation_when_the_bond_is_lost|Release Of A Bond Obligation When The Bond Is Lost]] |
+| release | [[legal_formats:release:release_of_a_guardian_by_a_minor_on_attaining_majority|Release Of A Guardian By A Minor On Attaining Majority]] |
+| release | [[legal_formats:release:release_of_dower_by_muslim_widow|Release Of Dower By Muslim Widow]] |
+| release | [[legal_formats:release:release_of_immovable_property_by_a_muslim_heir_in_favour_of_another|Release Of Immovable Property By A Muslim Heir In Favour Of Another]] |
+| release | [[legal_formats:release:release_of_part_of_land_comprised_in_a_mortgage|Release Of Part Of Land Comprised In A Mortgage]] |
+| release | [[legal_formats:release:release_of_property_from_charge_for_maintenance_under_a_will|Release Of Property From Charge For Maintenance Under A Will]] |

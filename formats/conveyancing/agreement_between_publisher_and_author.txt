@@ -1,0 +1,80 @@
+AGREEMENT BETWEEN PUBLISHER AND AUTHOR
+This agreement made this......................... day of.......................... 19......................... between A. B. C. Limited......................... having its registered office at......................... (hereinafter referred to as ‘publisher’ which expression, unless expressly excluded to the context shall be deemed to include its successors and assigns) of the one part and Shri......................... Resident of......................... thereinafter referred to as the Author which expression, unless expressly excluded to the context shall be deemed to include his successors and assigns) of the other part:
+Whereas the author has written a book entitled......................... and it is an original work of the author.
+And whereas the publisher has agreed to exclusively publish the said work in the book form.
+It is hereby agreed between the parties as under: —
+1. That the publisher shall publish the book entitled......................... in book form which is the original work of the author and the author who is owner of the copy-right thereof has not published the same so far.
+2. That the author undertakes not to grant any right to other publisher for publishing the said work or any part thereof without prior written consent of the publisher.
+3. That the publisher undertakes to publish the said work in book form at his own costs and risk.
+4. That the Publisher undertakes to pay royalty to the author at the rate of ......................... per cent of the published price.
+5. That the publisher shall not be liable to pay any royalty to the author on the copies distributed by the publisher for advertisement and/or lost/destroyed by the Act of God.
+6. That the Publisher undertakes to furnish statement of account of yearly sale alongwith the amount of royalty payable to the author.
+7. That the publication of new edition of the said work shall be decided by the publisher and the publisher shall give a notice in writing to the author who may revise the book. In case the author is unable to revise the book due to his inability on account of his death, the publisher shall be at liberty to get the same revised by any other author of its choice. However, the terms and conditions of reprint of the new addition shall remain the same as per the agreement.
+8. That in case the author is desirous of selling the copyright of the said work to any other person then in that case the terms and conditions of the same shall be mutually decided upon by the publisher and the author.
+In witness whereof both the parties have signed on this agreement on the day, month and year first above-written.
+Witnesses:
+1. ......................... 										First Party
+2. ......................... 										Second Party
+CASE LAW
+Section 2(a) 
+AGREEMENT
+Confirmation of order acknowledging receipt of the order registering it subject to terms and conditions over leaf containing clause making dispute subject to the jurisdiction of a particular court - clause held forms part of the contract.1
+ESSENTIAL INGREDIENTS
+The word ‘offer’ in the letter cannot be read as an offer to the world; it related to broker alone. Until further negotiations the letter as such must be held to remain uncertain and could not constitute any definite offer to the world at large to accept it. A broker has normally no authority to sell land even though he is instructed as to price at which vendor will sell. His function is to solicit offers and transmit them to the principle. Whether a concluded contract is arrived at or not is a question of fact and the parties and their lawyers could not make the same concluded if it was otherwise not so. What the parties understood at the time the said letter was written was to be gathered from the letter itself which is not vague in its language and not from statements which were made at a subsequent point of time.2
+A tender is an offer and the tenderer has every right to revoke/withdraw his tender before its acceptance. Forfeiture of earnest money deposit on the ground of withdrawal of tender is illegal.3
+Section 2(e)
+PRINCIPLES GOVERNING A CONTRACT
+A contract, unlike a tort is not unilateral. If there be no "meeting of mind" no contract may result. There should, therefore, be an offer by one party, express or implied and acceptance of that offer by the other in the sense in which it was made by the other. But an agreement does not result from a mere state of mind: intent to accept an offer or even a mental resolve to accept an offer does not give rise to a contract. There must be intent to accept and some external manifestation of that intent by speech, writing or other act, and acceptance must be communicated to the offered, unless he has waived such intention, or the course of negotiations implies an agreement to the contrary.4
+Section 2(h)
+Mere silence of defendant did not amount to acceptance of the terms and conditions. The joint letter was merely an agreement in principle to carry out the job on consortium basis and there was no concluded contract between the plaintiff and defendant.5
+Where contract is effected in absence of one of the trustees by the remaining trustees in the absence of any stipulation to that effect in the trust deed and without obtaining express and specific authorisation from the absent trustee in contravention of Sections 47 and 48 of Trusts Act, 1882, there is no concluded contract and hence void.6
+Where provisions of Sections 47 and 48 of the Trusts Act, 1882 are not only not complied with but violated, sale was not a concluded contract within Section 2(h) of the Contract Act so as to be enforceable against and binding on trustees or beneficiaries.7 
+Section 2(b) and (e) 
+CONDITIONAL OFFER
+A conditional offer to pay a certain amount made by the management of an industry to the trade union lapses when the condition is not accepted. The question whether there was consideration for the promise made by the management arises only if the offer made had been accepted by the trade union so as to ripen into an agreement. And if there is no concluded agreement between the parties then the further question as to whether it was supported by consideration would not arise nor would there be any question of its becoming one of the terms of the service.8
+Sections 2(b) and 12
+ONE-SIDED OFFER WHICH IS NEVER ACCEPTED
+A person cannot be bound by a one-sided offer which is never accepted particularly when the parties intended that the contract should be reduced in writing.
+This is the whole point of insisting on a document. It excludes speculation as to what was and what was not agreed to however much the matter might have been raised by one of the parties during the stage of negotiation.9
+NON-ACCEPTANCE OF MODIFICATION
+The non-acceptance of modification did not amount to rejection of the original tender.10
+Section 2(c)
+Government agreed with contractor to supply material at fixed rate. The Government importing material and sending receipts to contractor at enhanced rate when earlier receipts of the same imported material were at fixed rates. It was held that there was no agreement that the contractor should pay at a higher rate for the material that was imported and supplied to him.11
+No promise without consideration is enforceable in law.12 
+PROMISEE
+The promisors who had fulfilled their promise in all respects excepting the execution of a formal sale deed were not entitled to raise a plea that B’s wife was not entitled to demand specific performance thereof on the ground that she was not a party to the contract. It was held that her suit was not barred by Section 66, Civil Procedure Code, since the mortgagees who purchased the property in their own name did so in order to fulfil their agreement with B’s wife, the plea of benami in such situation was unsustainable.
+Her suit could not also be resisted on the ground of delay since she had been in possession all the time and had incurred considerable expenses.13
+Section 2(d)
+GIFT-LOVE AND AFFECTION DO NOT CONSTITUTE CONSIDERATION.
+It is one of the essential requirements of a gift that it should be made by the donor without consideration. The word consideration has not been defined in the T. P. Act but it has been used in that Act in the same sense as in the Contract Act and excludes natural love and affection. Thus it is of the essence of a gift as defined in the T. P. Act that it should be without consideration of the nature defined in Section 2(d) of the Contract Act.14
+PRIVITY OF CONTRACT
+Where on the application of the tenant service connection for business lighting was given to the tenant in occupation then the electrical energy supplied and consumed by the tenants the owner of the building cannot be made liable as consumer there being no privity of contract between the owner of the building and the Electricity Board.15
+Sections 10 and 23
+AGREEMENT TO BE VALID MUST BE RESULT OF FREE CONSENT
+An agreement to be valid shall be the result of free consent apart from other requirements while dealing with the question of duress/coercion and unequal bargaining power one is really concerned with the question of free will i. e. did the parties enter into the agreement with a free will.16
+Sections 10 and 31
+WHEN CONTRACT COMPLETE
+The contract between the parties was not a contingent contract because the contract was complete when the plaintiff advanced money to the defendant for deposit as earnest money. Since no construction work was done the plaintiff was entitled to recover the money advanced by him to the defendant by suit.17
+Sections 10 and 73
+COMPROMISE A CONCLUDED AGREEMENT
+When the title suit was compromised between the parties plaintiff agreed to first offer land to defendant in the event of sale. The compromise was a concluded agreement enforceable by law.18
+1. A. I. R. 1989 S. C. 1239.
+2. A. I. R. 1981 Cal. 37.
+3. Krishnavani Constructions v. The Executive Engineer, 1996 (2) C. C. C. 237 (A. P. ).
+4. A. I. R. 1966 S. C. 543: (1966) 1 S. C. A. 166: (1966) 1 S. C. W. R. 351: (1966) 1 S. C. R. 656.
+5. A. I. R. 1986 Delhi 336.
+6. (1979) 4 S. C. C. 602: (1892) L. J. Ch. 674: (1900) 2 Ch. 267: 1950 S. C. R. 30: A. I. R. 1950 S. C. 15: 1950 S. C. J. 153.
+7. A. I. R. 1979 A. P. 229: A. I. R. 1973 Guj. 133: A. I. R. 1963 S. C. 309: A. I. R. 1945 S. C. 23.
+8. A. I. R. 1957 S. C. 95: (1956) Lab. A. C. Reversed.
+9. A. I. R. 1955 S. C. 468.
+10. A. I. R. 1977 All. 494.
+11. A. I. R. 1978 A. P. 281.
+12. (1846) 153 E. R. 1014: A. I. R. 1981 S. C. 1274.
+13. Gorakh Ram v. Laxmi, A. I. R. 1953 S. C. 443.
+14. A. I. R. 1979 S. C. 843.
+15. A. I. R. 1985 Bom. 71: A. I. R. 1938 Patna 15: A. I. R. 1967 S. C. 349: A. I. R. 1962 S. C. 29.
+16. A. I. R. 1995 Delhi 25.
+17. A. I. R. 1981 All. 184.
+18. A. I. R. 1980 Cal. 258: A. I. R. 1955 Cal. 210: A. I. R. 1971 S. C. 1021.
+
+

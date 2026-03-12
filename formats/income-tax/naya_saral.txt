@@ -1,0 +1,170 @@
+ NAYA SARAL
+Form No. 2E
+ ITS - 2E
+( IN COM E - TA X   RE T URN  F ORM   F OR  RE S I DE NT   IN DIV I DUA L /H IND U  UNDI V I DE D  FA M I LY   NO T  HA V IN G  IN CO ME   F RO M  B US I NE S S   OR  P RO FE S S I O N O R  CA P I TA L  GA I NS   OR  A G RI CULT URA L  I NCO M E )
+[S ee  s ec on d pr ov i s o t o r ul e 12 ( 1) ( b) ( iii ) ]
+1. NAME
+2 . ADDRESS (in case of change)
+ PIN TELEPHONE
+3 . Permanent Account Number :
+ 7. SEX M/F :
+4 . Date of Birth :
+ 8. Assessment Year :
+5 . Status : Individual/Hindu undivided family : 9. Return : Original or Revised :
+6 . Ward/Circle/Special Range :
+ 10. Particulars of Bank Account (Mandatory in Refund Cases)
+   Name of the Bank MICR Code  (9 digit) Address of Bank Branch  Type of Account (Savings/Current) Account Number ECS (Y/N)
+ COMPUTATION OF INCOME
+                                                                                                                                                                                                 AMOUNT AMOUNT
+1 . Income chargeable under the head “Salaries” [Attach Form 16]
+ 701
+2 . Annual value / Higher of Annual rent received or receivable / Reduced
+ 307
+annual rent received or receivable because of vacancy :
+3. Taxes actually paid to local authority
+ 312
+4. Annual value of property (2-3) :
+ 313
+5. Less : Deductions claimed u/s 24 :
+(a) Thirty percent of annual value : 321
+(b) Interest payable on borrowed capital 322
+6. Total of 5 above :
+ 325
+7. Income chargeable under the head “Income from house Property” (4-6)
+ 702
+8. Gross income from other sources :   Gross Amount   Amount Exempted
+(a) Dividends from companies 454 460
+(b) Dividends from units 455 463
+(c) Interest
+ 456 461
+(d) Rental Income from machinery, plant etc. 457 462
+(e) Others :
+ 458 464
+Total : 459 465
+9. Total of 8 above (Gross amount minus Amount exempt)
+ 470
+10. Deduction u/s 57:
+( a)  Dep r ec iat io n
+(b)
+(c)
+11. Total of 10 above
+ 471
+12. Income chargeable under the head “Income from Other Sources” (9-11):
+ 706
+13. Gross Total Income (1+7+12)
+ 746
+14. Deductions u/s Ch VIA AMOUNT AMOUNT
+(a) 80CCC 235 (d) 80G 242 (g) 80RRB 282
+(b) 80D 236 (e) 80L 260 (h) Sec.
+(c) 80E 239 (f) 80QQB 275
+15. Total of 14 above :
+ 747
+16. Total Income (13-15)
+ 760
+17. Tax on total income :
+ 810
+18. Less Rebate : AMOUNT AMOUNT
+(a) Sec. 88 812 (c) Sec. 88C 814
+(b) Sec. 88B 813
+19. Total of 18 above
+ 820
+20. Balance Tax payable (17-19)
+ 827
+21. Add Surcharge
+ 828
+22. Tax payable (20+21)
+ 832
+23. Relief u/s 89.
+ 837
+24. Balance Tax Payable (22-23)
+ 841
+25. Tax deducted at source (a) Salaries 868 (b) Others : 872
+26. Total of 25 above :
+ 873
+27. Advance Tax paid Attach copy of challans) Date Amount
+ Date Amount
+(a) Upto 15/9 858
+ (c) 16/12 to 15/03 860
+(b) 16/9 to 15/12 859
+ (d) 16/03 to 31/03 861
+28. Total of 27 above
+ 862
+29. Tax paid during the previous year (26+28)
+ 892
+30. Interest payable : Amount
+ Amount
+(a) Section 234A : 842
+ (c) Section 234C : 844
+(b) Section 234B : 843
+ (d) Total Interest (a+b+c)
+ 846
+31. Less : Total Self assessment tax paid (a+b) :
+ 888
+(a)   Self Assessment tax paid upto 31st May, 2004 (Attach Challan)
+(b)  Self Assessment tax paid after 31st May, 2004
+Name of the BSR Code of Bank Date of deposit Serial No. Amount
+Bank Branch Branch (7 Digit) (DDMMYY) of challan (Rs.)
+32. Tax payable / refundable (24-29+30-31)
+ 891
+Verification
+I...............................................................................(name in full and in block letters), son/daughter of.....................................................................................solemnly declare
+that to the best of my knowledge and belief, the information given in this return and the annexures and statements accompanying it are correct, complete and truly
+stated and in accordance with the provisions of the Income-tax Act, 1961, in respect of income chargeable to income-tax for the previous year relevant to the
+assessment year __________________
+ Signature
+Receipt No. ...................................Date........................
+Seal
+Date :
+Place :
+Signature of the receiving official
+
+
+
+INSTRUCTIONS FOR FILLING UP NAYA SARAL
+(These instructions are non-statutory)
+1. NAYA SARAL Form may be filled up by a resident individual / Hindu Undivided Family, having income only from
+salary, house property and other sources. The form should be filled up in duplicate. One copy will be returned to
+the assessee after being duly acknowledged. The acknowledgement itself is deemed to be the intimation. No
+intimation is separately given unless there is a demand or a refund.
+2. This return is to be filed by 31st  July of the assessment year.
+3. All items should be filled in capital letters.
+4. Status (Item no. 5) - Please strike out whichever is not applicable.
+5. Item No. 10: Here, mention the particulars of Bank Account specifying the name of the bank, the 9-digit MICR
+code, address of the bank branch, the type of account, along with your account number. In case you want the
+refund, if any, to be credited directly into your bank account, fill in ‘Y’ in the box ‘ECS (Y/N)’, or else fill in ‘N’.
+6. Income from Salary (item no. 1) - State the net taxable salary as per the Form no. 16 (salary certificate) provided by
+the employer and enclose the Form No. 16.
+7. Income from House Property (Item no. 2) - In item no. 2, please indicate the annual letting value or the rent
+received / receivable whichever is higher. While calculating the rent received / receivable deduction as per
+section 23 in respect of vacancy etc. may also be taken into account. In Item No. 3 state the taxes actually
+paid to local authority (not on accrual basis).
+8. Income from other sources (item no. 8) - Gross income from other sources such as interest, income from units
+etc. should be shown against this item. Details of such amounts of income from other sources, as exempt, if
+any, should be given alongside in the columns. Deductions claimed u/s 57 in respect of income chargeable
+under the head “income from other sources” should be mentioned in item no. 10. Thereafter, net “income from
+other sources” should be mentioned in item no. 12.
+9. Deductions under chapter VI-A (item no. 14) - Chapter VI-A provides for various deductions, e.g. for donations
+(80G), medical insurance premia (80D), contribution to certain pension funds (80CCC), repayment of loan taken
+for higher studies (80E), interest on certain securities, dividends (80L). Deductions under section 80QQB and
+80RRB are available from assessment year 2004-05. Total amount of deductions claimed should be shown section-
+wise.
+10. Tax on total income (item no. 17) -  Please calculate the tax on total income at the applicable rates for the relevant
+assessment year and mention in item no. 17.
+11. Rebate (item no. 18) - Please indicate the tax rebate available as per section 88 of the Income Tax Act.
+For individuals who are aged 65 years or more, tax rebate is available under section 88B.
+For women who are aged less than 65 years, tax rebate is available under section 88C.
+12. Relief (item no. 23) - Relief is available under section 89 in cases where salary is paid in arrears or in advance.
+13. Proof of taxes paid (item no. 25, 27) - Against item no. 25 fill in the amount of tax deducted at source, both in
+respect of income from salaries and otherwise. Also attach proof of tax deducted at source.
+In respect of item no. 27 fill in the amounts of advance tax paid in each instalment. Also attach copy of challans for
+the advance tax paid.
+14. Interest payable (item no. 30) - Interest is charged under section 234A for late filing of return, under section 234B
+for shortfall in payment of advance tax and under section 234C for deferment of instalments of advance tax.
+Please indicate such interest separately. Please note that interest chargeable under sectin 234A, 234B and 234C
+is at the rate of one percent with effect from 08.9.2003 onwards.
+15. Item no. 31:- For self assessment tax paid on or before 31.5.2004, (a) should be filled up, and a copy of the challan
+should be attached with the return. For self assessment tax paid after 31.5.2004, table at (b) should be filled up.
+Copy of acknowledgement counterfoil (in respect of self assessment tax paid after 31.5.04) is not required to be
+attached, however, from the counterfoil, the name of the bank branch, BSR Code of the Bank Branch (7 digit), date
+of deposit, challan serial no., and amount of tax paid should be filed up.
+16. Item no. 32 - Please fill in the amount of tax payable / refundable.

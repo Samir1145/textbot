@@ -1,0 +1,737 @@
+TRUST AND RETENTION AGREEMENT
+ 
+	THIS AGREEMENT is made on the……………day of………….2000 between:
+ 
+(1) ABC Power Generation company Limited, a company registered under Companies Act, 1956 (1) of 1956, having its registered office at ............................. Mumbai, State of Maharashtra (hereinafter referred to as the "Borrower" which expression shall. unless it be repugnant to the subject or context thereof, include its successors and assigns);
+ 
+(2) XYZ Finance Company Limited (XYZF), a company registered under the Companies Act, 1956 and having its registered office at " ....................................... Mumbai as security trustee for the Lenders/Lead Institution (hereinafter referred to as the "Security Trustee/Lead Institution which expression shall, unless it be repugnant to the subject or context thereof, include its successors and assigns); and
+ 
+(3) ABC Bank (ABCB), a banking company within the meaning of the Banking Regulation Act, 1949 (the "Account Bank") and GHI Bank Limited (GHIB), a banking company within the meaning of the Banking Regulation Act, 1949 (the "Account Bank") ABC and GHI collectively referred to as Account Banks which expression shall, unless it be repugnant to the subject or context thereof, include their successors and assigns 
+ 
+NOW IT IS AGREED BETWEEN THE PARTIES as follows:
+ 
+1. Definitions and construction
+ 
+1. 1 Definitions
+ 
+"Acceptance Date" means the date on which the Lenders' Engineer certifies to the Borrower that the performance and guarantee tests In relation to the Plant have been successfully completed in accordance with the EPC Contract and the Performance Acceptance Tests as specified in Schedule F to the PPA have been successfully completed;
+ 
+"Account" means each of the Trust and Retention Account, the PPA Collection Account, the Dollar Construction Account, the Current Debt Service Accounts, the Commitment Charges Guarantee Account, the Overhaul Reserve Account, the Tax Escrow Account and the Contingency Account with the ABC Bank and the Debt Service Reserve Accounts and the Establishment Expenses Account with GHI Bank and "Accounts" means all of them collectively;
+ 
+"Account Bank" means, for the purposes of the Trust and Retention Account, the Dollar Construction Account, the Current Debt . Service Accounts, the Commitment Charges Guarantee Account, the Contingency Account, the Tax Escrow Account and the Overhaul Reserve Account, the ABC Bank, Mumbal Main Branch at Mumbal, for the purposes of the PPA Collection Account, the ABC Bank …………….Calcutta Main Branch, at Calcutta and for the purposes of the Debt Service Reserve Accounts the GHI Bank, Mumbai Branch and for purposes of the Establishment Expenses Account, the GHI Bank, Calcutta Branch;
+ 
+"MSEB" means the Maharashtra State Electricity Board;
+ 
+"Authorised Investment" shall have the meaning given in the Loan Agreements and Guarantee Agreements, provided that no Authorised Investment in respect of amounts in:
+ 
+(a)	the Debt Service Reserve Account shall, have a maturity in excess of 6 months;
+(b)	the Current Rupee Debt Service Account shall have a maturity in excess of the earlier of 3 months or the next 	Payment Date;
+(c)	the Current Dollar Debt Service Account shall have a maturtty in exoess, of the 	earlier of 6 months or the next 	Payment Date;
+(d)	the Commitment Charges Guarantee Account shall have a maturity in excess of 3 months;
+(e)	the Overhaul Reserve Account shall have a maturity in excess of 12 months; the 	Dollar Construction Account 	shall have a maturity in excess of 1 month;
+(g)	the Establishment Expenses Account and the Contingency Account shall have a 	maturity in excess of 1 week; 	and
+(h)	the Tax Escrow, Account shall have a maturity in excess of 5 days;
+ 
+"Average Debt Service Coverage Ratio" shall have the meaning given in the Loan Agreements and Guarantee Agreements;
+ 
+"Budgeted Operating Costs" means in relation to the relevant calendar, month:
+ 
+(i)	the costs included in the Operating Budget for such month;
+(ii)	plus and/or minus such unbudgeted additional amounts as may be notified by the Borrower to the Account Bank, after approval by the Security Trustee/Lead Institution and/or;
+(iii)	plus such further amounts as may be notified by the Borrower to the Account Bank, provided that the aggregate amount notified by the Borrower under this paragraph (iii)during each Year included in the Operating Budget, for costs other than fuel costs, emergency operations, overhaul and maintenance, costs and costs resulting from  changes in, law. and tax rates, shall not exceed 10% of 'the total budgeted amount for 	such year without the approval of the Security Trustee/Lead Institution.
+ 
+"Business Day" means any day on which banks are generally open for business in Mumbai , in relation to any notice or communication to be made under this Agreement, a day on, which. banks are open for business in the place of receipt of such notice or communication;
+ 
+"Commitment Charge" shall have the meaning ascribed thereto in the Fuel Supply Agreement;
+ 
+"Commitment Charges Financing Documents" shall mean collectively the agreements, instruments and other documents entered into by the Company and the Commitment Charge Lenders or any part thereof, under which funding or guarantee assistance is extended to the Company;
+ 
+"Commitment Charges Guarantee Account" means the account so named which is established and maintained by the Borrower pursuant to this Agreement;
+ 
+"Commitment Charge Lenders" shall mean the Lenders providing fund based or non fund based financial assistance for securing Commitment Charges under the Fuel Supply Agreement;
+ 
+"Construction Costs" means the liabilities, costs and expenses Incurred. by the Borrower in connection with the engineering, procurement, manufacturing, construction and commissioning of the Project and as mentioned in the Financing Plan, provided any deviation from the Financing Plan shall be approved by the Security Trustee/Lead Institution and provided to the Account Bank(s);
+ 
+"Construction Costs Budget" means each cash budget (the "Budget") prepared by the Borrower and approved by the Security Trustee/Lead Institution in writing for the construction of the Project. The Budget shall be substantially in a form attached hereto as Annexure 1 or as amended by the Borrower (with the prior r approval of the Security Trustee/Lead Institution);
+ 
+"Contingency Proceeds" means proceeds of any insurance effected by or on behalf of the Borrower, proceeds of any third party claims or employers claims, performance shortfall damages under the EPC Contracts, delay damages under the EPC Contracts and liquidated damages under the Fuel Supply Agreement;
+ 
+"Counter Guarantors" shall mean DEF Bank, GHI Bank and JKL Bank Limited.
+ 
+"Current Debt Service Accounts" means the Current Rupee Debt Service Account and Current Dollar Debt Service Account;
+ 
+"Current Dollar Debt Service Account" means the account so named, which is established and maintained by the Borrower pursuant to this Agreement;
+ 
+"Current Rupee Debt Service Account" means the account so named which is established and maintained by the Borrower pursuant to this Agreement;
+ 
+"Debt Service Reserve Accounts" means the Dollar Debt Service Reserve Account and the Rupee Debt Service Reserve Account;
+ 
+"Distribution Date" means the day of each calendar month or if such day is not a Business Day, the immediately preceding Business Day, on which payments have to be made under the Financing Documents or this Agreement, as the case may be;
+ 
+"Dollar" or "$" means the lawful currency of the United States of America;
+ 
+ 
+"Dollar Budgeted Operating Costs" means the Budgeted Operating Costs denominated in Dollars;
+ 
+"Dollar Construction Account" means the account so named which is established and maintained by the Borrower pursuant to this Agreement;
+ 
+"Dollar Debt Service Reserve Account" means the account so named which is established and maintained by the Borrower pursuant to this Agreement;
+ 
+"Dollar Lenders" mean the ABC Bank, XYZ Finance Company Ltd, STR Development Bank, Power Finance Corporation Limited and Asian Development Bank;
+ 
+"Enforcement Notice" means a notice from the Security Trustee/Lead Institution to the Account Banks of the acceleration of amounts due and owing under the Financing Plan and/or any enforcement procedure commenced by the Security Trustee/Lead Institution under any of the Security Documents;
+ 
+"Event of Default" means an event of default as defined under the Financing Documents;
+ 
+"Establishment Expenses Account" means the account established pursuant to clause 2.1 (xi)
+ 
+"Financing Documents" means the Guarantee Agreements and the ~ Loan Agreements;
+ 
+"Financing Plan" means the financing plan annexed to the Loan Agreements and the Guarantee Agreements, as amended;
+ 
+"Foreign Currency Loan Agreements" mean each of the following:
+ 
+(i)	the Foreign Currency., Loan Agreement between the Borrower and ABC Bank, 	dated December 5, 2000;
+(ii)	the Foreign Currency Loan Agreement between the Borrower and the STR Development Bank, dated 	December 5, 2000;
+(iii)	the Foreign Currency Loan Agreement between the Borrower -and the XYZ Finance Company Ltd., dated 	November 26, 2000;
+(iv)	the Foreign Currency Loan Agreement between the Borrower and Power Finance Corporation Limited, dated 	November 18, 2000; and
+(v)	the Foreign Currency Loan Agreement between the Borrower and The Asian 	Development Bank, dated 	November 26, 2000.
+ 
+"Guarantee Agreements" means each of the following:
+ 
+(i)	the Guarantee Agreement, dated November 26, 1998 between the Borrower and the Industrial Finance 	Corporation of India;
+(ii)	the Guarantee Agreement, dated December 5, 2000 between the Borrower and ABC Bank;
+(iii)	the Guarantee Agreement, dated December 5, 2000 between the Borrower and the  STR Development Bank;
+(iv)	the Guarantee Agreement, dated November 30, 2000 between the Borrower and GHI Bank;
+(v)	the Guarantee Agreement, dated December 2, 2000 between the Borrower and DEF Bank;
+(vi)	the Guarantee Agreement, dated December 2, 2000 between the Borrower and The  JKL Bank Limited;
+ 
+"Guarantee Commission" means the guarantee commission payable to the Guarantors under the Guarantee Agreements;
+ 
+"Guarantors" means the ABC Bank, the GHI Development Bank and the XYZ Finance Company Ltd.;
+ 
+"Independent Engineer" means a person appointed by the Lenders, as the independent engineer;
+ 
+"ABCP" means ABC Power Generation Company Limited;
+ 
+"Lenders" has the meaning ascribed thereto in the Rupee Loan Agreements, Foreign Currency Loan Agreements, Guarantee Agreements and Subscription Agreement;
+ 
+"Loans " has the meaning ascribed thereto in the Rupee Loan Agreements, Foreign Currency Loan Agreements and Subscription Agreement;
+ 
+"Loan Agreements" means the Rupee Loan Agreements and the Foreign Currency Loan Agreements 
+ 
+"Operating Budget" means each cash budget (the 'Budget") prepared by the Borrower, approved by the Independent Engineer and the Security Trustee/Lead Institution in writing for the operation and maintenance and any other costs of the Project, including fuel (by tonnage), major overhaul costs (by event), establishment and insurance costs, taxes, capital expenditures and debt service but excluding Construction Costs. The Budget shall be substantially In a form attached hereto as Annexure 2 or as amended by the Borrower (with the prior approval of the Security Trustee/Lead Institution) and shall be prepared on an annual basis and shall include projected monthly costs over a two year period except that the first Budget shall be prepared for the period commencing on execution of this agreement and ending on March 31, 2000. The second and subsequent Budgets, for the two-year period commencing April 1, 1999, shall be provided to the Security Trustee/Lead Institution one-month prior to the end of the financial year. Each Budget will be reviewed by the Borrower no less frequently than once every three months with any amendment thereto being submitted first to the Independent Engineer and then to the Security Trustee/Lead Institution for approval in writing and for delivery thereafter to the Account Banks;
+ 
+"Overdraft Facility" has the meaning ascribed in section 3.2.3.
+ 
+"Overhaul Costs" means those costs projected to be incurred during scheduled major overhaul outages and excluding costs to be incurred for routine annual overhaul and more frequent maintenance outages as specified in Annexure 2;
+ 
+"Overhaul Reserve Account" means the account so named which is established and maintained by the Borrower pursuant to this Agreement;
+ 
+"Payment Date" means:
+ 
+(i)	in relation to the Loan Agreements, the dates specified for scheduled payments of fee, expenses, principal and interest;
+(ii)	in relation to the Guarantee Agreements, the dates specified for scheduled payments of fees and guarantee commissions;
+ 
+"Permitted Payment" means the payments to and/from the Accounts contemplated by this Agreement;
+ 
+"Power Purchase Agreement" means the Power Purchase Agreement, dated 31st March, 1999 between ABCP and MSEB;
+ 
+"PPA Collection Account" means the account so named, established - and maintained by the Borrower pursuant to this Agreement for the purposes of deposit of payments under the Power Purchase Agreement;
+ 
+'Project" has the meaning given to it in the Loan Agreements;
+ 
+"Project Contracts" has the meaning ascribed thereto in the Loan Agreements;
+ 
+"Project Proceeds" means all cash proceeds payable to the Borrower, in, connection with the Project from any source including refund of taxes, other than- (i) Commitment Charge Refunds under the Fuel Supply Agreement and any interest income or return earned thereon, (ii) amounts deposited into the Dollar Construction Account to be disbursed as dollars in accordance with the Financing Plan, and (iii) Contingency Proceeds;
+ 
+"Quarter" means each three month period ending on March 31, June 30, September 30 and December 31;
+ 
+"Required Balance" means, on any Distribution Date:
+ 
+(i)in relation to the Current Dollar Debt Service Account, an amount in Dollars equal to the product of (a) and (b) where,
+ 
+(a)	Is a fraction, the denominator of which is 6 and the numerator of which is 6, minus the number of months 	remaining until the next following Payment Date, under the Foreign Currency Loan Agreements pursuant to 	which half yearly payments have to be made, and a fraction, the denominator of which is 3 and the numerator of which is 3, minus the number of months remaining until the next following Payment Date, under the Foreign Currency Loan Agreements pursuant to which quarterly payments have to be made (for the 	avoidance of doubt, the numerator shall not be less than zero); and
+(b)	is the aggregate amount of interest (including interest tax) and principal payable under the Foreign Currency 	Loan Agreements, on such Payment Date (for the avoidance of 	doubt, any amounts due more than six months 	and three months, respectively after such Distribution Date shall not be taken into account), less Interest 	income accrued;
+(ii)	in relation to the. Current Rupee Debt Service Account, an amount in Rupees equal to the product of (a) and (b) where:
+(a)	is a fraction, the denominator of which is 3 and the numerator of which is 3 minus the number of months remaining until the next following Payment Date under the Rupee Loan Agreements with Rupee Lenders and the Guarantee Agreements with the Guarantors (for the avoidance of doubt, the numerator shall not be less than zero); and
+(b)	is the aggregate amount of Interest (including interest tax) and principal payable under the Loan Agreements with Rupee - Lenders and the Guarantee Commission payable to the Guarantors under the Guarantee Agreements on such Payment Date (for the avoidance of doubt, any amounts due more than three months after such Distribution Date shall not be taken into account), less interest income accrued;
+(iii)	in relation to the Dollar Debt Service Reserve Account, an amount in Dollars equal to the principal and interest (including interest tax) scheduled to be paid under the Foreign Currency Loan Agreements on the next two quarterly and one semi-annual Payment Date; and
+(iv)	in relation to the Commitment Charges Guarantee Account, an amount in Rupees equal to the Commitment Charges Guarantee Commission scheduled to be paid under the Commitment Charges Financing Documents on the next two Payment Dates; and
+(v)	in relation to the Rupee Debt Service Reserve Account, an amount in Rupees equal to the principal and interest (including interest tax) and Guarantee Commission scheduled to be paid under the Rupee Loan Agreements and the Guarantee Agreements on the next two Payment Dates; and
+(vi)              in relation to the Overhaul Reserve Account, an amount in Rupees (and in Dollars if necessary -and approved by the Reserve Bank of India) for Overhaul Costs; 
+ 
+"Rupee" or "Rs." means the lawful currency of India;
+ 
+"Rupee Budgeted Operating Costs" means the Budgeted Operating Costs denominated in Rupees;
+ 
+"Rupee Debt Service Reserve Account" means the account so named which is established and maintained by the Borrower pursuant to this Agreement;
+ 
+"Rupee Lenders" mean Power Finance Corporation Limited, the XYZ Finance Company Ltd., AAA Finance and Insurance Company Ltd, BBB Finance Company Ltd, The JKL Bank Limited and DEF Bank;
+ 
+"Rupee Loan Agreements" mean each of the following:
+ 
+(i)	the Rupee Loan Agreement between the Borrower and Power Finance Corporation dated December 4, 2000;
+(ii) 	the Subscription Agreement between the Borrower and the XYZ Finance Company Ltd., dated November 26, 	2000;
+(iii)	the Rupee Loan Agreement between the Borrower and the AAA Finance and Insurance Company Ltd., 	dated 	December 1, 2000;
+(iv)	the Rupee Loan Agreement between the Borrower and the BB13 Finance Company Ltd., dated December 1, 	2000;
+(v)	the Rupee Loan Agreement between the Borrower and The JKL Bank Limited, dated December 2, 2000; and
+(vi)	the Rupee Loan Agreement between the Borrower and r DEF Bank,'dated December 2, 2000;
+ 
+"Security" means the security created in favour of the Security Trustee/Lenders under the Financing Documents;
+ 
+"Security Documents" has the meaning ascribed thereto in the Financing Documents;
+ 
+"Security Trustee" means the XYZ Finance Company Ltd., appointed as Security Trustee by the Lenders.
+ 
+'"TRA Default" shall have the meaning ascribed, thereto in this Agreement;
+ 
+"Working Capital Facility" shall mean the overdraft or other credit facilities availed by the Borrower from the Working Capital Lenders;
+ 
+"Working Capital Lenders" has the meaning ascribed thereto in the Financing Documents; and
+ 
+"year" means each twelve month period or each lesser period ending on March 31. 
+ 
+1.2 Construction
+ 
+In this Agreement:
+ 
+(A)	reference to an Account. includes a reference to any sub-account of that Account; ,
+(B)	unless otherwise expressly defined in this Agreement, capitalised terms which are defined in the Loan 	Agreement have the same meaning in this Agreement;
+(C)	unless the context otherwise requires, the singular includes the plural and vice versa;
+(D)	headings and the use of bold typeface shall be ignored in Its construction;
+(E)	a reference to a Clause or Schedule Is, unless indicated to the contrary, a reference to a clause or schedule to 	this Agreement;
+(F)	references to this Agreement shall be construed as references to any separate or independent stipulation or 	greement contained in it;
+(G)	the words "other", 'or otherwise" and "whatsoever" shall not be Constructed ejusdem generis or be construed as 	any limitation upon the generality of any preceding words or matters specifically referred to;
+(H)	references to the word "includes' or "including" are to be construed without limitation;
+(I)	references to a person shall include such person's successors and permitted assignees or transferees;
+(J)	all references to agreements, documents or other instruments include (subject to all elevant approvals) a reference to that agreement, document or instrument as amended, supplemented, substituted,, novated. or assigned from time to time;
+(K)	words importing a particular gender Include all genders;
+(L)	"person" includes any individual, partnership, firm, trust, body corporate, government, governmental body, 	authority, agency, unincorporated body of persons or association;
+(M)	any reference to a public organisation shall be deemed to Include a reference to any successor to such public 	organisation or any organisation or entity which has taken over the functions or responsibilities of such public 	organisation;
+(N)	references to "Party" means a party to this Agreement and references to "Parties" shall be construed 	accordingly; and
+(O)	references to any law shall include references to such law as it may, after the date of this Agreement, from 	time to time be amended, supplemented or reenacted.
+ 
+2. The accounts
+ 
+2.1 Establishment of the accounts
+ 
+The Borrower and the Account Banks confirm that the Borrower has-established in the name of the Borrower with the ABC Bank Mumbai Main Branch.at Mumbai an. Account………… No ……………...entitled ABC Power Generation Company Limited - Trust and Retention Account, an account No ……………... 	with ABC Bank ……………...	Branch entitled the PPA Collection Account, and with the GHI Bank ……………...Branch, accounts entitled Rupee Debt Service Reserve Account and Dollar Debt Service Reserve Account and with GHI Bank Calcutta……………...Branch an account entitled the "Establishment Expenses Account" and reference to the Trust and Retention Account in this Agreement shall include reference to Rupee Debt Service Reserve Account, the Dollar Debt Service Reserve Account and the Establishment Expenses Account, unless the context otherwise requires. The Trust and Retention Account shall have the following sub-accounts for the purposes of this Agreement, namely:
+ 
+(i)	a sub-account No ……………...denominated in Rupees entitled the OPPA Collection Account" for the purpose of receipt and same day credit to the Trust and Retention Account of all amounts payable by MSEB under the Power Purchase Agreement; 
+(ii)	a sub-account No……………...denominated In Dollars entitled the 'Dollar Construction Account' it being 	understood that, this account is for the purpose of 	receipt of principal received from the Dollar Lenders and for receipt of foreign equity for application towards Construction Costs;
+(iii)               a sub-account No……………...denominated in Rupees entitled the "Current Rupee Debt Service Account it being understood that, this account is for the purpose of 	accumulation on a monthly basis of one third or more of the aggregate principal and 	interest due to the Rupee Lenders and payable on the next quarterly Payment Date;
+(iv) 	a sub-account No ……………....denominated in Dollars entitled the 'Current Dollar Debt Service Account" it 		being understood that, this account is for the purpose of accumulation on a  monthly basis of one third or more of the aggregate principal and interest due to the Dollar Lenders and payable on the next quarterly Payment Date  and of one sixth or more of the aggregate principal and interest due to the Dollar Lenders on the 	 next 	semi-annual Payment Date, as the case may be;
+(v) 	a sub-account No …………….……denominated in Rupees entitled Commitment Charges Guarantee Account it 	being understood that, this account is for the purpose 	of accumulation on a monthly basis of one third or more 	of the aggregate Commitment 	Charges Guarantee Commission due under the Commitment Charge Financing   	Documents and payable on the next quarterly Payment Date;
+(vi)	a sub-account No …………….……denominated in Rupees entitled the "Rupee Debt Service Reserve  Account" it being understood that, this account is for the purpose of  retention of principal and interest due to 	Rupee Lenders for the instalments of 6 months principal and interest following the current instalment; 
+(vii) 	a sub-account No ……………...denominated in Dollars entitled the Dollar Debt Service Reserve Account" it 		being understood that, this account Is for the purpose of retention of principal and interest on, dollar Loans Lowed to Dollar Lenders by..the Borrower for the instalments of 6 months principal and interest Following 	current  instalment;
+(viii) 	a sub-account No ……………... denominated in Rupees entitled the "Tax Escrow Account" it being understood 	that, this account is for  the purpose of retention of amount and payment of taxes on income reimbursed by MPEB the Borrower;
+(ix)	a sub-account No ……………...entitled the "Overhaul Reserve Account" it being understood that, this account is 	for the purpose of retention of amounts towards 	Overhaul Costs projected to be Incurred during the next 12 	months as per the Operating Budget;
+(x) 	a sub-account No..........entitled "Contingency Account"  it being understood that, this account is for retention and use of Contingency Proceeds in accordance with this Agreement;
+(m) 	a sub-account No………………entitled the "Establishment Expenses Account" it being understood that, this 	account is for the purpose of retention of amounts payable towards expenses, in accordance with the Operating 	Budget but excluding those  amounts paid from the Trust and Retention Account under the Fuel Supply 	Agreement and Operations and Maintenance Agreement and for Overhaul Costs, etc. in  accordance With 	Annexure 2; and
+(xii)	Such other accounts as may be agreed -between the Borrower and the Security Trustee/Lead Institution.
+ 
+2.2 Declaration of trust
+ 
+The Borrower hereby settles on trust with each of the Account Banks the sum of Rs.100. The Borrower also hereby declares that all rights, title and interest in and to the trust, Trust and- Retention Account and the Authorised Investments made from the Trust and Retention Account shall be vested in the Account Banks, the Lenders and the Borrower in accordance with the terms of this Agreement and their respective interests are provided for herein. The Account Banks hereby accept the above amount of Rs, 100 in the trust hereby declared and upon the terms and conditions set -forth in this Agreement. Amounts deposited in the Trust and Retention Account from time to time shall be held in trust, received and applied as provided In this Agreement. No person other than the Guarantors, the Lenders and the Borrower shall have any rights hereunder as the beneficiaries of or as third party beneficiaries under, this Agreement.
+ 
+2.3 Maintenance of the accounts
+ 
+The Account Banks shall, save as otherwise provided herein, maintain the Trust and Retention Account in accordance with the terms of this Agreement and its usual practices and applicable regulations and, if permitted by applicable regulations, pay the maximum rate of interest payable to Its customers on the balance from time to time of the Trust and Retention Account as agreed between the Borrower and each of the Account Banks individually from time to time.
+ 
+2.4 Operating procedures
+ 
+The Account Banks and the Borrower have prior to execution of this Agreement agreed (after consultation with the Security Trustee/Lead -Institution) on the detailed mandates, terms and conditions and Operating Procedures for the Trust and Retention Account, (as set out in Annexure 3 to this Agreement), provided however, in the event of any inconsistency between this Agreement and such mandates, terms and conditions or procedures, this Agreement shall prevail.
+ 
+2.5 Sub-accounts
+ 
+The Borrower shall be permitted to instruct the Account Banks to make transfers to and from a sub-account provided that the Required Balances are maintained.
+ 
+2.6 General right of withdrawal with Security Trustee/Lead Institution Consent
+ 
+Notwithstanding any other provision of this Agreement, the Borrower may, at any time, with the prior written consent of the Security Trustee/Lead Institution, instruct the Account Banks to withdraw amounts from any Trust and Retention Account and pay the same to an Account designated by the Borrower (irrespective of whether such withdrawal and payment falls on a Distribution Date), provided that such consent shall not be required If the Required Balance is maintained in relation to the Trust and Retention Account and there is no TRA Default or an Event of Default which has occurred and is then subsisting. The consent of the Security Trustee/Lead Institution should indicate the details of any beneficiary of payments.
+ 
+2.7 Withdrawals to make payments prior to distribution date
+ 
+Notwithstanding any of the provisions of this Agreement:
+ 
+(A)	the Borrower may instruct the Account Banks to make withdrawals from the Current 	Rupee Debt Service 	Account ,or the Current Dollar Debt Service Account in order to make any payments under the Financing Plan 	or Operating Budgets which fall due  prior to a Distribution Date; and
+(B)	if a Distribution Date is not a date on which banks are generally open for business in the place, where any 	account is held (being a place other than Mumbai), the Borrower shall be entitled to instruct the Account Banks 	to make payment to or withdrawal from 	such account (and the corresponding withdrawal from or payment to 	any other  account) on the immediately preceding day on which banks are generally open for business In such 	place, provided that-any such payments and withdrawals would have been permitted on such Distribution Date.
+ 
+2.8 The restrictions in this Agreement on withdrawal of funds from the Trust and Retention Account shall not affect the obligations of the Borrower under the Financing Documents.
+ 
+2.9 Any payment instructions of the Borrower to the Account Bank under this Agreement shall be, as regards Operating Costs, in accordance , with the Operating Budget and as regards other payments, in, accordance with the Financing Documents.
+ 
+3. The Trust and Retention Account
+ 
+3.1 Account
+ 
+The Trust and Retention Account shall ,be established in the name of the Borrower.
+ 
+3.2 Deposits
+ 
+3.2.1 The Borrower:
+ 
+(A)	shall procure that all Project Proceeds (other than interest income accumulated in the Current Debt Service 	Accounts, and in the Debt Service Reserve Accounts and the 	Overhaul Reserve Account until the Required 	Balances are attained) shall be credited 	to or deposited in the Trust and Retention Account upon payment 	thereof;
+(B)	shall procure that all amounts deposited by APSEB in the PPA Collection Account shall be credited/deposited 	Into the Trust and Retention Account upon the same day as deposit Into the PPA Collection Account;
+(C)	shall procure that. all amounts credited/deposited in the Dollar Construction Account in excess of Dollar 	disbursements under the Financing Documents, shall be 	credited/deposited into the Trust and Retention Account 	on the same day as they are debited/withdrawn from the Dollar Construction Account unless ,credited/deposited 	into the Current Dollar Debt Service Account;
+(D)	shall procure that all amounts drawn by the Borrower pursuant to the Overdraft 	Facility extended by each of 	the Working Capital Lenders. shall be credited or deposited in the Trust and Retention Account;
+(E)	shall procure the deposit of Contingency Proceeds into the Contingency Account;
+(F)	shall procure that any surplus in any of the accounts shall be deposited into the Trust and Retention Account 	unless retained in, or transferred from the Dollar Debt Service Reserve Account to the Current Dollar Debt 	Service Account to meet future 	obligations; and
+(G)	may make other voluntary deposits of the Borrower's funds into the Trust and  Retention Account at any time.
+ 
+3.2.2 The Account Banks shall procure that all interest, if any, on balances in the Trust and Retention Account and interest on Authorised Investments made from the Trust and Retention Account, not otherwise used for the purposes for which the Debt Service Reserve Accounts, the Current Debt Service Accounts the Overhaul Reserve Account and the Establishment Expenses Account are established, shall be credited to or deposited In the Trust and Retention Account.
+ 
+3.2.3 While the Borrower is using a Working Capital Facility (the "Overdraft Facility") with an Account Bank so long as there is no TRA Default or an Event of Default which has occurred and Is then subsisting, any credit balance remaining uninvested in the Trust and Retention Account and/or the Establishment Expenses Account at the end of each day shall be automatically credited against the Overdraft Facility provided by such Account Bank until the Overdraft Facility balance is reduced to zero.
+ 
+Any deficiency in the Trust and Retention Account and/or the Establishment Expenses Account at the end of each day shall big automatically funded from the Overdraft Facility to bring such deficiency to zero (provided that borrowing capacity remains under the Overdraft Facility).
+ 
+3.3 Withdrawals
+ 
+The Account Banks shall withdraw amounts from the Trust and Retention Account on each Distribution Date in accordance with the Borrower's instructions only for the following purposes And in the following order of priority.
+ 
+(A) to pay
+ 
+(i)	Rupee Budgeted Operating Costs In accordance with the Operating Budget towards, inter afia fuel charges, costs payable under the Operations and Maintenance Agreements, costs payable towards insurance charges, establishment charges, taxes, capital, etc.; and
+(ii)	Dollar Budgeted Operating Costs in accordance with the Operating Budget; in each case, for the calendar month in which such Distribution Date occurs in accordance with Annexure 11;
+ 
+(B) to pay
+ 
+(i) 	an amount to the Current Rupee Debt Service Account equal to the Required Balance in relation to the Current Rupee Debt Service Account; and
+(ii)	an amount to the Current Dollar Debt Service Account equal to the Required Balance in relation to the Current Dollar Debt Service Account;
+ 
+(B1) to pay
+ 
+(i)	an amount to the Commitment Charges Guarantee Account equal to the Required  Balance in relation to the Commitment Charges Guarantee Account;
+ 
+(C) to pay
+ 
+an amount to the Overhaul Reserve Account, unt 11 the amount projected to be required to fund Overhaul Costs during the ensuing twelve months has been accumulated;
+ 
+(D) to pay
+ 
+(i)	an amount to the Rupee Debt Service Reserve Account equal to:
+ 
+(a)	the Required Balance in relation to the Rupee Debt Service Reserve Account; minus
+	(b)	the amount standing to the credit of the Rupee Debt Service Reserve
+		Account; and
+(ii)	an amount to the Dollar Debt Service Reserve Account equal to:
+ 
+(a)	the Required Balance in relation to the Dollar Debt Service Reserve Account; minus
+(b)	the amount standing to the credit of the Dollar Debt Service Reserve Account;
+ 
+(E) to pay
+ 
+dividends to the shareholders of the Borrower as provided in section 15 of this Agreement.
+ 
+3.4 Application of Insufficient Funds
+ 
+3.4.1 As provided In section 3.3, the application of funds in the Trust and Retention Account shall be applied in the order of priority set forth therein. If the funds available for payment to an Account are sufficient to pay a portion, but not all, of the amount required to be paid to any Account, the Borrower shall instruct the Account Bank to pay the available funds, to the . relevant Account, with the prior consent of the Security Trustee/Lead Institution
+ 
+3.4.2 If, on any Distribution Date,­
+ 
+(A)	the, balance in the Trust and Retention Account for payment towards Operating  Cost is less than the amounts 	referred to in section 3 1 ,3(A), the Account Bank shall pay that  portion of available Required Balances., first 	from (D).,hereof, second from (C) and third from (B) to make up such shortfall; or	
+ 
+(B)	the funds available for payment to the Current Debt Service Accounts are less than the amounts referred to in 	section 3.3 (B), the Borrower shall instruct the Account 	Bank to pay the portion of available Required Balances 	first from (D) hereof and then  from (C) to make such shortfall;
+ 
+(C)	the funds available for payment to the Overhaul Reserve Account are less than the amounts referred to in 	section 3.3(C), the Borrower shall instruct the Account Bank to 	pay the portion of available Required Balances 	from (D) hereof to the Overhaul Reserve Account as directed by the Borrower in accordance with the 	Operating Budget; or
+ 
+(D)	the funds available for payment to the Debt Service Reserve Accounts are less than the amounts- referred to in section 3.3(D), the Borrower shall instruct the Account Bank to pay the earliest available funds to the Rupee Debt Service Reserve, Account and. the Dollar Debt Service Reserve Account pro rata in order to attain the respective Required Balances applicable to such Accounts on such date.
+ 
+3.4.3 For the purpose of calculating the amount of pro rata payments In accordance with clause 3.4.2, the Borrower shall calculate the Required Balances in Rupees based on the  exchange rate in effect at such time but the payments , shall be made in the currency in which relevant Account Is denominated. For this purpose the Account Bank can rely on the calculations provided to It by the Borrower in writing.
+ 
+4. PPA Collection Account
+ 
+4.1 Account
+ 
+The PPA Collection Account shall, be established in the name of the Borrower.
+ 
+4.2 Deposits
+ 
+The Borrower shall procure payments of amounts due and payable by MSEB under the Power, Purchase Agreement into this Account.
+ 
+4.3 Withdrawals
+ 
+Any amount deposited in the PPA Collection Account shall be credited on the same day as the deposit to the Trust and Retention Account.
+ 
+5. Dollar Construction Account
+ 
+5. 1 Account
+ 
+The Dollar Construction Account shall be established, subject to the approval of the Reserve Bank of India, in the name of the Borrower.
+ 
+5.2 Deposits
+ 
+The Borrower shall procure that all amounts (i) drawn down under the Foreign Currency Loan Agreements, other than that with The Asian Development Bank, for application towards Construction Costs and (ii) of equity received from the foreign shareholders of the Borrower are deposited into this Account.
+ 
+5.3 Withdrawals
+ 
+The Account Bank shall withdraw amounts in the Dollar Construction Account and make payments towards Dollar amounts due and payable under the EPC contracts and also for payment of Dollar amounts due and payable towards. non-EPC costs in accordance with the Financing Plan and on the instructions of the Borrower. Any amounts remaining in the Dollar Construction Account at any time which are not required to make Dollar payments.in accordance with the Financing Plan will, on the instructions of the Borrower, with the consent of the Security Trustee/Lead Institution, be converted into Rupees for deposit into the Trust and Retention Account. Provided that any surplus amount in the Dollar Construction Account after Project Completion (as defined in the EPC Contract) shall be used to prepay the Loans on a pro rata basis.
+ 
+6. Establishment Expenses Account
+6.1 Account
+ 
+The Establishment Expenses Account shall be established in the name of the Borrower.
+ 
+6.2 Deposits
+ 
+Deposits to the Establishment Expenses Account shall be made in accordance with the Operating Budget under section 3.3 (A) above.
+ 
+6.3 Withdrawals
+ 
+The Account Bank shall withdraw amounts from the Establishment Expenses Account in accordance with the Operating Budget.
+ 
+7. Current Debt Service Accounts
+7.1 Account
+ 
+The Current Debt Service Accounts shall be established in the name of the Borrower. The Current Dollar Debt Service Account shall be denominated in Dollars and the Current Rupee Debt Service Account shall be denominated In Rupees.
+ 
+7.2 Deposits
+ 
+(A)	Deposits to the Current Rupee Debt Service Account
+ 
+Deposits to the Current Rupee Debt Service Account shall be made by the Account Bank in accordance with sections 3.3(13)(J) and 9.3(B).
+ 
+(B) Deposits to the Current Dollar Debt Service Account
+ 
+Deposits to the Current Dollar Debt 'Service Account shall be made by the Account Bank in accordance with Sections 3.3(B) (h) and 9.4(B).
+ 
+7.3 Withdrawals from the Current Rupee Debt Service Account
+ 
+The Account Bank shall withdraw amounts from the Current Debt Service Account on a Distribution Date:
+ 
+(A)	on the instructions of the Borrower to pay amounts due under the Financing Plan on such date; or
+(B)	on the instructions of the Borrower with the prior written consent of the Security Trustee/Lead Institution.
+ 
+7.4 Withdrawals from the Current Dollar Debt Service Account
+ 
+The Account Bank shall withdraw amounts from the Current Dollar Debt Service Account on a Distribution Date:
+ 
+(A)	on the instructions of the Borrower to pay amounts due under the Financing Plan on 	such date; or
+(B)	on the instructions of the Borrower with the prior written consent of the Security 	Trustee/Lead Institution.
+ 
+7.5 Application of Insufficient Funds
+ 
+If the amounts available in a Current Debt Service Account are insufficient to pay amounts due under Loan Agreements and the Guarantee Agreements In the order of priority listed in the Loan Agreements and the Guarantee Agreements, the Borrower shall instruct the Account Bank to pay the available amounts pro rata to the aggregate-, of each of the amounts due there under and in accordance with the priority in the Loan Agreements and the Guarantee Agreements. For this purpose the Account Bank can rely on the calculations provided to it by the Borrower in writing with the approval of the Security Trustee/Lead Institution.
+ 
+7A. Commitment Charges Guarantee Account
+ 
+7A. 1 Account
+ 
+The Commitment Charges Guarantee Account shall be established in the name of the Borrower. The Account shall be denominated in Rupees.
+ 
+7A.2 Deposits
+ 
+Deposits to the Commitment Charges Guarantee Account shall be made by the Account Bank in accordance with section 3.3(131)(1).
+ 
+7A.3 Withdrawals
+ 
+The Account Bank shall withdraw amounts from the Commitment Charges Guarantee Account on a Distribution Date:
+ 
+(A)	on the instructions of the Borrower to pay amounts due under the Commitment 	Charge Financing Documents on such date; or
+(B)	on the instructions of the Borrower with the prior written consent of the Security 	Trustee/Lead Institution.
+ 
+8. Overhaul Reserve Account
+ 
+8.1 Account
+ 
+The Overhaul Reserve Account shall be established in the name of the Borrower. The Account shall be denominated in Rupees until such time as an additional Overhaul Reserve Account, denominated in Dollars, is required and approval of the Reserve Bank of India to open such an account is obtained.
+ 
+8.2 Deposits
+ 
+Deposits to the Overhaul Reserve Account shall be made by the Account Bank in accordance with section 3.3(C), provided the amount to be maintained in the Account for any projected twelve months Overhaul Costs will be reduced by any cash and Authorised Investments retained by the Borrower in excess of cash and/or Authorised Investments required for the Current Debt Service Accounts and Debt Service Reserve Accounts.
+ 
+8.3 Withdrawals
+ 
+(A) The Account Bank shall withdraw amounts from this Account on the instructions of the Borrower for payment of Overhaul Costs in accordance with the Operating Budget.
+ 
+(B) In the event there are amounts in excess of the projected requirements, the Borrower may, at its option, direct the Account Bank to transfer any such excess to be transferred to the Trust and Retention Account.
+ 
+9. Debt Service Reserve Accounts
+ 
+9.1 Account
+ 
+The Debt Service Reserve Accounts shall be established in the name of the Borrower. The Dollar Debt Service Reserve Account shall be denominated in Dollars and the Rupee Debt Service Reserve Account shall be denominated in Rupees.
+ 
+9.2 Deposits to the Debt Service Reserve Account
+ 
+(A) Deposits to the Rupee Debt Service Reserve Account
+ 
+Deposits to the Rupee Debt Service Reserve Account shall be made by the Account Bank in accordance with sections 3.3(13)(t).
+ 
+(B) Deposits to the Dollar Debt Service Reserve Account
+ 
+Deposits to the Dollar Debt Service Reserve Account shall be made by the Account Bank in accordance with sections 3.3(13)(fi).
+ 
+9.3. Withdrawals from the Rupee Debt Service Reserve Account
+ 
+The Account Bank shall withdraw amounts from the Rupee Debt Service Reserve Account on a Distribution Date:
+ 
+(A)	on the instructions of the Borrower to make payments to the Current Rupee Debt Service Account to the extent that the amount standing to the credit of such account is less than the Required Balance; or
+ 
+(B)	on the instructions of the Borrower to make payments to the Overhaul Reserve Account to the extent that the amount standing to the credit of such account is less than the Required Balance; or
+ 
+(C)	to the extent that the balance of the Rupee Debt Service Reserve Account exceeds its Required Balance, on the instructions of the Borrower to pay the excess in the Rupee Debt Service Reserve Account (or such lesser amount as the Borrower may specify) solely to the Trust and Retention Account; or
+ 
+(D)	on the instructions of the Borrower with the prior written consent of the Security Trustee/Lead Institution.
+ 
+9.4 Withdrawals from the Dollar Debt Service Reserve Account
+ 
+ 
+The Account Bank shall withdraw amounts from the Dollar Debt Service Reserve Account on a Distribution Date:
+ 
+(A)	on the instructions of the Borrower, to make payments to the Current Dollar Debt Service Account to the extent that the amount standing to the credit of such Account is less than the Required Balance; or
+ 
+(B)	to the extent that the balance of the Dollar Debt Service Reserve Account exceeds its Required Balance, on the instructions of the Borrower, to pay the excess in the Dollar Debt Service Reserve Account (or such lesser amount as the Borrower may specify) solely to the Trust and Retention Account; or
+ 
+(C)	on the instructions of the Borrower with the prior written consent of the Security Trustee/Lead Institution.
+ 
+9A. Tax Escrow Account
+9A. 1 Account
+ 
+The Tax Escrow Account shall be established in the name of the Borrower.
+ 
+9A.2 Deposits
+ 
+The Borrower shall procure deposit amounts paid by APSEB towards reimbursement ,of taxes on Income of the Borrower under the Power Purchase Agreement into this Account.
+ 
+9A.3 Withdrawals
+ 
+The Account Bank shall, on the instructions of the Security Trustee/Lead Institution, utilise such amounts towards payment of taxes on income of the Borrower as provided in the Rupee Operating Budget.
+ 
+9B. Contingency Account
+ 
+9B.1 Account
+ 
+ The Contingency Account shall be established in the name of the Borrower.
+ 
+9B.2 Deposits
+ 
+The Borrower shall procure deposit of all Contingency Proceeds into this Account.
+ 
+9B.3 Withdrawals
+ 
+The Account Bank shall withdraw amounts from the Contingency Account:
+ 
+(i)	being insurance proceeds at the instructions of the Borrower to make good any repair or loss;
+(ii)	being proceeds of third party and employers' liability claims at the instructions of the Borrower for payment to the person to whom liability is due unless the claim has been previously settled by the Borrower, in which case the proceeds shall be deposited in the Trust and Retention Account;
+(iii)	being proceeds of liquidated 'damages under the EPC Contract at the instructions of the Borrower to pay damages payable under the Power Purchase Agreement or other Project Contracts as a result of events which gave rise to liquidated damages;
+(vi)	being proceeds of liquidated damages under the Fuel Supply Agreement to pay damages payable under the Power Purchase Agreement or other Project Contracts as a result of events which gave rise to liquidated damages; and
+(v)	to the extent of any surplus remaining after the application of funds as provided in (i) to (iv) above, to the extent Required Balances have not been I attained, at ,the option of the Lenders to prepay the Loans or retain the surplus In the Trust and Retention, Account, provided that if the Required Balances have already been attained, the surplus shall be transferred to the Trust and Retention Account.
+ 
+10. Currency Conversion
+ 
+For the purposes of ensuring that the proceeds of any withdrawal made hereunder from the Trust and Retention Account are denominated in the currency in which the same are to be applied hereunder, the Borrower shall instruct the Account Banks to convert the amount of any such withdrawal from the currency in which the same is denominated into the currency in which the proceeds thereof are to be applied at the then appricable exchange rate offered by the Account Bank in the normal course of its business or to transfer such withdrawal to any other banking institution selected by the Borrower for the sale or purchase of currency, in accordance with applicable approvals from the Reserve Bank of India from time to time. If the conversion is made prior to the relevant withdrawal date, the Account Banks shall retain the funds so converted in a Rupee or Dollar subaccount maintained in connection with such Account or, if no such sub-account is required to be so maintained, a sub-account in the relevant currency established for such purpose:
+ 
+Provided that any amounts payable by MSEB required to be converted into Dollars to meet Dollar obligations shall be converted into Dollars promptly after deposit into the Trust and Retention Account in accordance with this Agreement.
+ 
+Any currency conversion by the Borrower shall be in accordance with the approval of the Reserve Bank of India.
+ 
+11. Authorised Investments
+ 
+11. 1 Power to invest
+ 
+The Account Banks shall invest in Authorised Investments on the instructions of the Borrower, subject as provided in this Agreement, from such part of the amounts standing to the credit of any of the Trust and Retention Account. Section 20 of the Indian Trusts Act, 1882 shall not apply to investments of amounts in the Trust and Retention Accounts.
+ 
+11.2 Procedure for investments
+ 
+11.2.1 All Authorised Investments shall be made and/or realised by the Account Banks in accordance with the Borrower's instructions.
+ 
+11.2.2 All documents of title or other documentary evidence of ownership with respect to Authorised Investments made out of any Account will be held in the custody of the Account Bank under the name and for the account of the Borrower.
+ 
+11. 3 Realisations
+ 
+Upon the realisation of any investment made under this Section, the proceeds of realisation shall immediately be credited to the relevant Account by the Account Banks or immediately invested in another Authorised Investment in accordance with the Borrower's instructions.
+ 
+11.4 Mandatory realisations
+ 
+In the event, that the Borrower becomes aware that any Authorised Investment has ceased to be an Authorised Investment, the Borrower shall immediately instruct the Account Banks on a best efforts basis to realise such Authorised Investment on its maturity date or earlier if so instructed by the Borrower.
+ 
+11.5 Accounts Include Investments
+ 
+Any reference in this Agreement to the balance standing to the credit of an Account
+ 
+shall be deemed to include a reference to the principal and interest accrued thereon of
+Authorised Investments in which all or part of such balance is invested.
+ 
+11.6 Interest on Investments
+ 
+Except as otherwise described herein, any interest or other income paid in respect of Authorised Investments shall be paid to the Trust and Retention Account.
+ 
+11. 7 Enforcement notice
+ 
+On receipt of an Enforcement Notice from the Security Trustee/Lead Institution, the Account Banks shall realise the Authorised Investments, whether such investments have matured or not, on a best efforts basis and apply the proceeds as directed by the Security Trustee/Lead Institution (who shall act in accordance with the Security Documents).
+ 
+12. Withdrawals following event of default
+ 
+12.1 Events of default
+ 
+If the Security Trustee/Lead Institution notifies the Account Banks that an Event of Default has occurred, and is continuing, then, until such time as the Security Trustee/ Lead Institution has notified the Account Banks that the. Event of Default has been cured or waived under the relevant Loan Agreements and/or the Guarantee Agreements only upon receipt of Instructions from the Security Trustee/Lead Institution the Account Banks shall act and make withdrawals from the Accounts In accordance with the instructions of the Security Trustee/Lead Institution.
+ 
+12.2 Enforcement notices
+ 
+The Account Banks, at any time after the notification to them by the Security Trustee/ Lead Institution of the occurrence of an Enforcement Notice and until such time as it is notified by the Security Trustee/Lead Institution that such Enforcement Notice has been revoked by the Security Trustee/Lead Institution, shall:
+ 
+(A)	not be obliged to act on the instructions of the Borrower pursuant to this Agreement in relation to any sums at such time standing to the credit of the Accounts except with the prior written consent of the Security Trustee/Lead Institution;
+(B)	be entitled to pay to the Security Trustee/Lead Institution any sums standing to the credit of the Accounts for application by the Security Trustee/Lead Institution in or towards the payment and discharge of any amounts owing to the.Lenders under the Financing Documents in accordance with the Security Documents;
+(C)	not honour any cheques or other payment instructions of the Borrower without the consent of the Security Trustee/Lead Institution.
+ 
+Upon an Enforcement Notice, the Borrower undertakes not to issue any cheque or payment instructions, to the, Account Banks without the consent of the Security Trustee/ Lead Institution.
+ 
+13. Account banks provisions
+ 
+13.1 The Account Banks and the Lenders
+ 
+The Borrower hereby appoints the Account Banks to act as trustee for the Security Trustee/Lead Institution and the Borrower in connection herewith, and authorises the Account Banks to exercise such rights, powers, authorities and discretions as are specifically delegated to the Account Banks by the terms hereof, together with all such rights, powers, authorities and discretions as are reasonably incidental hereto, and the Account Banks accept such appointment pursuant to the terms hereof.
+ 
+13.2 Particular Duties of the Account Bank
+ 
+The Account Bank:
+ 
+(A)	may, in the absence of bad faith or gross negligence on its part, rely as to any matters of fact which might reasonably be expected to be within the knowledge of the Borrower upon a certificate signed by or on behalf of the Borrower;
+(B)	may, in the absence of bad faith or gross negligence on its part, rely upon the authenticity of any communication or documents believed by it to be authentic;
+(C)	shall, within 5 business days after receipt, deliver a copy to  the Security Trustee/ Lead Institution of any notice or document received by the Account Banks in their capacity as Account Banks from the Borrower -or any other person hereunder or in connection herewith; and
+ 
+(D)	shall, within 5 business days after receipt, deliver a copy tothe Borrower of any notice or document received by the Account Banks from the Security Trustee/ Lead Institution or any of the Lenders in connection herewith..
+ 
+13.3 Segregation of Funds
+ 
+Monies and other property received by the Account Banks under this Agreement shall, until used or applied in, accordance with this, Agreement, be hold in trust for, the purposes for which they were received and shall be segregated from other funds and property of the Account Banks.
+ 
+13.4 Termination
+ 
+13.4.1 This Agreement shall remain in full force and effect so long as, amounts remain outstanding from the Borrower under the Financing Plan, unless terminated earlier by the mutual consent of the parties or otherwise in accordance with the provisions of this Section by written notice from the Security Trustee/Lead Institution to the Account Banks.
+ 
+13.4.2 The Borrower may, by not less than 45 days prior notice to the Account Bank(s) and the Security Trustee/Lead Institution, terminate this Agreement and appoint one or more Account Banks, provided that the new Account Bank(s) War& acceptable to the Security Trustee/Lead Institution and arrangements are made satisfactory to the Security Trustee/Lead Institution for transfer of amounts deposited in the Accounts to new Accounts established with the successor Account Bank(a).
+ 
+13.4.3 The Account Banks shall be entitled to terminate this Agreement if the Borrower fails to comply with any of its material obligations to the Account Banks under this Agreement and fails to remedy the failure within 45 days after receipt of notice thereof from the Account Banks to the Borrower and the Security Trustee/Lead Institution, provided the Borrower appoints new Account Banks acceptable to the Security Trustee/ Lead Institution and arrangements are made satisfactory to the Security Trustee/Lead Institution for transfer of amounts deposited in the Accounts to now Accounts established with successor Account Banks.
+ 
+13.5 Fees
+ 
+The Borrower shall pay the Account Banks fees in an amount and at such times as may be agreed between the Account Banks and the Borrower.
+ 
+13.6 Books and Records
+ 
+The Borrower authorises the Account Banks to give the Security Trustee/Lead Institution unrestricted access to review the books and records of the Account Banks, subject to restrictions in law and right of confidentiality of the Account Banks. The Borrower irrevocably grants the Security Trustee/Lead Institution access to review the books and records of the Trust and Retention Account and irrevocably waives any right of confidentiality, which may exist in respect of such books and records to the Security Trustee/Lead Institution.
+ 
+13.7 Statement of Investments
+ 
+Upon the request of the Security Trustee/Lead -Institution, not later than 5 business days after the end of any calendar month, the Borrower will deliver to the Lenders a schedule of investments acquired or disposed off during that month in respect of the Trust and Retention Agreement, in such detail as the Lenders may reasonably require.
+Xcp.df
+13.8 Notice of Breach
+ 
+The Account Banks undertake to the Security Trustee/Lead Institution that It shall notify the Security Trustee/Lead Institution of any breach by the Borrower (to the best of its knowledge) of the provisions of this Agreement.
+ 
+14. TRA defaults
+ 
+If the Borrower is in breach of. any of its obligations under this Agreement and, following notice of default from the Security Trustee/Lead Institution, falls to remedy the same:
+ 
+(A)	in the case of a failure to deposit funds received by the Borrower in the appropriate Account in accordance with this Agreement, by depositing the same in such appropriate Account within five business days of receipt of such notice;
+(B)	in the case of a breach consisting of causing the Account Banks to transfer funds to any Account in breach of the terms of this Agreement, by depositing the relevant funds in the Account in which such transfer should have been made (or, in the case of a transfer to the Trust and Retention Account, by requesting the Security Trustee/Lead Institution to authorise the transfer of amounts incorrectly deposited in such Account to the Account to which the transfer should have been made) within five business days of receipt of such notice;
+(C)	in the case of a breach of the Borrower's obligations under section 12, by instructing the Account Banks to realise any investment made in, breach of section 12 within five business days of receipt of such notice;
+(D)	in case the Average Debt Service Coverage Ratio is less than 1.2; or
+(E)               in the case of any other breach, within 30 days of suc
+(F)               h notice; such default shall be deemed to be a “TRA Default “, and the Security Trustee/Lead Institution shall promptly authorlse the Account Banks to make transfers required pursuant to paragraph (B) above.
+ 
+15. Dividends
+ 
+If there has not occurred an (i) Event of Default, or (ii) a TRA Default and if the Required Balance in the Debt Service Reserve Accounts, the Overhaul Reserve Account and the Current Debt Service Accounts is in compliance with the amount specified in this Agreement, or (iii) there is no claim pending against the Borrower which has not been contested by the Borrower or provided for by means of a reserve in the Trust and Retention Account, and (iv) the Security Trustee/Lead Institution is satisfied that amounts in the Trust and Retention Account are adequate to meet the Operating Costs in accordance with the Annual Operating Budget for the month in which dividend is proposed to be declared, then the Security Trustee/Lead Institution shall allow the Borrower to pay the maximum dividend permitted under law, provided the Average Debt Service Coverage Ratio for the four calendar quarters Immediately prior to, the proposed dividend payment date and the four calendar quarters subsequent thereto, Including the quarter in which the dividend is proposed to be paid, Is 1.4 or greater provided that the calculation of the Average Debt Service Coverage Ratio shall be subject to the prior written approval of the Security Trustee/Lead Institution.
+ 
+16. Representation and warranties of the account bank and the Borrower
+ 
+Each of the Account Banks and the Borrower represent and warrant. that, it is duly organised and validly existing under the laws of India, with power to enter into this Agreement and tax exercise its rights and perform its obligations hereunder and has taken all corporate and other actions required for the execution of this Agreement and the performance of its obligations hereunder.
+ 
+17. Miscellaneous
+ 
+17.1 Closure of Accounts
+ 
+The Account Banks shall, at the request of the Borrower made on or after the payment by the Borrower of all outstanding amounts under the Loan Agreements and Guarantee Agreements (for this purpose, excluding the ADB Loan Agreement) and the Guarantee Agreements as confirmed by the Security Trustee/Lead Institution, close the Accounts and pay any amount standing to the credit thereof to the Borrower.
+ 
+17.2 Restriction on Assignment
+ 
+Save as provided in section 13.4, neither the Borrower, the Security Trustee/Lead Institution nor the Account Banks shall assign or transfer any part of their respective rights or obligations under this Agreement without the prior consent of the other, provided that the Security Trustee/Lead Institution may assign or transfer its rights and obligations to a successor Security Trustee/Lead Institution, with the consent of the Borrower (which shall not be unreasonably withheld) and this section 17.2 shall not prevent any Lender from assigning or transferring its rights under the Loan Agreements and the Guarantee Agreements, in accordance with the terms thereof.
+ 
+17.3 Successors and assignors
+ 
+This Agreement shall be binding on and shall Inure to the benefit of the Parties and their respective successors and permitted assigns.
+ 
+17.4 No set off
+ 
+The Account Banks agree not to claim or exercise any right of set off, banker's lien or other right or remedy with respect to amounts standing to the credit of the Trust and Retention Accounts. For the avoidance of doubt, it is declared by the Account Banks that the monies and properties held by the Account Banks shall not be considered as part of the assets of the Account Banks and, being trust property, shall in the case of a bankruptcy or liquidation of the Account Banks be wholly excluded from the assets of the Account Banks in such bankruptcy or liquidation.
+ 
+17.5 Notices
+ 
+17.5.1 All notices or other communications to be given or made under this Agreement shall be in writing and shall either be delivered personally or sent by courier, registered or certified mail or facsimile. The address for service of each Party and its facsimile number is set out under its name on the signature pages hereof. All notices shall be effective upon actual receipt, save that where a notice is transmitted by facsimile and is received after 5.30 p.m. on a business day or on a day that is not a business day, such notice shall be deemed to be received on the first business day following the date of actual receipt. Without prejudice to the foregoing, a Party giving or making a notice or communication by facsimile, shall promptly deliver a copy of such notice or communication personally, by courier or mail to the addressee of such notice or communication.
+ 
+17.5.2 Any Party may by notice change the addresses and/or addresses to which such notices and communications to it are to be delivered or mailed. Such change shall be effective when all the Parties have written notice of it.
+ 
+17.6 Waiver
+ 
+Failure by any Party at any time to enforce any provision of this Agreement or to require performance by the other Parties of any provision of this Agreement, shall not be construed as a waiver of such provision and shall not affect the validity of this Agreement or any part of it or the right of the relevant Party, to enforce any provision in accordance with its terms.
+ 
+17.7 Severability
+ 
+If any condition, Section or provision of this Agreement not being of a fundamental nature is held to be illegal or unenforceable, the validity or enforceability of the remainder of this Agreement shall not be affected thereby.
+ 
+17.8 Amendments
+ 
+No amendment to this Agreement shall be binding unless in writing and signed by the duly authorised representatives of the Parties.
+ 
+17.9 Governing law
+ 
+This Agreement shall be governed by and construed in accordance with Indian law.
+ 
+17. 10 Regulatory approvals
+ 
+Each of the Account Banks shall use its best efforts to procure and shall thereafter, maintain and comply with all regulatory approvals required for it, to establish and operate the Accounts. Each of the Account, Banks represent and warrant to the Borrower that, it is not aware of any reason why such regulatory approvals will not be ordinarily granted to the Account Bank.
+ 
+17.11 Notification of balances
+ 
+Within 7 days following the end of each calendar monthly reporting date, the Account Banks shall notify the Security Trustee/Lead Institution of the respective balances in the Accounts a statement of the deposits into and payment out of the Accounts, as at the close of business of such calendar month.
+ 
+IN WITNESS whereof the Borrower has caused its Common Seal to be affixed hereto and to a duplicate hereof on the date first above written and the Account Banks and the Security Trustee/Lead Institution have caused the same and the said duplicate to be executed by the hand of an authorised official.
+ 
+SIGNED AND DELIVERED by the within named ABC BANK by the hand of……………. an authorized official of the Account Bank
+ 
+	Address for notice
+ABC Bank
+Branch
+Fax No.
+ 
+SIGNED AND DELIVERED by the within named THE GHI BANK LIMITED by the hand of……………….an authorised official of the Account Bank
+	Address for notice
+GHI Bank
+ 
+SIGNED AND DELIVERED by THE XYZ FINANCE COMPANY LIMITED within named Security Trustee by the hand of……………….an authorised. Official of the Security Trustee/Lead Institution acting as trustee for the Lenders.
+ 
+Address for notice
+The XYZ Finance Company Ltd.
+………………………………….
+…………………………………..
+Mumbai Fax No.
+ 
+ 
+THE COMMON SEAL of ABC
+POWER GENERATION COMPANY LIMITED pursuant to the Resolution of its Board of Directors passed in that………………behalf on the day 	of…………..2001 hereunto been affixed in the presence of ........................ Director and …………..Secretary who have signed these presents in token thereof 
+Address for notice
+………………….
+…………………..
+…………………..
+ 
+ 
+ANNEXURE1
+FORM OF CONSTRUCTION, COSTS BUDGET
+ 
+The Construction Costs Budget may be amended by mutual agreement of the Borrower and the Security Trustee/Lead Institution.
+ 
+ANNEXURE2
+FORM OF OPERATING BUDGET
+ 
+The Operating Budget may be amended by mutual agreement of the Borrower and the Security Trustee/Lead Institution.
+ 
+ANNEXURE3
+OPERATING PROCEDURES
+ 
+The Operating Procedures may be amended by agreement of the Borrower, the Security Trustee/Lead Institution and the Account Banks.
+ 
+

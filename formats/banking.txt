@@ -1,0 +1,40 @@
+^ Category ^ Title ^
+| banking | [[legal_formats:banking:account_opening_form_for_limited_company|Account Opening Form For Limited Company]] |
+| banking | [[legal_formats:banking:account_opening_form_for_society_club_or_nonprofit_making_body|Account Opening Form For Society Club Or Nonprofit Making Body]] |
+| banking | [[legal_formats:banking:account_opening_form_for_the_trust|Account Opening Form For The Trust]] |
+| banking | [[legal_formats:banking:advice_of_nonacceptance_of_bill|Advice Of Nonacceptance Of Bill]] |
+| banking | [[legal_formats:banking:another_reply_to_the_bank_intimating_about_the_financial_status_of_a_company|Another Reply To The Bank Intimating About The Financial Status Of A Company]] |
+| banking | [[legal_formats:banking:application_form_by_a_cooperative_society_for_licence_to_commence_banking_business_as_a_central_cooperative_bank|Application Form By A Cooperative Society For Licence To Commence Banking Business As A Central Cooperative Bank]] |
+| banking | [[legal_formats:banking:application_form_for_licence_by_a_cooperative_society_to_commence_banking_business_as_a_primary_cooperative_bank|Application Form For Licence By A Cooperative Society To Commence Banking Business As A Primary Cooperative Bank]] |
+| banking | [[legal_formats:banking:application_form_for_licence_by_a_cooperative_society_to_commence_banking_business_as_a_state_cooperative_bank|Application Form For Licence By A Cooperative Society To Commence Banking Business As A State Cooperative Bank]] |
+| banking | [[legal_formats:banking:application_form_for_licence_to_commence_banking_business_by_a_co_operative_society_which_has_come_into_existence_by_division_etc|Application Form For Licence To Commence Banking Business By A Co Operative Society Which Has Come Into Existence By Division Etc]] |
+| banking | [[legal_formats:banking:application_form_for_licence_to_commence_banking_business_by_a_company_incorporated_in_india|Application Form For Licence To Commence Banking Business By A Company Incorporated In India]] |
+| banking | [[legal_formats:banking:application_form_for_licence_to_commence_business_by_a_company_incorporated_outside_india|Application Form For Licence To Commence Business By A Company Incorporated Outside India]] |
+| banking | [[legal_formats:banking:application_form_for_opening_a_new_place_of_business_or_change_the_location_of_an_existing_place_of_business_by_a_banking_company_incorporated_in_india|Application Form For Opening A New Place Of Business Or Change The Location Of An Existing Place Of Business By A Banking Company Incorporated In India]] |
+| banking | [[legal_formats:banking:application_form_for_opening_a_new_place_of_businessby_a_cooperative_bank|Application Form For Opening A New Place Of Businessby A Cooperative Bank]] |
+| banking | [[legal_formats:banking:authority_to_a_bank_to_pay_premiums_for_life_insurance_policy|Authority To A Bank To Pay Premiums For Life Insurance Policy]] |
+| banking | [[legal_formats:banking:bill_of_exchange_after_date|Bill Of Exchange After Date]] |
+| banking | [[legal_formats:banking:bill_of_exchange_payable_after_sight|Bill Of Exchange Payable After Sight]] |
+| banking | [[legal_formats:banking:bill_of_exchange_payable_on_demand|Bill Of Exchange Payable On Demand]] |
+| banking | [[legal_formats:banking:bill_of_exchange_payable_to_any_one_of_several_payees|Bill Of Exchange Payable To Any One Of Several Payees]] |
+| banking | [[legal_formats:banking:bill_of_exchange_withdrawee_in_case_of_need|Bill Of Exchange Withdrawee In Case Of Need]] |
+| banking | [[legal_formats:banking:circular_letter_of_credit|Circular Letter Of Credit]] |
+| banking | [[legal_formats:banking:circular_note|Circular Note]] |
+| banking | [[legal_formats:banking:clean_letter_of_credit|Clean Letter Of Credit]] |
+| banking | [[legal_formats:banking:demand_promissory_note|Demand Promissory Note]] |
+| banking | [[legal_formats:banking:demand_promissory_note_by_public_limited_company|Demand Promissory Note By Public Limited Company]] |
+| banking | [[legal_formats:banking:demand_promissory_note_for_joint_borrowers|Demand Promissory Note For Joint Borrowers]] |
+| banking | [[legal_formats:banking:documentary_letter_of_credit|Documentary Letter Of Credit]] |
+| banking | [[legal_formats:banking:endorsement|Endorsement]] |
+| banking | [[legal_formats:banking:factoring_agreement|Factoring Agreement]] |
+| banking | [[legal_formats:banking:foreign_bill_of_exchange_in_sets|Foreign Bill Of Exchange In Sets]] |
+| banking | [[legal_formats:banking:form1|Form1]] |
+| banking | [[legal_formats:banking:joint_promissory_note|Joint Promissory Note]] |
+| banking | [[legal_formats:banking:letter_from_a_bank_to_another_bank_enquiring_as_to_status_of_a_company|Letter From A Bank To Another Bank Enquiring As To Status Of A Company]] |
+| banking | [[legal_formats:banking:letter_of_indication|Letter Of Indication]] |
+| banking | [[legal_formats:banking:letter_of_lien_by_the_holder_of_fixed_deposit_to_avail_overdraft_sanctioned|Letter Of Lien By The Holder Of Fixed Deposit To Avail Overdraft Sanctioned]] |
+| banking | [[legal_formats:banking:promissory_note_payable_in_instalments|Promissory Note Payable In Instalments]] |
+| banking | [[legal_formats:banking:promissory_note_payable_on_demand|Promissory Note Payable On Demand]] |
+| banking | [[legal_formats:banking:receipt_of_consideration_of_a_promissory_note|Receipt Of Consideration Of A Promissory Note]] |
+| banking | [[legal_formats:banking:reply_to_the_bank|Reply To The Bank]] |
+| banking | [[legal_formats:banking:traveller_s_cheque|Traveller S Cheque]] |

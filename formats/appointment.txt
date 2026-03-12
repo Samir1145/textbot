@@ -1,0 +1,27 @@
+^ Category ^ Title ^
+| appointment | [[legal_formats:appointment:appointment_as_a_personal_secretary|Appointment As A Personal Secretary]] |
+| appointment | [[legal_formats:appointment:appointment_as_coordinator|Appointment As Coordinator]] |
+| appointment | [[legal_formats:appointment:appointment_as_marketing_manager|Appointment As Marketing Manager]] |
+| appointment | [[legal_formats:appointment:appointment_for_a_fixed_period|Appointment For A Fixed Period]] |
+| appointment | [[legal_formats:appointment:appointment_in_hotels_and_restaurants|Appointment In Hotels And Restaurants]] |
+| appointment | [[legal_formats:appointment:appointment_letter_of_a_probationer|Appointment Letter Of A Probationer]] |
+| appointment | [[legal_formats:appointment:appointment_letter_to_a_clerkoffice_assistant|Appointment Letter To A Clerkoffice Assistant]] |
+| appointment | [[legal_formats:appointment:appointment_letter_to_a_daily_wage_worker|Appointment Letter To A Daily Wage Worker]] |
+| appointment | [[legal_formats:appointment:appointment_letter_to_a_driver|Appointment Letter To A Driver]] |
+| appointment | [[legal_formats:appointment:appointment_letter_to_a_temporary_employee|Appointment Letter To A Temporary Employee]] |
+| appointment | [[legal_formats:appointment:appointment_of_a_consultant|Appointment Of A Consultant]] |
+| appointment | [[legal_formats:appointment:appointment_of_a_distributor_for_consumer_products|Appointment Of A Distributor For Consumer Products]] |
+| appointment | [[legal_formats:appointment:appointment_of_accounts_manager|Appointment Of Accounts Manager]] |
+| appointment | [[legal_formats:appointment:appointment_of_an_attorney_in_place_of_another|Appointment Of An Attorney In Place Of Another]] |
+| appointment | [[legal_formats:appointment:appointment_of_an_engineer_by_the_government|Appointment Of An Engineer By The Government]] |
+| appointment | [[legal_formats:appointment:appointment_of_an_engineer_under_government|Appointment Of An Engineer Under Government]] |
+| appointment | [[legal_formats:appointment:appointment_of_distributor_for_a_district|Appointment Of Distributor For A District]] |
+| appointment | [[legal_formats:appointment:appointment_of_lecturerteacher|Appointment Of Lecturerteacher]] |
+| appointment | [[legal_formats:appointment:assignment_of_lease|Assignment Of Lease]] |
+| appointment | [[legal_formats:appointment:assignment_of_partnership_firmgçös_business_to_the_private_limited_company|Assignment Of Partnership Firmgçös Business To The Private Limited Company]] |
+| appointment | [[legal_formats:appointment:compassionate_appointment_of_employment_after_retirement_from_service|Compassionate Appointment Of Employment After Retirement From Service]] |
+| appointment | [[legal_formats:appointment:compulsory_retirement|Compulsory Retirement]] |
+| appointment | [[legal_formats:appointment:dismissal_order|Dismissal Order]] |
+| appointment | [[legal_formats:appointment:dismissal_order_through_paper_notification_when_an_employee_was_convicted_by_a_court_of_law|Dismissal Order Through Paper Notification When An Employee Was Convicted By A Court Of Law]] |
+| appointment | [[legal_formats:appointment:employment_agreement|Employment Agreement]] |
+| appointment | [[legal_formats:appointment:retirement_of_superannuation|Retirement Of Superannuation]] |

@@ -1,0 +1,583 @@
+INDENTURE OF MQRTGAGE
+ 
+ 
+THIS INDENTURE made at Mumbai on this the……………..day of……………..2000 by ABC Power Generation 	Company Limited, a company registered under the Companies Act, 1956 (1 of 1956) and having its registered office at 	……………..Mumbai (hereinafter called "the Company") (which expression shall  unless excluded by. or repugnant to 	the context or meaning thereof be deemed to include its successors and assigns) of the ONE PART and the XYZ 	Finanace Company Limited, a company registered under the Companies Act, 1956 (1 of 1956) and having its registered 	office at…………….. Mumbai (hereinafter called "XYZF" or "the Security Trustee") (which expression shall unless 	excluded by or repugnant to the context or meaning thereof be deemed to include the Security Trustee or the Security 	Trustees for the time being hereof and its successor/s and assigns) of the SECOND PART acting in its capacity as the 	Security Trustee for the Term Lenders and the Commitment Charge Lenders.
+ 
+WHEREAS
+ 
+(1) By Loan Agreements entered into between the Company and Term Lenders, each of the Term Lenders have agreed to lend and advance to the Company and the Company has agreed to borrow from each of the Term Lenders on the terms and conditions contained in the Loan Agreements sums in the form of loans to the maximum extent set out against their respective names in Part A of the First Schedule hereto.
+ 
+(2) One of the conditions of the Loan, Agreements Is that the-Loans together with all interest, liquidated damages, costs, expenses and other monies, including in case of foreign currency loans any increase as a result of revaluation/devaluation/fluctuation whatsoever stipulated in the Loan Agreements shall be secured, inter alia, by a first mortgage of the Company's immovable properties situate at Maharashtra.
+ 
+(3) By Guarantee Agreements between the Company, the Guarantors and the Counter Guarantors, the Guarantors have agreed to guarantee (and the Counter Guarantors have agreed to counter guarantee) certain payment obligations of the Company, to the extent set out against their respective names in Part 8 of the First Schedule hereto (hereinafter collectively referred to as "the Guarantee Assistance”, to The Export-Import Bank of Hong Kong (hereinafter referred to as "HK-EXIM Bank") in terms of the HK-EXIM Loan, Agreement dated November 26, 2000.
+ 
+(4) One of the conditions of the Guarantee Agreements is that the Guarantee Assistance together with all guarantee commission and payments, if any, made pursuant to the Guarantee, all interest thereon, costs, charges, fees, expenses and all other monies, including any increase ,as a result of revaluation/devaluation/fluctuation in foreign currencies whatsoever stipulated in the Guarantee Agreement shall be secured, inter alia, by a first mortgage over the Company's immovable properties situate at Maharashtra.
+ 
+(5) By the Commitment Charge Financing Documents entered into/to be entered into between the Company and the, Commitment Charge Lenders, each of the Commitment Charge Lenders have agreed to lend and advance to the Company and/or provide guarantee assistance to the Company and the Company has agreed to borrow and/or avail from each of the Commitment Charge Lenders on the terms and conditions contained in Commitment Charge Financing Documents the sums in the form of loans and/or guarantees to the maximum extent set out against their respective names in Part C of the First Schedule hereto.
+ 
+(6) One of the conditions of the Commitment Charge Financing Documents is that, the principal together with all interest, liquidated damages, costs, expenses and other monies whatsoever stipulated in the Commitment Charge Financing Documents shall be secured, inter alia, by a second and subservient charge over the Company's immovable properties situate at Maharashtra.
+ 
+(7) The Company is seized and possessed of and/or otherwise well, and sufficiently entitled to all those pieces or parcels of lands, hereditaments and premises situate at Commercial Complex No ……………..admeasuring…………….. sq. ft of built up area on ground, floor of the building constructed on the plot No……………..situate long and being in Registration Sub-District……………..Tehsil……………..Village……………..Registration District Mumbai Suburban District in the State of Maharashtra more particularly described in the Second Schedule hereunder written and the Company is entitled to the other assets over which it is creating security hereunder.
+ 
+(8) The provisions, of the Urban Land (Ceiling and Regulation) Act, 1976 (hereinafter referred to as "ULCRA") are not applicable to the aforesaid immovable properties and therefore, no permission is required to be obtained under ULCRA for mortgaging the said immovable properties.
+ 
+(9) The Company has complied with all legal requirements and has obtained all consents and approvals required for creation of the security expressed to be created under clause 5 in favour of the Security Trustee for securing the Financial Assistance and the Commitment Charge Financial Assistance.
+ 
+(10) Accordingly, the Security Trustee and the Company have agreed that the mortgage of the aforesaid immovable property shall be by way of a legal mortgage in English form being these presents.
+ 
+NOW THIS INDENTURE WITNESSETH AND IT IS HEREBY MUTUALLY AGREED AND DECLARED BY AND BETWEEN THE, PARTIES HERETO AS UNDER:
+ 
+1. Definitions
+ 
+Unless the context otherwise requires, the following expressions shall herein have the meanings ascribed to them set out below:
+ 
+"Acceleration" means:-.
+ 
+(a)	the delivery by any Guarantor of a notice to the Company pursuant to section 10 of the Guarantee Agreements 	declaring all amounts owing, by the Company under the Guarantee Agreement to be due and payable forthwith.
+ 
+(b)	the delivery by any Lender or a Commitment Charge Lender that has a loan under the Loan Agreements or the 	Commitment Charge Financing Documents outstanding to it, of a notice to the Company pursuant to section 10A 	of the Loan Agreements or equivalent provision of the Commitment Charge Financing, Documents declaring the 	principal and all accrued interest to such Lender under the Loan Agreements And/or Commitment Charge 	Financing Documents to be due and payable forthwith.
+ 
+"Authorised Investments' has the meaning ascribed to it in the Trust and Retention Agreement.
+ 
+"Business Day" means a day on which the Facility Office of the I Security, Trustee is open for business.
+ 
+"Commitment Charge(s) Financing Documents" shall mean collectively  the agreements, instruments and other documents entered into or to be entered into by the Company and the Commitment Charge Lenders or any part thereof, under  which funding or guarantee assistance is extended to the Company as stated in Part C, Schedule V to these presents.
+ 
+"Commitment Charge Lenders" shall mean the lender(s) providing fund based or non-fund based finance for Commitment Charges under the Fuel Supply Agreement.
+ 
+"Commitment Charge Financial Assistance" shall mean the loans/guarantees provided by the Commitment Charge Lenders under the Commitment Charge Financing Documents being secured under this Indenture
+ 
+"Counter Guarantors" shall mean DEF Bank, GHI Bank and JKL Bank Ltd.,
+ 
+"Events of Default" has the meaning ascribed thereto in the Loan, Agreements, the Guarantee Agreements and Commitment Charge Financing Documents as, the case may be.
+ 
+"Facility Office" means the Mumbai office of the Security, Trustee through which the Security Trustee will exercise its rights under these presents.
+ 
+"FC Lenders" shall mean the XYZ Finance Company: Ltd., the STR Development Bank, Power Finance Corporation Limited, and the ABC Bank ………………Branch.
+ 
+"Financial Assistance" shall mean the Loans and Guarantees provided by the Term Lenders to the Company being secured under this Indenture.
+ 
+"Financing Documents" shall mean collectively the Loan Agreements, the Guarantee Agreements, instruments and other documents entered into by the Company and the Term Lenders financing the Project or any part thereof, under which funding is extended to the Company.
+ 
+"First Mortgaged Premises" means all the rights, title, interest, benefits, claims, whatsoever, of the Company to Commercial Complex No ……………….admeasuring  sq. ft. of built up area on ground floor of the building constructed on the plot No . .......situate lying and being in Registration Sub-District………………Village Registration District Mumbai Suburban District and comprised in the charge created by the Company pursuant to clause 5(a) -hereof.
+ 
+"Fuel Supply Agreement" shall mean the agreement entered into between the Borrower and…………….. Petroleum Corporation Limited, dated January 19, 2000
+ 
+"General Assets" means all the assets of the Company comprised,-in the floating charge created by the Company pursuant to clause 5.1(d) hereof, but does -not include the Specifically Mortgaged Premises, the First Mortgaged Premises, the Second Mortgaged Premises or the Third Mortgaged Premises.
+ 
+"Guarantors" shall mean the XYZ Finance Company Ltd., the STR Development Bank and ABC Bank.
+ 
+"Letter of Authority" shall mean the letter of authority provided by the Term Lenders and the Commitment Charge Lenders to the Industrial Finance Corporation of India for executing this Indenture and certain other security documents in respect of the Financial Assistance and the Commitment Charge Financial Assistance. 
+ 
+"Lenders" shall mean the Rupee Lenders, the FC Lenders, the Guarantor, the Counter Guarantors and Working Capital Lender(s).
+ 
+"Mortgaged Premises" shall mean each of the First Mortgaged Premises, Second Mortgaged Premises, Third Mortgaged Premises (collectively the "Specifically Mortgaged Premises") as defined in clause 5(a), (b) and (d) and the General Assets as defined in clause 5(d).
+ 
+"Permits" shall mean all Governmental permits, authorisations, approvals, no objections or licenses in connection with the Project.
+ 
+"Person" shall ,mean an individual, a corporation, a partnership, an association, a trust or any other entity or organisation, including governmental or political sub-division or an agency or instrumentality thereof.
+ 
+"Project Contracts" shall have the meaning given to it in the described Loan Agreements.
+ 
+"Project" has the meaning given to it in Schedule IV of these presents.
+ 
+"Retention Accounts" has the meaning given to it in the Trust and Retention Agreement.
+ 
+"Rupee Loans" means the loans agreed to be provided by, or non-convertible debentures subscribed by, the Rupee Lenders.
+ 
+"Rupee Lenders" shall mean the XYZ Finance Company Ltd., the DEF Bank, the AAA Insurance and Finance Company Ltd., BBB Finance and Insurance Company Ltd., Power Finance Corporation Limited and The JKL Bank Limited.
+ 
+"Security Documents" shall have the meaning ascribed thereto in the Loan Agreements, the Guarantee Agreements and the Commitment Charge Financing Documents.
+ 
+"Security Trustee" shall mean XYZF appointed by the Lenders and the Commitment Charge Lenders and any replacement therefor appointed by the Lenders and the Commitment Charge Lenders with the prior written consent of the Company.
+ 
+"Trust and Retention Agreement" shall mean the agreement, dated December 9, 2000.
+ 
+"Guarantee Agreements" shall mean the agreements as stated in Part B, Schedule V to these presents.
+ 
+"Loan Agreements" shall mean the agreements as stated in Part A, Schedule V to those  presents.
+ 
+"Working Capital Lenders" shall mean the lenders providing working capital facilities to the Borrower.
+ 
+2. Benefit of this Indenture/Declaration of Trust
+ 
+The Security Trustee shall hold the benefit of this Indenture, including the covenants and mortgages given by the Company pursuant hereto, for the benefit of the Term Lenders and the Commitment Charge Lenders named herein pursuant to the Letter of Authority.
+ 
+3. Covenant to pay
+ 
+Pursuant to the Financing Documents and the Commitment Charge Financing Documents and in consideration of each of the Term Lenders and the Commitment Charge Lenders having entered into or agreed to enter into the Financing Documents or the Commitment Charge Financing Documents, as the case may be, to which it is a party, the Company covenants and agrees that the Company shall comply with the terms and conditions of the Financing Documents and the Commitment Charge Financing Documents and shall pgy/repay the Financial Assistance and the Commitment Charge Financial Assistance in accordance with the respective Financing Documents and the Commitment Charge Financing Documents.
+ 
+4. Payment of fees
+ 
+The Company shall pay the respective fees payable in accordance with the relevant Financing Documents and the Commitment Charge Financing Documents.
+ 
+5. Grant and Transfer
+ 
+(i) For the consideration aforesaid and as continuing security for the repayment/discharge of the Financial Assistance, the Company as the legal and/or beneficial owner doth hereby assign, assure and transfer unto XYZF as the Security Trustee acting for and on behalf of and for the benefit of the Term Lenders, as and by way of continuing security by way of first charge, and to the extent not capable of being assigned, charges:
+ 
+(a)	All and singular the beneficial right title and interest of the Company in respect of	Commercial Complex No…………..held by the Company on ownership basis under the provisions of the Maharashtra Ownership Flats (Regulation of the Promotion, Construction, Sale and Management and Transfer) Act, 1963 admeasuring…………..sq. ft. of built up area on the ground floor of the building constructed on the Plot No …………..situate lying and being in Registration Sub­ District…………..Tehsil …………Village Registration District Mumbai Suburban District more particularly described in the Second Schedule hereunder written AND ALL the estate, right, title, Interest, property, claim and demand whatsoever, of the Company Into and upon the same, TO HAVE AND TO HOLD All and Singular the aforesaid premises unto and to the use of the Security Trustee for the benefit of the Term Lenders upon the trust and subject to the powers and provisions herein declared and contained of and concerning the same subject also to the proviso for redemption hereinafter contained (the "First Mortgaged Premises").
+(b)	All the right, title, interest, benefits claims demands whatsoever, of the Company in to under or in respect of the Project Contracts (and on termination of any Project Contract, any other agreement replacing the same), including without limitation rights to recover payments and the benefit of all receivables or other claims of the Company under or in respect of the Project Contracts set out under Schedule 3 attached hereto (hereinafter referred to as "the Second Mortgaged Premises') except payments received under the Fuel Supply Agreement in respect of repayment of the Commitment Charges and the interest thereon, in respect of which, the Term Lenders shall have a second charge, which is subservient to the first charge, created herein in favour of the Security Trustee for the benefit of the Commitment Charge Lenders and subject to prior charge created in favour of the Working Capital Lenders in respect of book debts.
+(c)	All the Company's right, title and interest in the Retention Accounts (and accounts replacing the, same) together with the benefits of  the Authorised Investments or other securities or assets which represent all amounts in the Retention Accounts (hereinafter referred to as the Third Mortgaged Premises") (the First Mortgaged Premises, the Second Mortgaged Premises and the Third Mortgaged Premises being collectively referred to as "the Specifically Mortgaged Premises).
+(d)	Subject to the first proviso to this Clause, all the other assets of  the Company located in the State of  Maharashtra both present and future I (other than its movable assets) for the time being, pertaining to the Company's assets and properties together with the right, title and Interest of the Company in any Governmental permits, authorisations, approvals, no objections, licenses and also together with the right, title and interest of the Company in relation to any claims or proceeds arising in relation to insurance policies obtained by the Company or pertaining to any of the assets of the Company (whether or not  specifically mortgaged under this , Indenture) other than the. Specifically Mortgaged Premises effectively charged by way of first fixed charge, pursuant to the provisions of sub-clause (a) through (c) including without limitation its uncalled capital, goodwill, the bank accounts of the Company (other than the  Retention Accounts) of or maintained by the Company in India and all amounts maintained therein and all monies, securities, instruments, investments and other property deposited in, credited to, or required to be deposited therein or credited thereto and the undertaking of the Company subject, to prior charges on book debts, Borrowers stock of raw materials, semi-finished goods, finished goods and  consumable stores in favour of Working Capital Lenders (hereinafter collectively referred to as 'the General Assets'); Provided, that such charge on 	the General Assets shall rank as a floating charge and, shall accordingly in no way , hinder the Company from selling, leasing or otherwise, disposing of the same or dealing with such assets or any part thereof in the ordinary course of its business , free of any liens under this Indenture and in each ca only as expressly permitted by the Financing Documents, the Security Documents and the Trust and Retention Agreement.
+ 
+(ii) For the consideration aforesaid and as continuing security for the payment/ discharge of the Commitment Charge Financial Assistance, the Company as the legal and/or beneficial owner doth hereby assign, assure and transfer unto the Commitment Charge Lenders, as and- by way -of continuing security by way of first charge the right, title and, interest of the Company to payments due under the Fuel Supply Agreement in respect of Commitment Charges and interest thereon and, by way of- second and subservient charge and to the extent not capable of being assigned., charges:
+ 
+(a)	All and singular the beneficial right, title and interest of the Company in respect of Commercial Complex No . ……………..held by the Company on ownership basis, under the provisions of the Maharashtra Ownership Flats (Regulations of the Promotion, Construction, Sale and Management and Transfer) Act, 1963 admeasuring ……sq ft. of built  up 1 area on ground floor of the building constructed on the plot No. I situate lying and, being. in Registration, Sub-District..........Tehsil……………. ,Village ………….Registration District Mumbai Suburban District more particularly described in the Second Schedule hereunder written AND ALL the estate, right, title, interest,  property, claim and  demand whatsoever, of the Company into and upon the same, TO HAVE AND TO HOLD All and Singular the aforesaid premises unto and to the use of the Security Trustee for the benefit of the Commitment Charge Lenders upon the trust and subject to the powers and provisions herein declared and contained of and concerning the same subject also to the proviso for redemption hereinafter contained (the "First Mortgaged Premises").
+(b)	All the right, title, interest, benefits, claims, demands whatsoever, of the Company in to under or In respect of  the Project Contracts (and on termination of any Project Contract, any other agreement replacing the  same),including without limitation rights to recover payments and the benefit of all receivables or other claims of the  Company under or in respect of the Project Contracts set out under Schedule 3 attached hereto (hereinafter referred to as "the Second Mortgaged Premises").
+(c)	All the Company's, right, title and interest in the Retention Accounts (and accounts replacing the same) together with the benefits of the Authorised Investments or other securities or assets which represent all amounts in the Retention Accounts (hereinafter referred to as "the Third Mortgaged Premises") (the First Mortgaged Premises, the Second Mortgaged Premises and the Third Mortgaged Premises are collectively referred to as "the Specifically Mortgaged Premises").
+(d)	Subject to the first proviso to this Clause, all the other assets of the Company located in the State of Maharashtra both present and future (other than its movable assets) for the time being pertaining to the Company's assets and properties together with the right, title and interest of the Company in any Governmental permits, authorisations, approvals, no objections, licenses and also together with the right, title and Interest of the Company in relation to any claims or proceeds arising in relation to insurance policies obtained by the 	Company or pertaining to any of the- assets of the Company (whether or not specifically mortgaged under this. Indenture) other than the Specifically Mortgaged Premises effectively charged by way of first fixed charge pursuant to the provisions of sub-clause (a) through (c) including without limitation its uncalled capital, goodwill, the bank accounts of the Company (other than the Retention Accounts) of or maintained by the Company In India and all amounts maintained therein and all  monies, securities; Instruments, Investments and other property deposited in, credited to, or required to be deposited, therein or property de credited thereto and the Undertaking of the Company subject to prior charges on book debts, Borrower's stock of raw materials, semi-finished goods, finished goods and consumable stores in favour of Working Capital Lenders (hereinafter collectively referred to as "the General Assets"); Provided, that such charge on the General Assets shall rank as a floating charge and shall accordingly in no way hinder the Company from selling, leasing or otherwise disposing. of the same; or dealing with such assets or any part thereof in the ordinary course of Its business, free of any liens under this Indenture and in each case subject to and only as expressly permitted by the Financing Documents, the Security Documents and the Trust and Retention Agreement.
+ 
+(iii) Notwithstanding anything contained herein, the mortgage and charge created in favour of the Security Trustee for the benefit of the Commitment Charge Lenders over the Specifically Mortgaged Premises and the General Assets shall rank second and subservient to the mortgage and charge created in favour of the Term Lenders.
+ 
+6. Conversion of floating charge
+ 
+The floating charge created pursuant to clause 5(i)(d) and clause 5(ii)(d),hereinabove shall automatically and without prior notice by the Security Trustee to the Company convert into a fixed charge as regards General Assets upon the occurrence and during the continuance of any Event. of Default in terms, of sections 10.1 of the Loan Agreements, the Guarantee Agreements or equivalent provision of the Commitment Charge Financing Documents or upon an event of Acceleration.
+ 
+7. Pad passu ranking
+ 
+The mortgage and charge created hereunder in favour of the Security Trustee for the benefit of the Term Lenders shall rank pad passu with all other security created or to be created in favour of any other lender:
+ 
+Provided that:
+ 
+(a)	the mortgage and charge created In favour of the Security Trustee for the benefit of the Commitment Charge Lenders shall be second and subservient to the mortgage arid charge created in favour of Security Trustee for the benefit of the Term Lenders.
+(b)	the mortgage and charge created in favour of the Security Trustee for the benefit of the Term Lenders on the right, title and interest of the Company to payments due under the Fuel Supply Agreement in respect of Commitment Charges and interest thereon, shall be second and subservient to the mortgage and charge created in favour of the Security Trustee for the benefit of the Commitment Charge Lenders.
+ 
+8. Security
+ 
+(a) Continuing security
+ 
+The security created by or pursuant to these presents is a continuing security and shall remain in full force and effect, notwithstanding any intermediate payment or settlement of account or other matter or thing whatsoever, and in particular the intermediate satisfaction by the. Company of the whole or any part of the Financial Assistance and the Commitment Charge, Financial Assistance and is in addition and without prejudice, to any, other security, guarantee, lien, indemnity or other right or remedy which the Security Trustee may now or hereafter hold for the Financial Assistance or the Commitment Charge Financial Assistance or any part thereof. This security may be enforced against the Company without first having recourse to any other rights of the Security Trustee, the Term Lenders or the Commitment Charge Lenders.
+ 
+(b) Other security
+ 
+This security is in addition to, and shall neither be merged in, nor in any way exclude or prejudice, or be affected by any other security, interest, right of recourse or other right whatsoever (or the invalidity thereof) which the Security Trustee, and/or the Term Lenders and the Commitment Charge Lenders may now or Many time hereafter hold or have (or would apart from this security hold or have) as regards the Company or any other person in respect of the Financial Assistance or the Commitment Charge Financial Assistance.
+ 
+(c) Cumulative Powers
+ 
+The powers which this Indenture confers on the Security Trustee and any receiver appointed hereunder are cumulative, without prejudice to their respective powers under the general law, and may be exercised as often as the, Security Trustee or the receiver thinks appropriate in accordance with these presents; the Security Trustee or the receiver may, in connection with the exercise of their powers, join or concur with any person in any transaction, scheme or arrangement whatsoever; and the Company acknowledges that the respective powers of the Security Trustee and the receiver shall in no circumstances whatsoever be suspended, waived or otherwise prejudiced by anything other than an express waiver or variation in writing.
+ 
+(d) Avoidance of payments
+ 
+If any amount paid by the Company in respect of the Financial Assistance or the Commitment Charge Financial Assistance is avoided or set aside on the liquidation or administration of the Company or otherwise, then for the purpose of this Indenture such amount shall not be considered to have been paid.
+ 
+9. Further acquisition
+ 
+(a) The Company hereby covenants with the Security Trustee that the Company shall, so long as the, Financial Assistance and the Commitment Charge Financial Assistance remains outstanding, promptly upon acquisition of any other immovable property in Maharashtra inform the Security Trustee and as soon as practicable thereafter at its own expense, without any demand on the part of the Security Trustee, the Term Lenders or the Commitment Charge Lenders, grant, convey, transfer, assign, secure and charge on the terms of these presents unto the Security Trustee to and for the, benefit of the Term Lenders by way of a first charge and to and for the benefit of the Commitment Charge Lenders by way of second and subservient charge, as and by way of additional security, such after acquired property or properties, rights and benefits in such property according to their respective tenures, and pending formal execution by the Company of assurances by way of additional security in favour of the Security Trustee for the benefit of the Term Lenders by way of first charge and the Commitment Charge Lenders ,by way of second charge, such after acquired property or properties shall be deemed to have always been comprised in these presents and accordingly all the provisions of this Indenture shall apply to such after acquired property.
+ 
+(b) Any buildings and structures, machinery, plant, equipment, fixtures, articles and things which shall from time to time hereafter, during the continuance, of this security be erected or installed or be in or upon or about the premises  hereinbefore expressed to be hereby granted, transferred and assigned or fixed or  attached to any buildings or structures now standing or hereafter to be erected on the said premises and/or any part thereof respectively and situate, lying and being in the State of Maharashtra and used or intended to be used in connection with the business of the Company whether in substitution or replacement of or in addition to any buildings and, structures, machinery and plant, equipment, fixtures, articles and things now standing or being fix-ed or attached or used or Intended to be used in connection with the business of the Company Or otherwise shall be included in the present security and be subject to. the, trusts, provisions and covenants in these presents contained and the Company shall at its own costs forthwith vest the same in the Security Trustee.
+ 
+10. Provision for redemption
+ 
+If the Company shall have paid/repaid or discharged in full the Financial Assistance or the Commitment Charge Financial Assistance (as the case may be), the Security Trustee shall, with reasonable promptness, upon the written request and at the expense of the Company, reassign, re-transfer and release unto the Company or as the Company shall direct and do all such other things, as may be reasonably necessary to release from the security created hereunder, for the benefit of the Term Lenders or the Commitment Charge Lenders (as the case may be), without recourse and without any representation or warranty of any kind by or on behalf of the Security Trustee, such of the Mortgaged Premises or only such part of the Mortgaged Premises as constitute the security; as have not theretofore been sold or otherwise foreclosed, applied or released pursuant to this Indenture, Provided that such reassignment, retransfer or release of the security created under this Indenture shall not thereby affect or cause the reassignment, retransfer or release of any property or assets secured under any other mortgage or charge which ranks pad passu in point of security or otherwise.
+ 
+12. Declarations and warranties
+ 
+(a) In order to induce the Term Lenders and the Commitment Charge Lenders to enter into the respective Financing Documents and the Commitment Charge Financing Documents, and to induce the Term Lenders and the Commitment Charge Lenders to accept the present mortgage security, the Company has made the warranties set forth in the respective Financing Documents, the Commitment Charge Financing Documents and those stated in this Indenture. Relevant provisions of the respective Financing Documents and the Commitment Charge Financing Documents are hereby incorporated by reference (provided that if there is a waiver from time to time of any warranties under the Financing Documents or the Commitment Charge Financing Documents, there shall be deemed to be a like waiver hereunder) and made a part of this Indenture as if, such warranties and other relevant provisions were set forth in full herein.
+ 
+(b) The Company acknowledges and accepts that the Term Lenders and the Commitment Charge Lenders agreed to enter into this Indenture on the basis of, and in full reliance of the warranties made herein.
+ 
+(c) Security Trustee not to be under any obligation or liability:
+ 
+Neither any assignment provided for or referred to in this Indenture nor the receipt by the Security Trustee of any payment pursuant to this Indenture including the insurances, shall cause the Security Trustee to be under any obligation or liability in respect of this Indenture including the insurances.
+ 
+(d) Company to get in and realise claims:
+ 
+The Company undertakes that at all times during the subsistence of the security created hereunder, but subject to the terms and conditions of the Security Documents, it shall get in and realise all claims in respect of the insurances. The Security Trustee to make such claims notwithstanding that no Event of Default under the Security Documents as occurred.
+ 
+(e)Company to remain liable:
+ 
+The Company shall remain liable to perform all the obligations assumed by it in relation to the Mortgaged Premises and the Security Trustee shall be under no obligation of any kind whatsoever, in respect thereof, to be under any liability whatsoever, to the Company to perform its obligations in respect thereof.
+ 
+(f)	The Company further confirms and warrants that:
+ 
+(i)	The Company is legally entitled and possessed of the corporate powers to execute, deliver and perform the terms and provisions of this Indenture and has taken all necessary corporate action to authorise the execution, delivery and performance by it of this Indenture;
+(ii)	This Indenture when executed and delivered will constitute its legal, valid and binding obligation;
+(iii)	Neither the execution and delivery by the Company of this Indenture, nor the Company's compliance with or performance of the terms and provisions hereof will contravene any provision of applicable law or any order, writ, injunction or decree of any court or any governmental authority (collectively, "Applicable Law") or will violate any provision of the Memorandum and Articles of Association of the Company or any agreement or other document by which, the Company (or any of its properties) may be bound;
+(iv)	There are no encumbrances or obligation to create encumbrances on the Mortgaged Premises except those created by this Indenture;
+(v)	The Company is lawfully possessed of a valid and subsisting freehold estate in and to the Property; and
+(vi)	The provisions of this Indenture are effective to create in favour of the Security Trustee for the benefit of the Term Lenders and for the benefit of the Commitment Charge Lenders, a legal, valid and binding security expressed to be created in clause 5 on all of the property and, assets of the Company. on which the Company purports to grant charges pursuant hereto, including without limitation, a legal, valid and binding security over all Project Contracts, and all necessary and appropriate recordings and filings have been made In all appropriate public offices, and all other necessary and appropriate action has been taken so that this Indenture creates effective security on all right, title, estate and interest of the Company in the property, assets and revenues of the Company covered thereby, prior and superior to all other security, and all necessary and appropriate consents, licences, approvals, permissions and authorisations to the creation, effectiveness, priority and enforcement of such security have been obtained from relevant government authorities.
+ 
+13. Covenants and permitted use
+ 
+(1) The Company shall observe and perform each of the covenants set forth in the respective Financing Documents and the Commitment Charge Financing Documents, which covenants are hereby incorporated herein by reference (provided that any waivers or consents given from time to time under the Financing Documents and the Commitment Charge Financing Documents, shall be deemed to be given hereunder) and made a part of the Indenture as if such covenants and other relevant provisions were set forth in full herein.
+ 
+(2) In addition to the covenants set forth in clause 13(l) subject to the terms of applicable law the Company does hereby further covenant that:-,
+ 
+(a)Enter possession, etc..-Following an Acceleration, then and in any such case it shall be lawful for the Security Trustee, to enter into and upon and take possession of the Specifically Mortgaged Premises and any future asset comprised in these presents and thenceforth the Company shall take no action inconsistent with or prejudicial to the. right of the Security Trustee as such for and for the benefit of the Term Lenders and the Commitment Charge Lenders quietly to possess, use and enjoy the same and to receive the Income, profits and benefits thereof, without interruption or hindrance by the Company or by any person or persons whomsoever, and upon the taking of such action, the Security Trustee shall be freed and discharged from or otherwise by the Company well and sufficiently saved and kept harmless and indemnified of from and against all former and other estates, title, claims, demands and encumbrances whatsoever.
+ 
+(b)Further assurances.-The Company and all other persons lawfully or equitably claiming or being entitled to claim any estate right, title or further assurances, interest in, to or upon the Mortgaged Premises and any future assets comprised in these presents or any of them or any parts thereof respectively shall and will, from time to time and at all times, at the cost of the Company or the other person (as appropriate), execute, make and do or cause and procure to be executed,  made and done every such assurance, act and thing for converting any floating charge forming part of the security hereunder, into a fixed charge and for further and more perfectly assuring all or any of the Mortgaged Premises and any future assets comprised in these presents unto and to the use of the Security Trustee for the benefit of the Term Lenders and the Commitment Charge Lenders on the terms of these presents as shall be reasonably required.
+ 
+(c)Payment of all taxes, rates, etc..-The Company shall at all times during the continuance of these presents and the security hereby created, duly and punctually pay any imposts duties and taxes which become lawfully payable by the Company in respect of the Mortgaged Premises or any part thereof or the carrying out by the Company or maintenance of any business or operations thereon and shall prevent any part of such Mortgaged Premises from becoming charged with the payment of any Imposts duties and taxes lawfully payable by the Company pari passu with or in priority to the security created hereunder and shall punctually discharge all security which it creates and, which by the general law are lawfully payable by the Company and would or might come to rank pari passu with or in priority to the security created hereunder.
+ 
+(d)Maintenance of assets.-The Company shall at all times and at its own cost and expense keep and maintain all buildings and erections forming part of the First Mortgaged Premises and all plant, machinery, fixtures, (including trade and tenant's fixtures) fittings and other equipment and effects thereon and therein forming part of the Specifically Mortgaged Premises in good and substantial repair and in good working order and condition and when necessary rebuild or renew the same and without prejudice to the generality of the foregoing, forthwith after service by the Security Trustee of any notice of defect or warrant of repair given pursuant to paragraph (e) below, repair and make good the same to the satisfaction of the Security Trustee.
+ 
+(e)Inspection, repairs, etc.-The Company shall permit the Security Trustee and its representatives, servants and agents either alone or with workmen and others from time to time and at all reasonable times to enter into and upon the First Mortgaged Premises and any future assets to inspect the same and if there shall be any want of repair thereof or if the Security Trustee in its reasonable discretion considers any other works, matters, or things are required in order to preserve its security hereunder, then the Security Trustee shall give notice thereof to the Company calling upon the Company to repair or replace the same. Upon the Company's failure to do so within a reasonable period after receipt of such notice, it shall be lawful for, but not obligatory upon the Security Trustee to repair or replace the same or any part hereof at the expense of the Company.
+ 
+Nothing herein contained shall be deemed to affect or prejudice the rights and powers of the Security Trustee or of the Term Lenders and the Commitment Charge Lenders or any of them under these presents including the right to call for the whole of the Financial Assistance or the Commitment Charge Financial Assistance as the case may be following an Acceleration.
+ 
+(f)Rights and Liberties.-The Company doth hereby irrevocably grant full and free rights and liberty as and by way of easement to pass, re-pass and have unfettered access at all times to the Security Trustee and their successors-in-title over the vacant lands, hereditaments and premises or any part thereof charged by these presents in common with all other persons entitled to like rights at all time thereafter.
+ 
+14. Specific actions
+ 
+Without limiting the generality of the assurances and covenants hereinabove, the Company will promptly upon receiving a request from the Security Trustee
+ 
+(a)	execute a valid legal mortgage in English form (or in such other form as the Security Trustee shall require), of any freehold or leasehold properties or other interests in immovable property presently or in the future belonging to the Company in Maharashtra and which is not hereby effectively charged or secured;
+(b)	execute a valid fixed charge In such form as the Security Trustee may require over any assets, forming the subject matter of the General Assets or the floating charge hereunder upon an Event of Default or Acceleration;
+(c)	execute such documents as may be necessary or, in the opinion of the Security Trustee expedient to transfer to the Security Trustee to enable the Security Trustee to be registered as the holder, owner or proprietor or otherwise obtain legal title to any of the Specifically Mortgaged Premises, in each cases on the terms of these presents;
+(d)	execute such further writings and take all such further actions, as may be necessary, for creating security on the terms of these presents over the Retention Accounts or in any account established in place or in lieu thereof, including any substituted security or any Authorised Investments made from such accounts, any insurance proceeds, Permits or such other tangible or intangible assets of the Company of the same category as are intended to be secured or charged under these presents; and
+(e)	otherwise execute all transfers, conveyance, assignments, assurances and other instruments of security whatsoever and give all notices, orders, instructions and directions whatsoever which the Security Trustee may reasonably or by normal practice or by law require.
+ 
+15. Additional Financial Covenants
+ 
+The Company shall comply with the following obligations in addition and supplemental to the financial covenants and obligations of the Company as are already contained in the Financing Documents and Commitment Charge Financing Documents hithertofore entered into with the Term Lenders and the Commitment Charge Lenders viz.:
+ 
+(i)	Ensure that the First Mortgaged Premises charged hereunder continue to remain the absolute property of the Company and at the disposal of the Company save and , except to the extent of the mortgages, charges and encumbrances permitted to be created by and as are disclosed to the ,Term Lenders and the Commitment Charge Lenders.
+(ii)	Ensure that all the First Mortgaged Premises are duly and effectively insured jointly in the name of the Company and the Security Trustee in accordance with the requirements of the Financing Documents and in respect of First Mortgaged Premises being charged, the name of the Security Trustee and any other person or institution having an insurable interest in the First Mortgaged Premises are duly endorsed as "Beneficiary"/"Loss Payee" on such insurance policies and all renewals thereof and that the conditions and stipulations provided for in the Financing Documents and the Commitment Charge Financing Documents in that behalf are duly and effectually observed and performed by the Company.
+ 
+16. Enforcement
+ 
+(1) The security created hereunder in favour of the Security Trustee for the benefit of the Term Lenders and the Commitment Charge Lenders shall become enforceable by the Security Trustee following an Acceleration. Notwithstanding any other provision of this Indenture, the security created in favour of the Security Trustee for the benefit of the Commitment Charge Lenders shall not be enforceable (whether by way of exercise of general enforcement powers herein, pursuant to clause 18, clause 20 or otherwise) without the consent of the Term Lenders to the extent the security created in favour of the Security Trustee for the benefit of the Term Lenders is subsisting.
+ 
+(2) General Enforcement Powers:
+ 
+At any time after the security shall have become enforceable, pursuant to the terms of any of the Financing Documents, the Commitment Charge Financing Documents or by the terms of this Indenture, the Security Trustee may, without prejudice to any other rights it may have and without prior notice to the Company:
+ 
+(a)	sell, call in, collect, convert into money or otherwise deal with or dispose off the Mortgaged Premises or any part thereof, on an instalment basis or otherwise and generally in such manner and upon such terms whatever, as the Security Trustee (in consultation with the Term Lenders and the Commitment Charge Lenders) may consider fit;
+(b)	exercise any and all powers which a receiver could exercise hereunder or by law;
+(c)	appoint by writing any Person or Persons to be a receiver of all or any part of the Mortgaged Premises, from time to time determine the remuneration of the receiver and remove the receiver (except where an order of the courts is required therefor) and appoint another in place of any receiver, whether such receiver is removed by the Security Trustee or an order of the court or otherwise ceases to be the receiver or one of two or more receivers;
+(d)	substitute itself or its assignee for the Company under any or all of the Project Contracts and the Company's residual interest in the Trust and Retention Agreement; and
+(e)	enter into and upon and take possession of the Mortgaged Premises and any future assets comprised in these presents and after the taking of such action the Company shall take no action inconsistent with or prejudicial to the right of the Security Trustee quietly to possess, use and enjoy the same and to receive the income, profits and benefits thereof without interruption or hindrance by the Company or by any Person or Persons whomsoever, and upon the taking of such action, the Security Trustee shall be freed and discharged from' or otherwise by the Company well and sufficiently saved and kept harmless and indemnified of, from and against all former and other estates, titles, claims, demands and encumbrances whatsoever, unless caused by the fraud, gross negligence or wilful misconduct of the Security Trustee or that of its officers or employees.
+ 
+(3) Powers of the Security Trustee:
+ 
+The Security Trustee shall have the authority to act upon and enforce the provisions of this Indenture in accordance with these presents or to adopt appropriate remedies in that behalf, at the direction of one or more Term Lenders and the Commitment Charge Lenders and may, in that behalf adopt remedies in relation thereto in different forums that are appropriate to each respective Lender and the Commitment Charge Lender, and shall exercise all powers under this Indenture in accordance with applicable law.
+ 
+17.Expenses
+ 
+All expenses incurred by the Security Trustee has occurred in connection with preservation of the Company's assets (whether then or thereafter existing) and collection of amounts due to the Term Lenders and the.Commitment Charge Lenders shall be payable by the Company and shall stand secured under these presents.
+ 
+18. Sale without Intervention of court
+ 
+PROVIDED ALWAYS AND IT IS HEREBY AGREED AND DECLARED as follows:
+ 
+(a) Subject to clause 18(b), following an Acceleration, it shall be lawful for the Security Trustee at any time, without any further consent of the Company, to sell, assign or concur with any other Person in selling, assigning the Mortgaged Premises and any future assets comprised under the present security or any part thereof either by pub% auction or private contract with the land, leasehold estate, buildings and structures separately therefrom, with liberty to make any arrangements as to removal of the pl to machinery, fixtures, fittings and other implements from the land, building and structures and with liberty also to make such conditions or stipulations respecting title or evidence title or other matters as the Security Trustee may deem proper, with power to buy or obtain assignment of the Mortgaged Premises at any sale and to resell or reassign the Mortgaged Premises at any sale by auction or to rescind or vary any contract for sale and to resell or reassign the Mortgaged Premises without being answerable or accountable for any loss or diminution occasioned thereby and with power also to execute assurances and give effectual receipts for the purchase money and do all other acts and things for completing the sale/assignment which the person or persons exercising the power of sale/assignment shall think proper, and the aforesaid power shall be deemed to be a power to sell and concur in selling the Mortgaged Premises without the intervention of the Court within the meaning of section 69 of the Transfer of Property Act, 1882;
+ 
+(b) the power of sale and/or assignment hereinbefore contained shall not be exercised by the Security Trustee unless and until:
+ 
+(i)	default shall have been made by the Company in, payment of any principal or part thereof for the time being 	owing to the Term Lenders or the Commitment Charge Lenders for the space of three calendar months next 	after the notice, in writing required by sub-section (2) of section 69 of the Transfer of Property Act, 1882, 	requiring the payment of such amounts principal or any part thereof, as may for the time being be due shall have 	been served on the Company; or
+ 
+(ii)	interest on the Financial Assistance and the Commitment Charge Financial Assistance amounting at least to Rs. 	500 (Rupees Five Hundred Only) shall be in arrears and remain unpaid for three months after becoming due;
+ 
+(c) 	No purchaser or other person dealing with the Security Trustee and/or any receiver upon any sale purporting to 	be made in pursuance of the aforesaid power in that behalf, shall be bound or concerned to see or inquire 	whether either of the events mentioned in sub-clause (b) has happened or whether any default has been made in 	payment of any moneys intended to be hereby secured or whether any money remains owing on the security of 	these presents or as to the necessity or expediency of the stipulations, subject to which such sale and/or 	assignment shall have been made or otherwise as to the propriety or regularity of such sale and/or assignment 	and notwithstanding any impropriety or irregularity whatsoever, in any such sale and/or assignment the same shall 	as regards the safety and protection of ft purchaser or purchasers be deemed to be within the aforesaid power in 	that behalf and be valid and effectual and the remedy of the Company in respect of any breach of any of the 	clauses or provisions hereinbefore contained or of any impropriety or irregularity whatsoever in any such sale 	and/or assignment shall be in damages only;
+ 
+(d)	All other provisions and trusts ancillary to the power of sale which are contained in section 69 of the Transfer of 	Property Act, 1882, shall apply to this security as if the same were incorporated herein; and
+ 
+(e)	Upon any such sale/assignment as aforesaid the receipt by the Security Trustee for the purchase money shall 	effectually discharge the purchasers or purchaser there from and from being concerned to see to the application 	thereof or being answerable for the loss or misapplication thereof.
+ 
+19. Non-applicability of certain provisions of the Transfer of Property Act
+ 
+(a) Section 67A.-The provisions of section 67A of the Transfer of Property Act, 1882, shall not apply to these presents and the Security Trustee notwithstanding that the Security Trustee may hold two or more mortgages executed by the Company including of these presents in respect of which the Security Trustee has the right to obtain the kind of the decrees under section 67 of the Transfer of Property Act and shall be entitled to sue and it maintain such decree on any of such mortgages without being bound to sue on all such mortgages in respect of which the mortgage moneys shall have become due;
+(b) Continued Possession.-It shall be lawful for the Company to retain possession of and use the Mortgaged Premises until the Security Trustee shall be entitled to take possession thereof under these presents and shall take possession thereof accordingly; and
+(c) Section 65A.-The Company shall while in lawful possession of the Mortgaged Premises have no power to make leases thereof, save and except in pursuance of the terms of the Financing Documents and the Commitment Charge Financing Documents, and with the consent in writing of the Security Trustees first had and obtained (which consent the Security Trustee shall not be bound to give) on such terms and conditions as the Security Trustee shall in their absolute discretion consider fit and the provisions of section 65A of the Transfer of Property Act, 1882, shall not apply.
+ 
+20. Appointment of receiver
+ 
+I. Subject to the observance of such restrictions as may be imposed by section 69A of the Transfer of Property Act, 1882, or any other applicable statutory provisions, the Security Trustee at any time after the security hereby constituted, shall have become enforceable may by writing appoint as receiver of the Mortgaged Premises or any part thereof one or more persons entities or any Authorised Officer or Officers of such person and may remove any receiver so appointed and appoint another in his stead.
+ 
+II. Status, Powers and Remuneration of receiver
+ 
+(a)	Appointment of any receiver may be made either before or after the Security Trustee shall have entered into or 	taken possession of the Mortgaged Premises;
+(b)	Such receiver may, from time to time, be invested with such of the rights, powers, authorities and discretions 	exercisable by the Security Trustee set forth herein or under law or as the Security Trustee may think expedient 	including the following rights, powers and authorities:
+(i)	to enter upon or take possession of, collect, and get into all or any part of the Mortgaged Premises and 	for that purpose to take any proceedings and enforce any order or judgment in the name of the Company 	or otherwise as the receiver shall consider fit;
+(ii)	to manage or carry on or concur in carrying on the business of the Company in relation to the Mortgage 		Premises as the receiver shall consider fit;
+(iii)	to make any arrangement or compromise between the Company and any other person or pay any 			compensation or incur any obligation which the Security Trustee or the receiver shall consider fit;
+(iv)	for the purpose of exercising any of the powers, authorities and discretions conferred on it by this  		Indenture and/or defraying any costs or expenses which may be incurred by it in the exercise thereof or 		for any other purpose, to borrow moneys on the security of the Mortgaged Premises on such terms (with 		or without security) as the receiver or the Security Trustee shall consider fit and so that, with the prior 		written consent of the Security Trustee, any such security may be or include a charge on the whole or 		any part of the Mortgaged Premises ranking wholly or partly in priority to or pari passu with the security 		created hereunder;
+(v)	to assign, sell, lease, license, grant options to sell, deal with or manage or concur in assigning, selling, 	leasing, licensing, granting options to sell, dealing with or managing and to vary, terminate or accept 	surrenders of leases, licenses or tenancies of or otherwise dispose of any part of the Mortgaged 	remises in such manner and generally on such terms and conditions as the Security Trustee or the 	receiver shall consider fit and to carry any such transactions into effect in the name of and on behalf of 	the Company or otherwise;
+(vi)	to make, effect and do all maintenance, repairs, developments, reconstructions, improvements,   furnishings, equipment, insurances, alterations or additions to or in respect of the Mortgaged Premises and maintain, renew, take out or increase insurances in the interest of the Security Trustee for maintaining the value of the Mortgaged Premises, in every such case as the Security Trustee or the receiver shall consider fit;
+(vii)	to obtain all clearances, planning, consents and permissions, building regulations, approvals and any other consents or licenses necessary, or appropriate to carry out any of the matters referred to in this Indenture or otherwise as the Security Trustee or receiver shall consider fit;
+(viii)	to redeem any prior encumbrance and settle and pass the accounts of the encumbrances so that any accounts so settled and passed shall (subject to any manifest error) be conclusive and binding on the Company and the money so paid shall be deemed to be an expense properly incurred by the receiver;
+(ix)	to settle, refer to arbitration, compromise and arrange any claims, accounts, disputes, questions and demands with or by any Person or body who is or claims to be a creditor of the Company or relating in any way to the Mortgaged Premises or any part thereof;
+(x)	to bring, prosecute, enforce, defend and discontinue all such actions and proceedings in relation to the Mortgaged Premises or any part thereof as the receiver shall consider fit;
+(xi)	to implement or continue the development of (and obtain all clearances and other consents required in connection therewith) and/or complete any buildings or structures on, any real property comprised in the Mortgaged Premises and do all acts and things Incidental thereto,-,
+(xii)	to do all such things and take all such actions as may be required in order to ensure the continued safe, efficient and economic operation of Project;
+(xiii)	to do all such other acts and things (including, without limitations, signing and executing all documents and deeds) as may be considered by the Security Trustee or receiver to be incidental or conducive to any of the matters or powers aforesaid or otherwise Incidental or conducive to the preservation, improvement or realisation of the Mortgaged Premises; and
+(xiv)	to exercise all such other power and authority as the Security Trustee shall consider fit to confer and so that the Security Trustee may in relation to such part of the Mortgaged Premises as is the subject to the security expressed to be created hereunder confer any powers and authorities which it could give if it were an absolute beneficial owner thereof.
+ 
+(c)	Unless otherwise directed by the Security Trustee such receiver may exercise all the rights, powers, authorities and discretions herein or by law vested in the Security Trustee;
+(d)	Such receiver shall exercise its powers, authorities and discretion from time to time in accordance with instructions made and given by the Security Trustee;
+(e)	Subject to the provisions of section 69A of the Transfer of Property Act, 1882, the Security Trustee may from time to time fix the remuneration of such receiver and may direct payment thereof out of the Mortgaged Premises;
+(f)	The Security Trustee from time to time and at any time, may require any such receiver to give security for the due performance of its duties as such receiver, and may fix the nature and amount of security to be so given, but the Security Trustee shall not be bound in any case to require any such security;
+(g)	The Security Trustee shall be in no way responsible for any misconduct, misfeasance, malfeasance or negligence on the part of any such receiver and shall be in no way liable for or in respect of any debts or other liabilities incurred by any such receiver whether the Company shall or shall not be in liquidation;
+(h)	All the powers, provisions and trusts contained in section 69A of the Transfer of Property Act, 1882, shall apply to the receiver appointed under this Clause; and
+(i)	Every receiver appointed under the provisions hereof shall be deemed to be the agent of the Company and the Company shall be solely responsible for such receiver's acts and defaults and for his remuneration.
+ 
+21. Not Mortgages-in-Possession
+ 
+Without prejudice to the generality of clause 22, the Company does hereby expressly agree with the Security Trustee that neither the Security Trustee nor any receiver appointed as aforesaid shall, by reason of the Security Trustee or such receiver entering into or taking possession of the Mortgaged Premises or any part thereof, be liable to the Company to account as a mortgagee-in-possession for anything except actual receipts or be liable for any loss or for any default or omission for which a mortgagee-in-possession might be liable.
+ 
+22. Protection of Security Trustee and receiver: Limitation of Liability
+ 
+Neither the Security Trustee nor any receiver shall be liable in respect of any loss or damage (to the extent not caused by the Security Trustee's fraud, gross negligence or wilful default) which arises out of the exercise or the attempted or purported exercise of or the failure to exercise any of their respective rights, powers, authorities, discretions and trusts that may be vested in the Security Trustee.
+ 
+23. Costs and Expenses
+ 
+(a) The Company shall, upon notice from the Security Trustee pay or reimburse to the Security Trustee all fees for services performed by the Security Trustee, all out of pocket, and travelling expenses and other costs, charges and expenses in any way incurred by the Security Trustee its officers, employees or agents in connection with the negotiation, preparation, execution, modification or amendment of or the preservation, protection or release of the rights of the Security Trustee, the Term Lenders and the Commitment Charge Lenders under these presents and/or any documents or instruments contemplated or in connection with or relating to these presents including, without limitation, costs of investigation of title, travelling expenses and legal fees for drafting, stamping and registration of the documents and any other expenses pursuant to this Indenture, and further covenants and agrees to indemnify the Security Trustee, the Term Lenders and the Commitment Charge Lenders against all actions, proceedings, costs, charges, expenses, claims and demands whatsoever which may be brought or made against or incurred by any or both of them in respect of any matter or thing done or omitted to be done without their wilful default or gross negligence in respect of or in relation to the Mortgaged Premises.
+ 
+(b) Legal Fees and Expenses.-The Company shall pay all legal fees, costs, charges, and expenses of the external legal counsel of the Security Trustee, each of the Term Lenders and the Commitment Charge Lenders and all such sums incurred or paid by the Security Trustee, the Term Lenders and/or the Commitment Charge Lenders or either of them in connection with and incidental to or in connection with these presents and incurred as well for the assertion or defence of the rights of the Security Trustee as such for and for the benefit of the Term Lenders and/or the Commitment Charge Lenders as for the protection and security of the Mortgaged Premises and for the demand, realisation and recovery of the Financial Assistance and/or the Commitment Charge
+ 
+Financial Assistance shall be added to the Financial Assistance and the Commitment Charge Financial Assistance respectively and be secured hereby.
+ 
+24. Stamp Duty and Reimbursement of Expenses
+ 
+(I)Stamp Duty and Other Fees on Execution, Registration, etc.
+ 
+The Company shall pay all stamp duty, other duties, taxes, fees, penalties or other charges payable on or in connection with the execution, issue, delivery, registration of this Indenture, the Security Trustee Agreement and any document, act and registration performed pursuant hereto, if and when the Company may be required to pay the same according to any of the Financing Documents, Commitment Charge Financing Documents or according to the laws for the time being or at any time in force in the state in which its properties are situated.
+ 
+(II) Reimbursement obligations
+ 
+All reasonable costs, expenses, charges and fees paid or incurred by the Security Trustee in the exercise of any of the rights, remedies or powers granted hereunder, or under the Security Trustee Agreement including without limitation, for payment of any costs, expenses, charges or fees in this Clause shall. be for the account of the Company and the Company undertakes promptly on demand to pay the same or, as the case may be to reimburse the Security Trustee or its authorised agents, representatives, successors and assignees for any such monies paid by the Security Trustee or any of them with interest thereon at the rate of interest of XYZF as defined in the Loan Agreements from the date the Company receives notice thereof from the Security Trustee and/or its agents, representatives, successors and assigns until reimbursed by the Company, and all such sums and costs shall be added to the Financial Assistance or the Commitment Charge Financial Assistance (as the case may be) and be secured under these presents.
+ 
+25. Attorney
+ 
+(a) Appointment.-If, (and for so long as) an Event of Default has occurred and is continuing or has not been waived, for all or any of the aforesaid purposes, the Company hereby irrevocably appoints the Security Trustee as well as each receiver to be appointed under these presents to be its attorney or attorneys, and in the name and on behalf of the Company to act and execute all deeds and things which the Company is authorised to execute and do under the covenants and provisions herein contained and generally to use the name of the Company in the exercise of all or any of the powers by the so presents or by law conferred on the Security Trustee or any  receiver appointed by such Security Trustee and al so to execute on behalf of the Company, at the cost of the Company the powers hereunder or by law conferred on the Security Trustee or any receiver appointed by it and also to execute on behalf of the Company, at the cost of the Company such documents and deeds as may be necessary to give effect to the provision§ referred to hereinabove and also for preservation, enforcement and realization of the security and the Company shall bear the expenses that may be Incurred by the Security Trustee or any receiver in that behalf.
+ 
+(b) Ratification.-The Company covenants with the Security Trustee to ratify and confirm all acts or things made done or executed by any attorney as contemplated by clause 25(a) hereinabove.
+ 
+26. (1) Application of monies
+ 
+All monies received by the Security Trustee or any receiver appointed under these presents, whether prior to or as a result of the enforcement of the security constituted hereunder, shall be held upon trust and shall be applied by the Security Trustee (except as otherwise required by law) in the first place, to reimburse themselves and pay, retain or discharge all the costs, charges and expenses incurred in or about the entry, appointment of receiver, calling in, collection, conversion or the exercise of the powers and trusts under these presents including their and the receiver's remuneration as herein provided and shall apply the residue of the aforesaid monies, subject to the rights of the other first pad passu charge holders:
+ 
+(a)	Firstly, in or towards payment of. the Financial Assistance to the Term Lenders whether the same shall be due or 	not,
+(b)	Secondly, in or towards payment of the Commitment Charge Financial Assistance to the Commitment Charge 	Lenders whether the same shall be due or not and pay all other sums secured hereby; and
+(c)	Thirdly, to pay the remainder of said proceeds if any to the Company.
+ 
+(2) Liability to Term Lenders and the Commitment Charge Lenders for Deficiency
+ 
+The Company shall remain liable to the Term Lenders and the Commitment Charge Lenders for any deficiency.
+ 
+27. Waiver
+ 
+(1) No Implied waiver or Impairment-No delay or omission of the Security Trustee or any receiver in exercising any right, power or remedy accruing of the Security Trustee upon any default hereunder, shall impair any such right power or remedy or be construed to be a waiver thereof or any acquiescence in such default, nor shall the action or inaction of the Security Trustee or any receiver in respect of any default or any acquiescence by it, in any default, affect or impair any right power or remedy of the Security Trustee in respect of any other defaults nor shall any single or partial exercise of any such right power or remedy preclude any further exercise thereof or the exercise of any other right power or remedy. The rights and remedies of the Security Trustee herein provided are cumulative and not exclusive of any rights or remedies provided by law or equity or in any of the other Financing Documents, the Commitment Charge Financing Documents or the Security Documents.
+ 
+(2) Express Waiver.-A waiver or consent granted by the Security Trustee under this Indenture will be effective only if given in writing and then only in the instance and for the purpose for which it is given.
+ 
+28. Communications
+ 
+(i) All notices or other communications to be given or made under these presents shall be in writing, shall either be delivered personally or sent by courier, registered or certified mail or facsimile. The address for service of the Company shall be:
+ 
+ABC Power General Company Limited
+…………..…………..…………..
+…………..…………..…………..
+Mumbai 400021
+Fax No.
+The address for service of the Security Trustee shall be:
+"XYZF PLAZA
+…………..…………..
+…………..…………..
+…………..…………..
+Mumbai - 400001
+Facsimile No. 022 ..............
+ 
+(ii) All notices shall be effective upon actual receipt, save that, where a notice is transmitted by facsimile and is actually received after 5.30 p.m. on a business day or on a day that is not a business day for the receiving party, such notice shall be deemed to be received on the first business day following the date transmitted by facsimile to the receiving party's facsimile number. Without prejudice to the foregoing, a party giving a notice or communication by facsimile shall promptly deliver a copy of such notice or communication personally, by courier or by mail to the addressee of such notice or communication.
+ 
+(iii) Any party may in writing to other party change its designated address. Such change shall take effect when all parties have been informed of it.
+ 
+29. Provisions severable
+ 
+Every provision contained in this Indenture shall be severable and distinct from every other such provision and if at any time any one or more of such provisions is or becomes invalid illegal or unenforceable in any respect under any law, the validity, legality and enforceability of the remaining provisions hereof shall not be in any way -affected or impaired thereby.
+ 
+The Company doth hereby confirm the provisions of clause 12 hereof and undertakes that during the subsistence of the security created by the Company in favour of the Security Trustee the Company shall not do or suffer to be done or be party or privy to any act, deed, matter or thing which may, in anywise, prejudicially affect the securities and the rights created in favour of the Security Trustee acting for and on behalf of and for the benefit of the Term Lenders and the Commitment Charge Lenders.
+ 
+If there is any inconsistency between (i) the rights and obligations of the Company in relation to the Security Trustee under these presents and (ii) the rights and obligations of the Company in relation to the Financing Documents or the Commitment Charge Finance Documents the provisions of these presents shall be deemed modified so that the rights and obligations of the Company under these presents are consistent with the rights and obligations of the Company under the Financing Documents or the Commitment Charge Financing Documents, as the case may be.
+ 
+30. Governing law
+ 
+This Indenture shall be governed by and construed in accordance with Indian law.
+ 
+IN WITNESS WHEREOF the Common Seal of the Company has been hereunto and to the counterparts hereof affixed and the Security Trustee has caused these presents and the counter-parts hereof to be executed by its duly authorised officer the day and year first hereinabove written.
+ 
+The Common Seal of the within named)| |
+ABC POWER GENERATION COMPANY LIMITED | |
+has been hereunto affixed pursuant to a Resolution | |
+of its Board of Directors passed on the day of| |
+........... 1 2000 in the presence of Mr . | |
+Director and Mr . the Compan~| |
+Secretary who have all subscribed their signature| |
+hereto in token thereof in the presence of:| |
+1 . ......................................| |
+2 . ......................................| |
+Signed and delivered by the within named THE| |
+XYZ FINANCE COMPANY LTD, as Security| |
+Trustee, by the hand of Mr . ................................| |
+its ........................ in the presence of:| |
+1 . ........................................| |
+2 . .........................................| |
+ 
+						SCHEDULE I
+						PART A
+					THE TERM LENDERS
+										(Rupees in crore) (US $ in Million)
+Sr.| |Amount of|Amount of|
+No.|Name of the Lender/address|Rupee|Foreign|
+ | |Loans/NCDs|Currency Loans|
+1 .|The XYZ Finance Company Ltd.,| |US$|
+ |...............................
+Mumbai- 400001| | |
+2.|STR Development Bank| |US$|
+ |Mumbai - 400 023.| | |
+3.|Power Finance Corporation Limited,| |US$|
+ |.............................
+New Delhi-I 10001| | |
+4.|AAA Insurance & Company Ltd.,| | |
+ |...............................
+Mumbai - 400 021.| | |
+5.|BBB Finance & Insurance Company Ltd.,| | |
+ |.............................
+MUMBAI - 400 020.| | |
+6.|ABC Insurance Co. Ltd.,| | |
+ |.............................
+Mumbai - 400 001| | |
+7.|XYZ Insurance & Finance Co. Ltd.,| | |
+ |.............................
+New Delhi-1 10002| | |
+8.|MNO Insurance Company Limited,| | |
+ |..............................
+Calcutta - 700 001| | |
+9.|UXY Insurance Company Limited,| | |
+ |..............................
+Chennai - 600 014| | |
+10.|ABC Bank| |us|
+ |..............................
+Mumbai| | |
+11.|DEF Bank| | |
+ |…………..
+Mumbai| |-|
+12.|GHI Bank| | |
+ |...........................
+Mumbai| | |
+13.|The JKL Bank Limited,| | |
+ |.................. Branch,| | |
+ |Mumbai - 400 003| | |
+ |TOTAL (in US$)
+…………..| |US$|
+ |(In Rupees)| | |
+	
+							PART B
+						GUARANTORS
+						Guarantee Assistance's
+ 
+										(Rupees in crore) (US $ in Million)
+Sr.| |Amount of|
+No.|Name of the Lender/address|Guarantee|
+ | |Assistance|
+1 |XYZ Finance Company Ltd.,| |
+ |.......................|US$*|
+ |Mumbai|(      )*|
+2. |STR Development Bank| |
+ |…………..|US$|
+ |…………..						
+MUMBAI - 400 005.|(     )*|
+3.|ABC Bank| |
+ |............................... .|us $|
+ |…………..
+Mumbai|(     )*|
+ 
+ 
+							PART C
+						COUNTER GUARANTORS
+						Guarantee Assistance
+Sr.| |Amount of Guarantee|
+No.|Name of the Lender/a:ddress|Assistance by way of|
+ | |counter guarantee|
+4|DEF Bank|US$|
+ |...................... Branch,| |
+ |Mumbai 400 003| |
+5|GHI Bank|US $|
+ |......................
+Mumbai 400 003| |
+6|The JKL Bank Limited,|US $|
+ |............... Bazar Branch| |
+ |Mumbai 400 003| |
+ |TOTAL (in US$)|US$^|
+ |(in Rupees)|(    ) ^|
+ 
+		PART D
+COMMITMENT CHARGE TERM LENDERS AND COMMITMENT CHARGE DEBT
+ 
+(Rupees in crore)
+Sr.| |Amount of Commitment|
+No.|Name of the Lender/address|Charges Guarantee|
+ | |Assistance|
+1 . |The JKL Bank Limited,| |
+ |.................. Bazar Branch| |
+ |Mumbai - 400 003| |
+2.|Commitment Charge Lenders| |
+ 
+							SCHEDULE2
+	FIRST MORTGAGED PREMISES
+ 
+Commercial Complex No., admeasuring…………..…………..sq. ft. of built up area on first floor of the building constructed on the Plot No …………..situate lying and being in Registration District…………..Registration Sub-District …………..Village ………….., Taluka …………..Mumbai - 400 097.
+ 
+together with fixtures and fittings thereon, both present and future.
+ 
+							SCHEDULE3
+						PROJECT CONTRACTS
+ 
+1. The Offshore Equipment Supply Contract, dated February 1, 2000.
+2. The Offshore Engineering and Technical Assistance Contract, dated February 1, 2000.
+3. The Onshore Equipment Supply Contract, dated February 1, 2000.
+4. The Onshore Civil and Construction Services Contract, dated February 1, 2000.
+5. Co-Ordination Agreement, dated February 1,2000.
+6. Amendments to the EPC Contracts, dated February 1, 2000.
+7. Performance Bond.
+8. Operation and Maintenance Agreement, dated October 06, 2000
+9. The Fuel Supply Agreement, dated January 19, 2000.
+10. The Power Purchase Agreement, dated March 31, 1999;
+11. The Water Supply Agreement, dated January 23, 2000 between the Company and the Irrigation Department of the Government of Maharashtra.
+12. Effluent Discharge Agreement, dated January 23, 2000.
+13. [Escrow Agreement, dated July 27, 2000.]
+14. Guarantee of Government of Maharashtra, dated August 7, 1999.
+15. Other agreements entered into or to be entered into by the Borrower in respect of the Project.
+16. Insurance Policies.
+ 
+							SCHEDULE4
+							THE PROJECT
+ 
+The Borrower proposes to set up a liquid fuel based combined cycle power project of an installed capacity approximately …………..MW (ISO) at  Industrial Development Area, District…………..in the State of Maharashtra. The plant comprises of two gas turbine units of approximately…………..MW each and a steam turbine of approximately…………..MW.
+	SCHEDULE5
+		PART A	
+		LOAN AGREEMENTS
+ 
+1. Subscription Agreement between the Borrower and XYZ Finance Company Limited, dated November 26, 2000
+2. Rupee Term Loan Agreements between the Borrower and:
+(i)	Rupee Loan Agreement between the Borrower and Power Finance Corporation, dated December 4, 2000;
+(ii)	Rupee Loan Agreement between the Borrower and the AAA Finance and Company Ltd., dated December 1, 	2000;
+(iii)	Rupee Loan Agreement between the Borrower and the BBB Insurance and Finance Company Ltd., dated 	December 1, 2000;
+(iv)	Rupee Loan Agreement between the Borrower and The JKL Bank Limited, dated December 2, 2000; and
+(v)	Rupee Loan Agreement between the Borrower and DEF Bank, dated December 2,2000.
+3. Foreign Currency Loan Agreements:
+(i)	Foreign Currency Loan Agreement between the Borrower and ABC Bank, dated December 5, 2000;
+(ii)	Foreign Currency Loan Agreement between the Borrower and the STR Development Bank, dated December 5, 	2000;
+(iii)	Foreign Currency Loan Agreement between the Borrower and the XYZ Finance Company Ltd., dated 	November 26, 2000;
+(iv)	Foreign Currency Loan Agreement between the Borrower and Power Finance Corporation Limited, dated 	December 4, 2000; and
+(v)	Foreign CUrrency Loan Agreement between the Borrower and The Export Import Bank of Hong Kong, dated 	November 26, 2000.
+ 
+	PART B
+GUARANTEE AGREEMENTS
+ 
+1. Guarantee Agreements:
+ 
+(i)	Guarantee Agreement, dated November 26, 2000 between the Borrower and the XYZ Finance Company Ltd.;
+(ii)	Guarantee Agreement, dated December 5, 2000 between the Borrower and ABC Bank;
+(iii)	Guarantee Agreement, dated December 5, 2000 between the Borrower and the STR Development Bank;
+(iv)	Guarantee Agreement, dated November 30, 2000 between the Borrower and GHI Bank;
+(v)	Guarantee Agreement, dated December 2, 2000 between the Borrower and DEF Bank;and I
+(vi)	Guarantee Agreement, dated December 2, 2000 between the Borrower and The JKL Bank Limited.
+ 
+	PART C
+COMMITMENT CHARGE FINANCING DOCUMENTS
+ 
+1. The JKL Bank Limited, Commitment Charge Guarantee Agreement, dated December 2, 2000.
+2. Guarantee Agreement executed or to be executed with Commitment Charge Lenders for Commitment Charge Guarantee of Rs. 17.00 crores.
+ 
+

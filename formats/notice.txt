@@ -1,0 +1,66 @@
+^ Category ^ Title ^
+| notice | [[legal_formats:notice:another_notice_under_section_78b_indian_railways_act_1890_for_short_delivery|Another Notice Under Section 78B Indian Railways Act 1890 For Short Delivery]] |
+| notice | [[legal_formats:notice:combined_notice_uneder_section_78b_indian_railways_act_1890_and_under_section_80_code_of_civil_procedure|Combined Notice Uneder Section 78B Indian Railways Act 1890 And Under Section 80 Code Of Civil Procedure]] |
+| notice | [[legal_formats:notice:complaint_under_sections_138_and_142_of_the_negotiable_instruments_act|Complaint Under Sections 138 And 142 Of The Negotiable Instruments Act]] |
+| notice | [[legal_formats:notice:form_of_a_complaint_on_behalf_of_the_proprietorship_firm|Form Of A Complaint On Behalf Of The Proprietorship Firm]] |
+| notice | [[legal_formats:notice:form_of_a_notice_by_a_sole_proprietor_partner_of_a_firmdirector_of_a_company_from|Form Of A Notice By A Sole Proprietor Partner Of A Firmdirector Of A Company From]] |
+| notice | [[legal_formats:notice:form_of_a_notice_from_an_individual|Form Of A Notice From An Individual]] |
+| notice | [[legal_formats:notice:form_of_a_notice_on_behalf_of_an_individual_by_an_advocate|Form Of A Notice On Behalf Of An Individual By An Advocate]] |
+| notice | [[legal_formats:notice:form_of_a_notice_to_the_drawer|Form Of A Notice To The Drawer]] |
+| notice | [[legal_formats:notice:form_of_complaint_on_behalf_of_a_banking_company|Form Of Complaint On Behalf Of A Banking Company]] |
+| notice | [[legal_formats:notice:insurance_claim_notice|Insurance Claim Notice]] |
+| notice | [[legal_formats:notice:intimation_to_the_assessing_officer_under_section_2105_regarding_the_notice_of_demand_under_section_156_of_the_incometax_act_1961_for_payment_of_advance_tax|Intimation To The Assessing Officer Under Section 2105 Regarding The Notice Of Demand Under Section 156 Of The Incometax Act 1961 For Payment Of Advance Tax]] |
+| notice | [[legal_formats:notice:notice_about_the_employee_who_has_ceased_to_be_in_employment|Notice About The Employee Who Has Ceased To Be In Employment]] |
+| notice | [[legal_formats:notice:notice_by_a_partner_to_make_available_the_account_books_of_partnership_firm_for_inspection|Notice By A Partner To Make Available The Account Books Of Partnership Firm For Inspection]] |
+| notice | [[legal_formats:notice:notice_by_advocate_claiming_damages_for_defamation|Notice By Advocate Claiming Damages For Defamation]] |
+| notice | [[legal_formats:notice:notice_by_creditor_to_guarantors_to_pay_debt|Notice By Creditor To Guarantors To Pay Debt]] |
+| notice | [[legal_formats:notice:notice_by_guarantor_to_determine_continuing_guarantee|Notice By Guarantor To Determine Continuing Guarantee]] |
+| notice | [[legal_formats:notice:notice_by_landlord_to_tenant_for_demand_of_possession_of_house_after_expiry_of_lease_period|Notice By Landlord To Tenant For Demand Of Possession Of House After Expiry Of Lease Period]] |
+| notice | [[legal_formats:notice:notice_by_lessor_to_lessee_to_quit_for_non_payment_of_rent|Notice By Lessor To Lessee To Quit For Non Payment Of Rent]] |
+| notice | [[legal_formats:notice:notice_by_mortgagee_to_mortgagor_to_furnish_further_security|Notice By Mortgagee To Mortgagor To Furnish Further Security]] |
+| notice | [[legal_formats:notice:notice_by_partner_to_other_partners_to_determine_partnership|Notice By Partner To Other Partners To Determine Partnership]] |
+| notice | [[legal_formats:notice:notice_by_purchaser_for_specific_performance_of_an_agreement|Notice By Purchaser For Specific Performance Of An Agreement]] |
+| notice | [[legal_formats:notice:notice_by_tenant_to_determine_lease|Notice By Tenant To Determine Lease]] |
+| notice | [[legal_formats:notice:notice_for_business_outstanding|Notice For Business Outstanding]] |
+| notice | [[legal_formats:notice:notice_not_to_commit_nuisance_by_constructing_latrines|Notice Not To Commit Nuisance By Constructing Latrines]] |
+| notice | [[legal_formats:notice:notice_of_assignment_by_assignee|Notice Of Assignment By Assignee]] |
+| notice | [[legal_formats:notice:notice_of_assignment_of_debt|Notice Of Assignment Of Debt]] |
+| notice | [[legal_formats:notice:notice_of_assignment_of_life_insurance_policy|Notice Of Assignment Of Life Insurance Policy]] |
+| notice | [[legal_formats:notice:notice_of_assignment_of_mortgage|Notice Of Assignment Of Mortgage]] |
+| notice | [[legal_formats:notice:notice_of_determination_of_lease_for_breach_of_covenants_contained_in_the_lease_deed|Notice Of Determination Of Lease For Breach Of Covenants Contained In The Lease Deed]] |
+| notice | [[legal_formats:notice:notice_of_dishonour_of_bill_of_exchange_to_drawer|Notice Of Dishonour Of Bill Of Exchange To Drawer]] |
+| notice | [[legal_formats:notice:notice_of_dishonour_of_bill_of_exchange_to_indorser|Notice Of Dishonour Of Bill Of Exchange To Indorser]] |
+| notice | [[legal_formats:notice:notice_of_dishonour_of_cheque_under_section_93_negotiable_instruments_act1881|Notice Of Dishonour Of Cheque Under Section 93 Negotiable Instruments Act1881]] |
+| notice | [[legal_formats:notice:notice_of_dissolution_of_partnership|Notice Of Dissolution Of Partnership]] |
+| notice | [[legal_formats:notice:notice_of_expulsion_of_partner_under_section_33_indian_partnership_act_1932|Notice Of Expulsion Of Partner Under Section 33 Indian Partnership Act 1932]] |
+| notice | [[legal_formats:notice:notice_of_intended_purchaser_to_a_possible_preemptor|Notice Of Intended Purchaser To A Possible Preemptor]] |
+| notice | [[legal_formats:notice:notice_of_lis_pendens|Notice Of Lis Pendens]] |
+| notice | [[legal_formats:notice:notice_of_resale_of_goods_by_seller|Notice Of Resale Of Goods By Seller]] |
+| notice | [[legal_formats:notice:notice_of_retirement_by_a_partner|Notice Of Retirement By A Partner]] |
+| notice | [[legal_formats:notice:notice_of_sale_of_pledged_goods|Notice Of Sale Of Pledged Goods]] |
+| notice | [[legal_formats:notice:notice_of_suit_under_section_80_code_of_civil_procedure|Notice Of Suit Under Section 80 Code Of Civil Procedure]] |
+| notice | [[legal_formats:notice:notice_of_termination_of_guarantee_for_faithful_service_of_employee|Notice Of Termination Of Guarantee For Faithful Service Of Employee]] |
+| notice | [[legal_formats:notice:notice_revoking_licence_to_graze_cattle_and_reap_and_remove_grass_on_the_land_of_the_licensor|Notice Revoking Licence To Graze Cattle And Reap And Remove Grass On The Land Of The Licensor]] |
+| notice | [[legal_formats:notice:notice_to_a_carrier_for_damages_for_loss_of_goods_under_section_10_carriers_act_1865|Notice To A Carrier For Damages For Loss Of Goods Under Section 10 Carriers Act 1865]] |
+| notice | [[legal_formats:notice:notice_to_branch_manager_claiming_damages_for_payment_of_cheque_for_which_stop_payment_orders_was_issued|Notice To Branch Manager Claiming Damages For Payment Of Cheque For Which Stop Payment Orders Was Issued]] |
+| notice | [[legal_formats:notice:notice_to_debtor_to_pay_debt|Notice To Debtor To Pay Debt]] |
+| notice | [[legal_formats:notice:notice_to_owner_of_adjacent_land_not_to_make_any_construction_which_may_invade_the_privacy|Notice To Owner Of Adjacent Land Not To Make Any Construction Which May Invade The Privacy]] |
+| notice | [[legal_formats:notice:notice_to_pay_mortgage_money|Notice To Pay Mortgage Money]] |
+| notice | [[legal_formats:notice:notice_to_railway_for_claim_of_liabilities_in_tort|Notice To Railway For Claim Of Liabilities In Tort]] |
+| notice | [[legal_formats:notice:notice_to_tenant_to_attorn_tenancy|Notice To Tenant To Attorn Tenancy]] |
+| notice | [[legal_formats:notice:notice_to_the_assessing_officer|Notice To The Assessing Officer]] |
+| notice | [[legal_formats:notice:notice_to_the_registrar_of_firms_under_section_63_indian_partnership_act_1932|Notice To The Registrar Of Firms Under Section 63 Indian Partnership Act 1932]] |
+| notice | [[legal_formats:notice:notice_under_section_138_of_the_negotiable_instruments_act|Notice Under Section 138 Of The Negotiable Instruments Act]] |
+| notice | [[legal_formats:notice:notice_under_section_138_of_the_negotiable_instruments_act_and_section_420_of_ipc|Notice Under Section 138 Of The Negotiable Instruments Act And Section 420 Of Ipc]] |
+| notice | [[legal_formats:notice:notice_under_section_138_of_the_negotiable_instruments_act_for_dishonour_of_cheque|Notice Under Section 138 Of The Negotiable Instruments Act For Dishonour Of Cheque]] |
+| notice | [[legal_formats:notice:notice_under_section_80_code_0f_civil_procedure_against_public_officer|Notice Under Section 80 Code 0F Civil Procedure Against Public Officer]] |
+| notice | [[legal_formats:notice:notice_under_section_80_code_of_civil_procedure|Notice Under Section 80 Code Of Civil Procedure]] |
+| notice | [[legal_formats:notice:proforma_complaint_by_firmcompany|Proforma Complaint By Firmcompany]] |
+| notice | [[legal_formats:notice:proforma_of_a_complaint_under_section_138_by_a_firm|Proforma Of A Complaint Under Section 138 By A Firm]] |
+| notice | [[legal_formats:notice:promissory_notes|Promissory Notes]] |
+| notice | [[legal_formats:notice:public_notice|Public Notice]] |
+| notice | [[legal_formats:notice:public_notice_in_newspaper_by_the_advocate_of_purchaser_of_property|Public Notice In Newspaper By The Advocate Of Purchaser Of Property]] |
+| notice | [[legal_formats:notice:public_notice_of_election_by_a_minor_not_to_become_a_partner|Public Notice Of Election By A Minor Not To Become A Partner]] |
+| notice | [[legal_formats:notice:public_notice_of_election_by_a_minor_on_attaining_majority|Public Notice Of Election By A Minor On Attaining Majority]] |
+| notice | [[legal_formats:notice:registered_a_d_notice_for_dishonour_of_cheque_under_section_138_of_the_negotiable_instruments_act_1881|Registered A D Notice For Dishonour Of Cheque Under Section 138 Of The Negotiable Instruments Act 1881]] |
+| notice | [[legal_formats:notice:reply_communicating_willingness_to_purchase_the_property|Reply Communicating Willingness To Purchase The Property]] |

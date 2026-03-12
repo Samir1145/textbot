@@ -1,0 +1,372 @@
+FOREIGN CURRENCY LOAN AGREEMENT
+ 
+THIS FOREIGN CURRENCY LOAN AGREEMENT ("Agreement") made at Delhi on this the…………….day of …………….Two thousand and one between ABC Power Generation Limited, a company registered under the Companies Act, 1956 (Act 1 of 1956) and having its registered office at…………….Delhi, State of Maharashtra (hereinafter referred to as the "Borrower" which expression shall, unless it be repugnant to the subject or context thereof, include its successors and assigns);
+	AND
+ 
+THE XYZ FINANCE COMPANY LIMITED, a company registered under the Companies Act, 1956 and having its registered office at ...................................... Delhi (hereinafter referred to as "XYZ" or "Lender" which expression shall, unless it be repugnant to the subject or context thereof, include its successors and assigns).
+ 
+ARTICLE 1: DEFINITIONS
+ 
+1.1 The following terms shall have the following meanings:
+ 
+1. "ABC FC Loan Agreement" shall mean the agreement entered into or to be entered into in respect of the ABC Bank foreign currency loan.
+ 
+2. "Commitment Charge Lender(s)" shall mean the lender(s) providing fund based or non-fund based finance for Commitment Charges under the Fuel Supply Agreement.
+ 
+3. "Counter Guarantors" shall mean DEF Bank, GHI Bank and The JKL Bank Limited.
+ 
+4. "Due Date" shall mean, in respect of:
+ 
+an instalment of principal, the date on which the instalment falls due as stipulated in Schedule VI hereto; and
+ 
+II.	interest, the date on which interest falls due as stipulated in Schedule V hereto.
+ 
+5. "Effluent Discharge Agreement" shall mean the agreement entered into between the Borrower and the Government of Maharashtra, dated January 23, 2000.
+ 
+6. "EPC Contracts" shall mean the agreements entered into by the Borrower in respect of engineering, procurement and construction of the power plant.
+ 
+7. "Escrow Agreement" shall mean the agreement, dated 27th July, 2000 entered into between Maharashtra State Electricity Board (MSEB), the Borrower and MNO Bank.
+ 
+8. "FC Lenders" shall mean the Lender, the Power Finance Corporation Limited, the STR Development Bank and the ABC Bank . …………….Branch.
+ 
+9. "FC Loans" shall mean the amounts of various foreign currencies specified in this Agreement, the STR FC Loan Agreement, the PFC FC Loan Agreement and the ABC FC Loan Agreement or their equivalents in other foreign currencies used for their purchase, agreed to be provided by the FC Lenders for the Project or as the context requires.
+ 
+10. "Financing Plan" means the financing plan as described in Schedule III hereto.
+ 
+11. "Fuel Supply Agreement" shall mean the agreement entered into between the Borrower and……………. Petroleum Corporation Limited, dated January 19, 2000.
+ 
+12. "GOM Guarantee" shall mean the Guarantee executed by the Government of Maharashtra in favour of the Borrower dated August 7, 2000 with respect to the obligations of MSEB under the Power Purchase Agreement, dated March 31, 1999 and amendment thereof, dated October 9, 2000.
+ 
+13. "General Conditions" shall mean the General Conditions No. GC-FC-1-88 applicable to foreign currency loans provided by financial institutions as amended and attached herewith to this Agreement.
+ 
+14. "Guarantor" or "Guarantors" shall mean the XYZ Finance Company Ltd., the STR Development Bank and the ABC Bank.
+ 
+15. "STR FC Loan" shall mean the foreign currency loan availed or to be availed by the Borrower pursuant to The STR Development Bank Foreign Currency Loan Agreement.
+ 
+16. "STR FC Loan Agreement" shall mean the agreement entered into or to be entered into in respect of The STR Development Bank Foreign Currency Loan.
+ 
+17. "FC Loan" shall mean the foreign currency loan availed or to be availed by the Borrower pursuant to this Agreement.
+ 
+18. "ADIS" shall mean The Asian Development Bank, which has agreed to provide a foreign currency loan to the extent of US Dollar 89,750 Million to the Borrower.
+ 
+19. "Lead Institution" shall mean the XYZ Finance Company Limited designated by the Lenders and the Commitment Charge Lenders to the Project as their attorney.
+ 
+20. "Lenders" shall mean the Rupee Lenders, the FC Lenders, Guarantors, the Counter Guarantors, the Working Capital Lender(s) and the Commitment Charge Lenders.
+ 
+21. "Loans" shall mean the loans, subscription to NCDs, and/or guarantees availed by the Borrower from FC Lenders, Rupee Lenders, Guarantors, Counter Guarantors, Working Capital Lender(s) and Commitment Charge Lenders.
+ 
+22. "Operations and Maintenance Agreement" shall mean the agreement dated 6th October, 1997 (as amended by amendment, dated May 29, 2000) entered into between the Borrower and UVW Generation Company Limited.
+ 
+23. "PFC FC Loan" shall mean the foreign currency loan availed or to be availed by the Borrower pursuant to the PFC FC Loan Agreement.
+ 
+24. "PFC FC Loan Agreement" shall mean the agreement entered into or to be entered into in respect of the PFC FC Loan.
+ 
+25. "Power Purchase Agreement" shall mean the agreement, dated 31st March, 1999 entered into between the Borrower and MSEB for purchase of electricity generated by the Project.
+ 
+26. "Project" means the Project to be financed as described in Schedule 11 hereto.
+ 
+27. "Project Contracts" shall mean each of the following agreements:
+ 
+(a)	Power Purchase Agreement;
+(b)	GOAP Guarantee;
+(c)	EPC Contracts;
+(d)	Operation and Maintenance Agreement;
+(e)	Escrow Agreement;
+(f)	Fuel Supply Agreement;
+(g)	Water Supply Agreement;
+(h)	Effluent Discharge Agreement; and
+(i)	Such other contracts, deeds and documents that are entered into and to be entered into by the Borrower in respect of the Project.
+ 
+28. "Promoters" shall mean Santex Construction Limited, Santex Industries Limited, Santex Investments Limited and UVW Power Generation Company Limited/XYZ Power Co. Limited.
+ 
+29. "Receivables" shall mean all monies due and to become due to the Borrower at any time including, without limitation, all proceeds of disbursements of the Lenders, subscriptions for shares in the share capital of the Borrower, working capital, cash credit and instruments of similar nature, monies due or to become due to the Borrower under the Project Contracts, and under all performance bonds, letters of credit and instruments of a similar nature issued in its favour in respect of the Project except the refund of Commitment Charges by Hindustan Petroleum Corporation Limited pursuant to the Fuel Supply Agreement.
+ 
+30. "Rupee Loans" means the loans agreed to be provided by, or non-convertible debentures subscribed by, the Rupee Lenders.
+ 
+31. "Rupee Lenders" shall mean the XYZ Finance Company Limited, DEF Bank, AAA Insurance and Finance Company Ltd., BBB Insurance Company Ltd., Power Finance Corporation of India and The JKL Bank Limited.
+ 
+32. "Security" shall mean the security created in favour of the Security Trustee/Lead Institution under Article III of this Agreement.
+ 
+33. "Security Documents" shall mean the agreements entered into or to be entered into between the Borrower and the Security Trustee for creation of Security.
+ 
+34. "Security Trustee" shall mean the XYZ Finance Company Limited, the Lead Institution among the Financial Institutions and Banks.
+ 
+35. "Trust and Retention Agreement" shall mean the agreement entered into or to be entered into between the Borrower, the Security Trustee and the Account Banks.
+ 
+36. "Water Supply Agreement" shall mean the agreement entered between the Government of Maharashtra and the Borrower dated January 23, 2000.
+ 
+37. "Working Capital Lender(s)" shall mean the lender(s) providing working capital facilities to the Borrower.
+ 
+II General Conditions
+ 
+The FC Loan hereby agreed to be granted by the Lender shall be subject to the Borrower complying with the terms and conditions set out herein and also in the General Conditions, a copy of which is annexed hereto. The General Conditions shall be deemed to form part of this Agreement and shall be read as if they are specifically incorporated herein.
+ 
+ARTICLE II: AGREEMENT & TERMS OF LOANS
+2.1 Amount and terms of loans
+ 
+The Borrower agrees to borrow from the Lender and the Lender agrees to lend to the Borrower in the foreign currency(ies) specified in Schedule IV hereto, on the terms and conditions contained herein and in the General Conditions, the sums to the maximum extent in the various foreign currencies as set out in Schedule 1.
+ 
+2.2 Interest
+ 
+(i) The Borrower shall pay to the Lender interest on the FC Loan at the rate(s) and in the manner provided in Schedule V hereto:
+ 
+Provided, however, interest on rupee-tied defaulted amounts, arrears of liquidated damages and on sums incurred by the Lender by way of expenses in terms of sections 4.1, 4.5 and 4.7 respectively of Article IV of the General Conditions shall be payable half yearly on June 15 and December 15 each year.
+ 
+(ii) Disbursements made pending creation of Security as stipulated in Article III hereof, in case of non-creation of final security within 3 months from the date of first disbursement shall carry further interest at the rate of 1% per annum plus interest tax from the date of first disbursement till creation of Security.
+ 
+2.3 Front end fee
+ 
+The Borrower shall pay to the Lender a one time front end fee at the rate of 1 % on the amount of the FC Loan plus interest tax on or before the execution of the Agreement.
+ 
+2.4 Last date of withdrawal
+ 
+Unless the Lender otherwise agrees, the right to make drawals from the FC Loan(s) shall cease on February 15, 2003.
+ 
+2.5 Payment
+ 
+The Borrower undertakes to repay the principal amount of the FC Loan to the Lender in accordance with the Amortization Schedule set forth in Schedule VI hereto.
+ 
+2.6 Conversion right in case of default
+ 
+(i) If the Borrower commits a default in payment or repayment of any instalment of principal amount of the FC Loan or interest thereon or any combination thereof under section 10.1 (a), (b) or (c), then the Lender shall have the right to convert (which right is hereinafter referred to as "the conversion right") at its option 20% of the rupee equivalent of the defaulted amount (determined in accordance with section 4.10 of Article IV of the General Conditions) into fully paid-up equity shares of the Borrower, at par, in the manner specified in a notice in writing to be given by the Lender to the Borrower (which notice is hereinafter referred to as the "notice of conversion") prior to the date on which the conversion is to take effect, which date shall be specified in the said notice (hereinafter referred to as the "date of conversion").
+ 
+(ii) On receipt of the notice of conversion, the Borrower shall allot and issue the requisite number of fully paid up equity shares to the Lender as from the date of conversion and the Lender shall accept the same in satisfaction of the said defaulted amount(s) in respect of the FC Loan to the extent so converted. The part of the Loans so converted shall cease to carry interest as from the date of conversion and the Loans shall stand correspondingly reduced. Upon such conversion, the installments of the Loans payable after the date of conversion as per Schedule VI herein shall stand reduced proportionately by the amount of the FC Loan so converted. The equity shares so allotted and issued to the Lenders shall carry from the date of conversion, the right to receive proportionately the dividends and other distributions declared or to be declared in respect of the equity capital of the Borrower. Save as aforesaid, the said shares shall rank pari passu with the existing equity shares of the Borrower in all respects. The Borrower shall, at all times, maintain sufficient unissued equity shares for the above purpose.
+ 
+(iii) The conversion right reserved as aforesaid may be exercised by the Lender on one or more occasions during the currency of the FC Loan on the happening of the default as specified in this Section.
+ 
+(iv) The Borrower assures and undertakes that in the event of the Lenders exercising the right of conversion as aforesaid, the Borrower shall use its best efforts to get the equity shares which will be issued to the Lender as a result of the conversion listed with the Stock Exchange(s) at Delhi and Delhi.
+ 
+(v) For the purposes of this section, it shall not be construed as a default, if the Borrower approaches the Lender well in advance for postponement of principal or interest as the case may be and the Lender agrees to the same.
+ 
+ARTICLE III: SECURITY
+3.1 Security for the loans
+ 
+(A) The Loans together with all interest, liquidated damages, front end fee, premia on prepayment or on redemption, costs, expenses and other monies including any increase as a result of devaluation/revaluation/fluctuation in the foreign currencies involved payable whatsoever stipulated in this Agreement shall be secured by:
+ 
+(a)	a first mortgage and charge in favour of the Security Trustee in a form satisfactory to the Lender of all the 	Borrower's immovable properties both present and future;
+ 
+(b)	a first registered mortgage and charge in favour of the Security Trustee of all of the Borrower's immovable properties in Maharashtra, and all its intangible assets both present and future, and a charge over all Project 	Contracts, insurance proceeds and bank accounts; and
+ 
+(c)	a first charge by way of hypothecation in favour of the Lenders of all the Borrower's movables, (save and except 	book debts) including movable machinery, machinery spares, tools and accessories, present and future, subject to 	prior charges created and/or to be created in favour of the Working Capital Lenders on the Borrower's stocks of 	raw materials, semi-finished, finished goods, consumable stores, book debts and such other movables as may be 	agreed by the Lead Institution.
+ 
+The mortgage and charge referred to above shall rank pari passu with the mortgages and charges created and/or to be created in favour of the Lenders in respect of the financial assistance as set out herein:
+
+
+_________________________________________________________________________________________
+Lender		Rupee Term			Foreign Currency		Guarantee 		Total
+Loan/NCD			Loan Amount			Assistance^
+	Amount							Amount (Principal)
+			___________________________________________________
+	Rs. Crores	US $		Rs.		us $		Rs.			Rs.
+		Million		Crores		Million		Crores 			Crores
+________________________________________________________________________________________
+XYZ F
+STR DB
+AAA
+BBB
+PFC
+JKL Bank
+ABC Bank
+DEF Bank
+GHI Bank
+________________________________________________________________________________________
+Total	#@
+_________________________________________________________________________________________
+ 
+(B) The Borrower shall make out a good and marketable title to its properties to the satisfaction of the Lender and comply with all such formalities as may be necessary or required for the said purpose.
+ 
+3.2 Creation of additional security
+ 
+If at any time during the subsistence of this Agreement, the Lead Institution is of the opinion that the security provided by the Borrower has become inadequate to cover the balance of the Loans then outstanding, then, on the Lead Institution advising the Borrower to that effect, the Borrower shall provide and furnish to the Lender, to the satisfaction of the Lead Institution, such additional security as may be available with the Borrower and as may be acceptable to the Lead Institution to cover such deficiency.
+ 
+3.3 Pledge of shares
+ 
+The Borrower shall cause the Promoters to create a pledge in favour of the Security Trustee aggregating 51% of the total issued equity share capital of the Borrower at all times, excluding the shares issued to the Lender pursuant to clause 2.6 or similar provision in agreements with lenders in respect of the Loans.
+ 
+3.4 Trust and retention account
+ 
+The Borrower shall enter into a Trust and Retention Agreement and open the accounts described therein in which the proceeds of Receivables of the Borrower would be deposited for the due repayment of the principal amount of the Loans and interest thereon, and all other payments under this Agreement and for making all payments in accordance with the Trust and Retention Agreement. The appointment of the trustee for operating the accounts shall be subject to approval of the Security Trustee.
+ 
+3.5 Acquisition of additional immovable properties
+ 
+So long as any monies remain due and outstanding to the Lender, the Borrower undertakes to notify the Lender in writing of all its acquisition of immovable properties and as soon as practicable thereafter to make out a marketable title to the satisfaction of the Lender and charge the same in favour of the Lender, on a pari passu basis with the other Lenders, by way of first charge in such form and manner as may be decided by the Lender.
+ 
+3.6 Guarantee
+ 
+The Borrower shall procure irrevocable and unconditional personal guarantee(s) of S/Shri. A and B both joint and several and a Corporate Guarantee of Santex Constructions Limited in favour of Lender for the due repayment of the Loans and the payment of all interest and other monies payable by the Borrower in the form prescribed by the Lender and to be delivered to the Lender before any part of the loan is advanced. The Borrower shall not pay any guarantee commission to the said Guarantors.
+ 
+ARTICLE IV: APPOINTMENT OF NOMINEE DIRECTOR(S)
+ 
+The Borrower agrees that Lender shall be entitled to appoint and withdraw from time to time Director(s) on the Board of Directors of Borrower at any time during the currency of this Agreement.
+ 
+ARTICLE V: SPECIAL CONDITIONS
+ 
+The FC Loan hereby granted shall also be subject to the Borrower complying with the special conditions set out in Schedule VII hereto.
+ 
+ARTICLE VI: EFFECTIVE DATE OF AGREEMENT
+ 
+This Agreement shall become binding on the Borrower and the Lender on and from the date first above written. It shall be in force till all the monies due and payable under this Agreement are fully paid off.
+ 
+SCHEDULE 1: PARTICULARS OF XYZ FC LOAN
+Name of the Lender|Amount in foreign currency|
+THE XYZ FINANCE COMPANY LIMITED
+.. ..............................
+………………………
+Delhi|US $ ………………Million|
+ 
+SCHEDULE II: THE PROJECT
+ 
+The Borrower proposes to set up a liquid fuel based combined cycle power project of an installed capacity approximating …………..MW (ISO) at……………..Industrial Development Area, District……………..in the State of  Maharashtra. The plant comprises two gas turbine units of approximately……………..MW each and a steam turbine of approximately
+........	MW
+SCHEDULE III: FINANCING PLAN
+Project Cost
+			(Rs. In crore)
+Item|Re Cost 
+(Rs. Cr.) |$ Cost 
+(US$ M) |Total
+(Rs. Cr.)|
+Land and Site Development| | | |
+Payments under EPC Contract| | | |
+Initial Spares| | | |
+Pre-Operative Costs| | | |
+Financing Expenses| | | |
+interest During Construction| | | |
+Provision for Contingency| | | |
+Margin Money for Working Capital| | | |
+Total Cost| | | |
+Other requirement of funds
+Commitment Charges to Fuel Supplier| | | |
+Liquidated Damages Payable to APSEB| | | |
+Total Project Cost| | | |
+ 
+* Exchange rate for conversion of US$ has been taken at 1 US $ = Rs. 46 during appraisal in January/February 2000.
+
+
+
+
+
+
+Means of Financing|(Rs. In crores)|
+Equity| | |
+Santex Group| | |
+SMIL| | |
+SCUSIL| | |
+Santex Group (Sub-Total)| | |
+UVW/WXY Power Co. Limited| | |
+CDC| | |
+Hanjung| | |
+ 
+Means of Financing|(Rs. In crores)|
+Debt:| | |
+Rupee Loan NCDs| | |
+Fls/Banks| | |
+Foreign Currency Loan| | |
+Fls/Banks| | |
+Export Credit Assistance from ADB| | |
+ |(US$ Mn)| |
+ |(US$ mn)| |
+Total| |
+ 
+SCHEDULE IV: PARTICULARS OF XYZ FC LOAN
+ 
+Foreign currency loan of US Dollar……………..Million which is allocated out of  Line of Credit to the Lender and the Borrower has to abide by the terms of the above line of credit which are laid down in Schedule-V enclosed hereto. The Borrower shall pay to the Lender interest on the principal amount of the FC Loan outstanding from time to time, at the rate of six-monthly US$ LIBOR plus 3.5% per annum plus interest tax as prevailing on the date of each disbursement. The exact due dates of payment of interest are June 15 and December 15, each year.
+ 
+SCHEDULE V: PROVISIONS APPLICABLE TO XYZ FC LOAN
+ 
+Special terms and conditions applicable to sub-loans allocated out of the private sector infrastructure facility of US$ 100 million from Asian Development Bank (ADB)
+ 
+International Competitive Bidding (ICB)
+ 
+For acquisition of equipment valued at or in excess of US$ 10 million or Civil Works valued at or in excess of US$ 20 million for any qualified project, the Borrower shall have to follow the international competitive bidding procedure. If the contract(s) are awarded to a local firm under ICB, the same would be eligible for Private Sector Infrastructure Facility. Further, the Project sponsor or Engineering Procurement and Construction (EPC) Contract shall be selected through competitive bidding or should be selected amongst international entities in accordance with the procedure acceptable to ADB.
+ 
+SCHEDULE VI: AMORTIZATION SCHEDULE
+ |(In US$)|Closing Balance|
+ | | |
+15-12.2001| | |
+15.06.2002| | |
+15-12.2002| | |
+15.06.2003| | |
+15.12.2003| | |
+15.06.2004| | |
+15.12.2004| | |
+15.06.2005| | |
+15-12.2005| | |
+15-06.2006| | |
+15.12.2006| | |
+15.06.2007| | |
+15-12.2007| | |
+15.06.2008| | |
+ 
+(XYZF's FC Loan)
+ 
+ |(in US$)|Closing Balance|
+15.12.2008| | |
+15.06.2009| | |
+15.12.2009| | |
+ 
+SCHEDULE VII: SPECIAL CONDITIONS
+A. Pre-commitment Conditions
+ 
+Before the financial assistance becomes effective, the Borrower shall to the satisfaction of the Lender comply with the following conditions:
+ 
+(i)	obtain in-principle sanction from MSEBs banker(s) for opening of irrevocable and revolving letter of credit for 	prompt payment of dues by MSEB;
+(ii)	enter into an escrow account arrangement with MSEB to cover payment of electricity dues from MSEB;
+ 
+(iii)	amend the Operations and Maintenance (O&M) agreement so as to provide for guarantee on heat rate, 	liquidated damages for increase in heat rate or decrease in availability of plant;
+(iv)	furnish an undertaking from Promoters i.e., Santex Constructions Limited (SCL), Santex Industries Limited (SIL), 	Santex Investment Limited (SIL) and UVW Power Generation Limited to the effect that cost overrun, if any, shall be made good by Promoters without recourse to Fl's/Banks and in a manner satisfactory to the Lender;
+(v)	arrange for ECA loans to the extent of US$ ... million from ADB on terms satisfactory to the Lender. In the event of any savings (as compared to provisions in the project cost) on account of lower insurance cover charges, management fee on deferred payment guarantee, etc. the Rupee Loan shall be reduced to that extent;
+(vi)	furnish an undertaking from Promoters to bridge the gap, if any, in raising equity capital by way of private 	placement with SDC (Rs.1 15 crores);
+(vii)	tie-up entire means of financing on the terms satisfactory to the Lender;
+(viii)	obtain all necessary approvals from the Government of India (FIPB)/Reserve Bank of India, etc. for the 	proposed foreign equity investment in the equity share capital of the Borrower;
+(ix)	appoint, in consultation with the Lender, a reputed firm of Engineering Consultants as "Lender's Engineers' for 	monitoring the power project during the implementation period as well as during operation period with direct 	reporting to the Lender, all costs and expenses in this regard will be borne by the Borrower;
+(x)	undertake to comply with all the statutory requirements for preferential allotment of SCL's shares to 	NRI's/OCB's.
+(xi)	get amended all approvals obtained earlier in the name of Santex Power to the name of the Borrower.
+(xii)	get amended the Government of Maharashtra Guarantee to the effect that it continues to be valid irrespective of 	Maharashtra Government's shareholding in MSEB.
+(xiii)	amend the Shareholders Agreement (SA) to provide for­ 
+-disinvestment/dilution of shareholding by Santex Group and UVW Generation Co. Limited/ABC Energy Limited shall be in consultation with and prior approval of the Lender;
+	-SA shall not be terminated without the prior approval of the Lender;
+ 
+(xiv)	finalise the insurance package including Advance Loss of Profit to the satisfaction of the Lender;
+(xv)	appoint insurance Advisor and Legal Advisor to Lenders. The necessary fees and other expenses for the same shall be borne by the Borrower;
+(xvi)	The Project agreements/contracts shall be to the satisfaction of the Lender;
+(xvii)	Modify the Memorandum & Articles of Association of the Borrower to enhance the borrowing powers as per the envisaged means of financing;
+(xviii)	Ensure that the promoters shall meet the liquidated damages payable to the APSEB from their own resources without recourse to the Lender.
+(xix)	Ensure that the envisaged promoters contribution is subscribed to in full and paid up in cash to the extent of 100% in respect of Santex Group aggregating Rs. 125.50 crores.
+(xx)	Qbtain MSEB approval for extension of the date of financial closure as per PPA.
+(xxi)	Obtain all statutory/non-statutory clearances and approvals required for the project including Pollution 	Control/Environmental Clearance and ensure that the equipment proposed to be installed is adequate and 	appropriate to the Pollution Control requirement.
+ 
+B. Pre-disbursement Conditions
+ 
+Before seeking disbursement of assistance sanctioned, the Borrower shall to the satisfaction of the Lender comply with the following conditions:
+ 
+(i)	modify the Memorandum & Articles of Association to enhance the authorised capital and borrowing powers as 	per the envisaged means of financing;
+(ii)	bring in 50% of the proposed equity contribution of UVW Power Generation Limited/ABC Power Co. Limited, 	and SDC aggregating Rs……………..crores i.e., Rs. .........Crores;
+(iii)	shall agree to open a Trust and Retention Account in a bank and shall deposit all the cash inflows in the said 	account and the proceeds shall be utilised in a manner and priority to the satisfaction of the Lender;
+(iv)	acquire and obtain possession of the entire land with provision for mortgage of land in favour of institutions and 	obtain all necessary approvals for usage of the land for the purpose of the power plant;
+(v)	constitute a Project Management Committee of its Directors for the purpose of supervising and monitoring the progress in the implementation of the project. The Committee shall be responsible for the management of the 	project during construction period including civil tendering, placement of orders for supply of plant and machinery 	and other assets and monitoring the implementation of the Project;
+(vi)	agree and undertake to furnish to the Lender such information and data as might be required by the Lender to ensure that the physical progress as well as expenditure incurred on the Project are as per the schedule;
+(vii)	agree that the Lender shall have the right to review the cost of the Project any time during the implementation of the Project as also before the final disbursement of the loan amount. Pending completion of the review, the Borrower shall obtain prior approval of the Lender for utilising the amount of the loans equivalent to the contingency provision in the cost of Project;
+(viii)	agree that the Lenders shall be entitled to appoint one or more nominee(s) on the Board of Directors of the Borrower during the currency of financial assistance.
+ 
+C. Other conditions
+ 
+The Borrower shall
+ 
+(i)	constitute an audit sub-committee of its Directors (other than the Directors representing the Promoters) for 	monitoring/guidance.
+(ii)	arrange for carrying out safety audit in connection with storage, handling and transportation of petroleum 	products and shall comply with the recommendations set out in the audit report.
+(iii)	make satisfactory arrangement with its bankers for meeting its working capital requirements and shall furnish a letter from its bankers in this regard.
+(iv)	agree that the Lender may at its discretion withhold disbursement of the amount of the Loan equivalent to the 	provision against margin money for working capital in the cost of the Project till such time as the Project is 	completed or the build up of working capital commences.
+(v)	shall not undertake any new project or expansion of the existing projects or make any investment or take assets 	on lease without prior approval of the Lender during the currency of the proposed Loan from the Lender.
+(vi)	the Lender shall have the right to review and reset the rate of interest.(including the spread on LIBOR) after 	seven years from the date of first disbursement, provided that the Borrower shall have the right to prepay the FC 	Loan without any penalty or premium if the rate of interest is adversely reset after seven years from the date of 	first disbursement.
+(vii)	broad base its Board of Directors by induction of experienced outside professionals to the satisfaction of the Lender.
+(viii)	obtain all other statutory and non-statutory clearances for the Project.
+(ix)	shall ensure the release of funds from ADB in line with the disbursement of foreign currency loans from the Financial Institutions/Banks.
+(x)	all other terms and conditions stipulated by other financial institution and banks over and above the conditions stipulated herein shall apply mutatis mutandis for the assistance sanctioned by the Lender (XYZF).
+ 
+IN WITNESS WHEREOF the Borrower has caused its Common Seal to be affixed hereto and to a duplicate hereof on the day, month and year first hereinabove written and the Lender has caused the same and the said duplicate to be executed by the hand of Mr. X Chief Deputy General Manager of the Lender.
+ 
+THE COMMON SEAL OF ABC Power Generation Company Limited, has pursuant to the Resolution of its Board of Directors passed in that behalf on the……………..day of...........2000 hereunto been affixed in the presence of Mr. A, Director and Mr. B Secretary, of the Borrower who have countersigned the same in token thereof.
+ 
+SIGNED AND DELIVERED FOR The XYZ Finance Company Ltd. by the hands of Mr. A as authorised official of the XYZ Finance Company Limited
+ 
+

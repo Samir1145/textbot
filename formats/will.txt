@@ -1,0 +1,29 @@
+^ Category ^ Title ^
+| will | [[legal_formats:will:another_form_of_will_by_a_lady_in_favour_of_husband|Another Form Of Will By A Lady In Favour Of Husband]] |
+| will | [[legal_formats:will:codicil_1|Codicil 1]] |
+| will | [[legal_formats:will:codicil_substituting_a_trustee|Codicil Substituting A Trustee]] |
+| will | [[legal_formats:will:codicil_substituting_a_trustee_appointed_under_will|Codicil Substituting A Trustee Appointed Under Will]] |
+| will | [[legal_formats:will:codicil_to_will|Codicil To Will]] |
+| will | [[legal_formats:will:detailed_will_in_favour_of_family_members|Detailed Will In Favour Of Family Members]] |
+| will | [[legal_formats:will:form_of_a_complicated_will|Form Of A Complicated Will]] |
+| will | [[legal_formats:will:joint_will_by_husband_and_wife|Joint Will By Husband And Wife]] |
+| will | [[legal_formats:will:release_by_a_legatee_to_executor|Release By A Legatee To Executor]] |
+| will | [[legal_formats:will:revival_of_a_will|Revival Of A Will]] |
+| will | [[legal_formats:will:revocation_of_will|Revocation Of Will]] |
+| will | [[legal_formats:will:revocation_of_will_and_codicils|Revocation Of Will And Codicils]] |
+| will | [[legal_formats:will:second_codicil|Second Codicil]] |
+| will | [[legal_formats:will:short_form_of_a_will|Short Form Of A Will]] |
+| will | [[legal_formats:will:short_form_of_will_in_favour_of_wife_of_the_testator|Short Form Of Will In Favour Of Wife Of The Testator]] |
+| will | [[legal_formats:will:simple_will_giving_all_property_to_wife|Simple Will Giving All Property To Wife]] |
+| will | [[legal_formats:will:w_i_l_l|W I L L]] |
+| will | [[legal_formats:will:will_2|Will 2]] |
+| will | [[legal_formats:will:will_bequeathing_business_concerns_of_the_testator_and_other_properties|Will Bequeathing Business Concerns Of The Testator And Other Properties]] |
+| will | [[legal_formats:will:will_by_a_disabled_person_in_favour_of_wife_and_daughter|Will By A Disabled Person In Favour Of Wife And Daughter]] |
+| will | [[legal_formats:will:will_by_a_hindu_in_favour_of_family|Will By A Hindu In Favour Of Family]] |
+| will | [[legal_formats:will:will_in_favour_of_minor_son|Will In Favour Of Minor Son]] |
+| will | [[legal_formats:will:will_in_favour_of_relations|Will In Favour Of Relations]] |
+| will | [[legal_formats:will:will_in_favour_of_wife_and_children|Will In Favour Of Wife And Children]] |
+| will | [[legal_formats:will:will_in_trust_for_religious_uses|Will In Trust For Religious Uses]] |
+| will | [[legal_formats:will:will_with_several_legacies_and_religious_and_charitable_bequests_and_residue_to_vest_in_trustees_for_benefit_of_wife_and_children|Will With Several Legacies And Religious And Charitable Bequests And Residue To Vest In Trustees For Benefit Of Wife And Children]] |
+| will | [[legal_formats:will:will_with_trust_for_wife_and_children|Will With Trust For Wife And Children]] |
+| will | [[legal_formats:will:will_with_trust_for_wife_and_children_pecuniary_legacies_and_annuities|Will With Trust For Wife And Children Pecuniary Legacies And Annuities]] |

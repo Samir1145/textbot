@@ -1,0 +1,71 @@
+Classification of Offences
+
+Section|Cognizable or
+Non-cognizable|Bailable or
+Non-bailable|By what Court triable|
+120-B|According as the offence which is the object of conspiracy is cognizable of non-cognizable|According as the offence which is the object of conspiracy is bailable or non-bailable|Court by which abetment of the offence which is the object of conspiracy is triable|
+124|Cognizable|Non-bailable|Court of session|
+143|Cognizable|Bailable|Any Magistrate|
+148|Cognizable|Bailable|Magistrate of the first class|
+149|According as the offence is cognizable or non-cognizable|According as the offence is bailable or non-bailable|Court by which the offence is triable|
+150|Cognizable|According as the offence is bailable or non-bailable|Court by which the offence is triable|
+152|Cognizable|Bailable|Magistrate of the first class|
+157|Cognizable|Bailable|Any Magistrate|
+158|Cognizable|Bailable|Any Magistrate|
+171-E|Non-cognizable|Bailable|Magistrate of the first class|
+172, 173,
+174, 177|Non-cognizable|Bailable|Any Magistrate|
+193|Non-cognizable|Bailable|Magistrate of the first class|
+200|Non-cognizable|Bailable|Court by which of the offence of giving false evidence is triable|
+203|Non-cognizable|Bailable|Any Magistrate|
+209|Non-cognizable|Bailable|Magistrate of the first class|
+216-A|Cognizable|Bailable|Magistrate of the first class|
+255|Cognizable|Non-bailable|Court of session|
+302, 304|Cognizable|Non-bailable|Court of session|
+304A|Cognizable|Bailable|Magistrate of the first class|
+304B|Cognizable|Non-bailable|Court of session|
+307, 308|Cognizable|Non-bailable|Court of session|
+309|Cognizable|Bailable|Any Magistrate|
+311|Cognizable|Non-bailable|Court of session|
+312|Non-cognizable|Bailable|Magistrate of the first class|
+313|Cognizable|Non-bailable|Court of session|
+323|Non-cognizable|Bailable|Any Magistrate|
+324, 325|Cognizable|Bailable|Any Magistrate|
+326, 327|Cognizable|Non-bailable|Magistrate of the first class|
+333|Cognizable|Non-bailable|Court of session|
+341,342,
+354|Cognizable|Bailable|Any Magistrate|
+363|Cognizable|Bailable|Magistrate the first class|
+364, 364A
+366, 366A
+366B|Cognizable|Non-bailable|Court of session|
+376|Cognizable|Non-bailable|Court of session|
+376A|Non-cognizable|Bailable|Court of session|
+376C|Cognizable|Bailable|Court of session|
+376D|Cognizable|Bailable|Court of session|
+377|Cognizable|Non-bailable|Magistrate of the first class|
+379, 380,
+381, 384|Cognizable|Non-bailable|Any Magistrate|
+392, 393|Cognizable|Non-bailable|Magistrate of the first class|
+395, 396|Cognizable|Non-bailable|Court of session|
+406, 407,
+409|Cognizable|Non-bailable|Magistrate of the first class|
+411|Cognizable|Non-bailable|Any Magistrate|
+417|Non-cognizable|Bailable|Any Magistrate|
+420|Cognizable|Non-bailable|Magistrate of the first class|
+426|Non-cognizable|Bailable|Any Magistrate|
+447, 448,
+451|Cognizable|Bailable|Any Magistrate|
+452|Cognizable|Non-bailable|Any Magistrate|
+465|Non-cognizable|Bailable|Magistrate of the first class|
+467|Non-cognizable|Non-bailable|Magistrate of the first class|
+468|Cognizable|Non-bailable|Magistrate of the first class|
+477A|Non-cognizable|Bailable|Magistrate of the first class|
+489A|Cognizable|Non-bailable|Court of session|
+493|Non-cognizable|Non-bailable|Magistrate of the first class|
+494, 495,
+496, 497|Non-cognizable|Bailable|Magistrate of the first class|
+498A|Cognizable|Non-bailable|Magistrate of the first class|
+500|Non-cognizable|Bailable|Court of session|
+506|Non-cognizable|Bailable|Any Magistrate|
+

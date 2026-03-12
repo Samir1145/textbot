@@ -1,0 +1,115 @@
+FORM NO. 26C
+[See section 194c and rule 37]
+Annual return of deduction of tax from payments made to contractors or sub-contractors under section 296 of the Income-tax, 1961, for the year ending 31st March, …………….
+
+(a)   Tax Deduction Account Number|||||||||||
+|||||||||||
+        (b)   Permanent Account Number|||||||||||
+||||||||||||||||||
+2.    Details of the person responsible for paying any sum of carrying out any work in pursuance of a    contract or sub-contract :|
+||||||||||||||||||
+        (a)   Name /Designation||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+        (b)   Address||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Flat/Door/Block No.||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                  Name of premises/Building||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Road/Street/Lane||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                  Area/Locality||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Town/City/District||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                   State||||||||||||||||||||||||||
+||||||||||||||||||
+                Pin Code|||||||
+|||||||
+
+
+©	Has address of the person responsible for paying any income by way of interest		Tick	as applicable Yes		No.
+	Pursuance of a contract or sub-contract changed since submitting the last return
+Description of the person responsible for making payment [see section 194C(1)(a) to (i)]		
+
+Details of payments made to contractors or sub-contractors and tax deducted thereon :
+Payee|Gross sum of payment made (Rs.)|Total sums on which no tax deducted (Rs.)|Total sums on which tax deducted|Total amount of tax deducted|
+|||Amount 
+(Rs.)|Number of person|Income-tax (Rs.)|Surcha-rge 
+(Rs.)|Total (Rs.)|
+|(1)|(2)|(3)|(4)|(5)|(6)|(7)|
+1. Companies||||||||
+2. Person other than Companies||||||||
+Total||||||||
+
+Details of tax paid to the credit of Central Government :
+By or on behalf of Central Government :
+Sl. No|Amount deducted|Transfer Voucher Number|Date of Transfer Voucher|
+(1)|(2)|(3)|(4)|
+||||
+||||
+||||
+||||
+Total||||
+       
+By persons responsible for paying other than Central Government :
+Sl. No.|Challan No.|Date of payment|Amount of tax paid|Name and address of bank|
+(1)|(2)|(3)|(4)|(5)|
+|||||
+|||||
+|||||
+|||||
+Total|||
+
+
+
+
+
+
+
+Details of payment made to contractors or sub-contractors and of tax deducted at source at the prescribed rates in force :
+Details of sums paid to contractors or sub-contractors being companies :
+  Sl.No.|Permanent Account Number (PAN)|Name of company|Address of company|Type of company (see note below)|Gross value of the contract /subcontract (Rs.)|Sums paid/credited (Rs.)|Date on  which sums credited or paid whichever is earlier|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of the Central Government|Tax Deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the company|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|(12)|(13)|
+|||||||||||||
+|||||||||||||
+|||||||||||||
+                          Total||||
+
+(b)	Details of sums paid to contractors or sub-contractors other than companies :
+  Sl.No.|Permanent Account Number (PAN)|Name of person|Address of person|Type of company (see note below)|Gross value of the contract /subcontract (Rs.)|Sums paid/credited (Rs.)|Date on  which sums credited or paid whichever is earlier|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of the Central Government|Tax Deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the company|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|(12)|(13)|
+|||||||||||||
+|||||||||||||
+|||||||||||||
+                          Total||||
+
+Note: 	Fill in ‘C’ for Contract, S for Sub-contractor and ‘A’ for Advertising company  
+
+
+
+
+
+Details of payments made to contractors or sub-contractors and /or  tax deducted at source at a lower rate or no tax deducted in accordance with section 194C(4) :
+Details of sums paid to contractors or sub-contractors being companies :
+Sl.No.|Permanent Account Number (PAN)|Name of company|Address of company|Type of company (see note below)|Gross value of the contract /subcontract (Rs.)|Sums paid /credited (Rs.)|Date on  which sums credited or paid whichever is earlier|Rate of deduct-ion of tax (%)|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of the Central Government|Tax Deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the company|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|(12)|(13)|(14)|
+||||||||||||||
+||||||||||||||
+||||||||||||||
+                          Total|||||
+
+(b)	Details of sums paid to contractors or sub-contractors other than companies:
+Sl.No.|Permanent Account Number (PAN)|Name of person|Address of person|Type of company (see note below)|Gross value of the contract /subcontract (Rs.)|Sums paid /credited (Rs.)|Date on  which sums credited or paid whichever is earlier|Rate of deduct-ion of tax (%)|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credit of the Central Government|Tax Deduction Certificate Number|Date of furnishing of tax Deduction Certificate to the company|
+(1)|(2)|(3)|(4)|(5)|(6)|(7)|(8)|(9)|(10)|(11)|(12)|(13)|(14)|
+||||||||||||||
+||||||||||||||
+||||||||||||||
+                          Total|||||
+
+Note: 	Fill in ‘C’ for Contract, S for Sub-contractor and ‘A’ for Advertising company  
+
+Verification
+I, …………………………………………………………, certify that all the particulars furnished above are correct and complete.
+Place :						Name and signature of the person responsible for deducting tax at source……………………………………
+Date :						Designation :……………………………………………………….

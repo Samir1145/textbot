@@ -1,0 +1,26 @@
+^ Category ^ Title ^
+| petition | [[legal_formats:petition:application_for_anticipatory_bail_before_high_court|Application For Anticipatory Bail Before High Court]] |
+| petition | [[legal_formats:petition:application_for_anticipatory_bail_before_sessions_judge|Application For Anticipatory Bail Before Sessions Judge]] |
+| petition | [[legal_formats:petition:application_for_anticipatory_bail_under_section_438_cr_pc|Application For Anticipatory Bail Under Section 438 Cr Pc]] |
+| petition | [[legal_formats:petition:application_for_bail_before_high_court_under_section_439_cr_pc|Application For Bail Before High Court Under Section 439 Cr Pc]] |
+| petition | [[legal_formats:petition:bail_petition_before_a_magistrate_during_police_enquiry_under_s_437_cr_pc|Bail Petition Before A Magistrate During Police Enquiry Under S 437 Cr Pc]] |
+| petition | [[legal_formats:petition:in_the_court_of_subordinate_judge_at|In The Court Of Subordinate Judge At]] |
+| petition | [[legal_formats:petition:memorandum_of_civil_miscellaneous_petition|Memorandum Of Civil Miscellaneous Petition]] |
+| petition | [[legal_formats:petition:petition_by_creditor_to_adjudge_debtor_insolvent|Petition By Creditor To Adjudge Debtor Insolvent]] |
+| petition | [[legal_formats:petition:petition_for_appointment_of_guardian|Petition For Appointment Of Guardian]] |
+| petition | [[legal_formats:petition:petition_for_bail_under_section_389_cr_pc|Petition For Bail Under Section 389 Cr Pc]] |
+| petition | [[legal_formats:petition:petition_for_bail_under_section_439_cr_pc_before_sessions_judge|Petition For Bail Under Section 439 Cr Pc Before Sessions Judge]] |
+| petition | [[legal_formats:petition:petition_for_divorce_by_mutual_consent_under_section_13_b_of_the_hindu_marriage_act_1955|Petition For Divorce By Mutual Consent Under Section 13 B Of The Hindu Marriage Act 1955]] |
+| petition | [[legal_formats:petition:petition_for_extension_of_succession_certificate|Petition For Extension Of Succession Certificate]] |
+| petition | [[legal_formats:petition:petition_for_leave_under_order_ii_rule_2_of_the_c_p_c|Petition For Leave Under Order Ii Rule 2 Of The C P C]] |
+| petition | [[legal_formats:petition:petition_for_probate_or_letters_of_administration_with_the_will_annexed|Petition For Probate Or Letters Of Administration With The Will Annexed]] |
+| petition | [[legal_formats:petition:petition_for_revocation_of_grant_of_probate_and_letters_of_administration_of_will|Petition For Revocation Of Grant Of Probate And Letters Of Administration Of Will]] |
+| petition | [[legal_formats:petition:petition_for_revocation_of_grant_of_probate_letters_of_administration_certificate|Petition For Revocation Of Grant Of Probate Letters Of Administration Certificate]] |
+| petition | [[legal_formats:petition:petition_for_the_grant_of_succession_certificate_by_widow|Petition For The Grant Of Succession Certificate By Widow]] |
+| petition | [[legal_formats:petition:sample_form|Sample Form]] |
+| petition | [[legal_formats:petition:sample_form_1|Sample Form 1]] |
+| petition | [[legal_formats:petition:special_leave_petition_seeking_stay_order_from_operation_of_impugned_judgment|Special Leave Petition Seeking Stay Order From Operation Of Impugned Judgment]] |
+| petition | [[legal_formats:petition:specimen_of_a_writ_petition_for_public_interest_litigation|Specimen Of A Writ Petition For Public Interest Litigation]] |
+| petition | [[legal_formats:petition:suit_for_declaration_permanent_injunction|Suit For Declaration Permanent Injunction]] |
+| petition | [[legal_formats:petition:testamentary_and_intestate_jurisdiction|Testamentary And Intestate Jurisdiction]] |
+| petition | [[legal_formats:petition:writ_of_certiorari|Writ Of Certiorari]] |

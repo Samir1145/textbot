@@ -1,0 +1,121 @@
+ "FORM NO. 27E
+(See section 206C and rule 37E)
+Half yearly return of collection of tax under section 206C of I.T. Act, 1961 in respect of collections for the period ending ................
+1. Particulars of Seller
+(a) Name of Seller
+(b) Address : Flat / Door/ Block No.
+    Name of Premises / Building/
+    Road / Street / Lane
+    Area / Locality /
+    Town / District / City
+ PIN
+State
+(c) Tax Collection Account Number
+(d) Permanent Account Number
+2.* Has address of the seller changed
+ Tick as applicable Yes No
+3. (a) Please tick  the boxes below indicating the collection made during the half year from which tax was required to be collected at source by you under the Income Tax Act, 1961
+A
+ B
+ Alcoholic liquor for human consumption Timber obtained under a forest lease.
+ Timber obtained by any mode other than under a forest lease Any other forest produce not being timber or tendu leaves
+ D
+C
+E Scrap
+(b) Please furnish information in separate Annexures as per the enclosed proforma for each type of collection indicated in item (a) above.
+4. Details of tax collected and paid to the credit of the Central Government
+S.  N o .
+ Am o un t  C o ll e ct e d Tra n sf e r  Vo u c he r  /   C ha l la n   N o.   g iv e n  b y  Ba n k D a t e  o f   Tra n sf e r  V o uc h e r  /  C h a ll a n
+ B a nk  B ra n ch  C o d e
+S ec t io n  C o d e
+( 1 35 )
+ (1 3 7 )
+( 1 36 )
+ ( 1 38 )
+ (1 3 9 )
+(1 4 0 )
+T ot al
+N o t e  -  Wh e re   co l le c t io n   is  m a d e  b y  o r  o n  b e h a lf   o f  t h e  G o ve rn m e n t  t o   gi ve   p a rt i cu la r s  o f  t ra n s f er  v o u ch e rs;   o t h e r  de d u ct o r s  t o  g iv e  p a rt i cu l a rs  o f   ch a ll a n  n o .   re g ar d in g  d e p o si t   in t o
+b an k.
+ VERIFICATION
+I, _________________________________________________________, hereby certify that all the particulars furnished above are correct and complete.
+Place :
+ Signature of person responsible for collecting tax at source _____________________________________________________________________
+Name and designation of person responsible for collecting tax at source __________________________________________________________
+Date :
+___________________
+* If address has changed give changed address in column 1(b)
+
+
+
+ Annexure -
+Details of purchase price of ......................................1 debited / received for the period ending......................... and of tax collected at source2
+ R at e  
+a t
+Na m e  a n d   Ad d re s s  o f  b u ye r  (A d d re s s  n e e d
+ Pe rm a n en t   Ac co un t   N um b e r
+Am ou n t  o f
+ Da te  o n  wh i ch
+ D at e   o n   w h ic h  t a x
+ D at e   o n   w h ic h  t a x
+A mo u n t  o f   t a x
+ B a nk  B ra n ch  C o d e
+To t al   va lu e   of   t h e
+Bu y er
+C od e 3
+w hic h
+c o ll e ct e d
+n o t  b e  g i ve n  i f  P AN   is  m e n t io n e d )
+p a ym e n t  (R s . )
+a mo u nt   pa i d/ d e bi t ed
+( PA N )  o f   b u ye r
+co l le ct e d
+p a id   t o  t h e  c re di t   of
+p u r ch a se ( s)
+t ax
+( R s. )
+Ce n t ra l  Go ve rn m e nt  4
+co ll e ct e d
+(2 )
+ ( 3)
+( 4) (5 ) ( 6) ( 7)
+ ( 8) (9 ) ( 1 0 ) (1 1 )
+( 1)
+Notes  : -
+1  Please write.
+B
+A
+ Alcoholic liquor for human consumption
+  Timber obtained under a forest lease.
+C
+E Scrap
+ D
+ Timber obtained by any mode other than under a forest lease Any other forest produce not being timber or tendu leaves
+2  Please use separate Annexures for each type of collection.
+3  Please enter Buyer Code 01 for companies, 02 for 'other than companies'.
+4  Where collection is made by or on behalf of the Government, transfer voucher number may be entered in column (9).
+5  If necessary, please use additional sheets to give full details of collection in the above format. Please also give running serial number to all pages.
+6  Write X if lower collection is as per section 206C(9).
+   Write Y for any other reason, give details in separate sheet.
+ Signature of person responsible for collecting tax at source____________________________________________________________________________
+Name and designation of person responsible for collecting tax at source_________________________________________________________________" ;
+
+
+
+ Annexure -
+Details of purchase price of ......................................1 debited / received for the period ending......................... and of tax collected at source2
+C ha ll an
+ Reas on  for  n on-
+c ollec t ion /  low er
+D a t e   of   f u rn i sh i ng
+n u mb e r g i ve n
+Ta x  C o ll ec t io n
+co lle c ti on  if
+Ce r t if i ca t e
+b y  
+b a n k
+a ny5
+( 1 4 )
+(1 2 ) (1 3 )
+Signature of person responsible for collecting tax at source____________________________________________________________________________
+Name and designation of person responsible for collecting tax at source_________________________________________________________________" ;

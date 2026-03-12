@@ -1,0 +1,99 @@
+FORM NO. 27A
+[See rule 37B]
+Form for furnishing information with the return  or statement of deduction of tax at source filed on computer media
+1. Details of the tax deductor
+(a) Tax Deduction Account Number
+(b) Permanent Account Number
+(c)  Name of organisation
+(d) Address : Flat / Door/ Block No.
+    Name of Premises / Building
+    Road / Street / Lane
+    Area / Locality /
+    Town / District / City
+State
+ PIN
+Telephone No.
+ Fax
+2. Details of the person responsible for deduction of  tax at source
+(a)  Name
+(b) Address : Flat / Door/ Block No.
+    Name of Premises / Building/
+    Road / Street / Lane
+    Area / Locality /
+    Town / District / City
+State
+ PIN
+Telephone No.
+ Fax
+
+
+
+3.  Control Totals 
+ 
+Forms1  Total Amount Paid  Total Income Tax 
+ Total No. of Persons  
+from whom tax deducted  
+deducted at Source 
+  
+  
+ 
+(Column No.228 of form 24) 
+24   
+ 
+(Column No. 218 of form 24) 
+  
+  
+ 
+(Column  No. 7 of form 26) 
+26   
+ 
+(Column No. 4 of form 26) 
+  
+ 
+(Column  No. 8 of form 27) 
+  
+27   
+ 
+(Column No. 4 of form 27) 
+ 
+4.      Other information 
+ 
+Return 
+Stateme
+nt Form 
+No. 
+ Period 
+Ending 
+ Assessme
+nt Year 
+ Total No. of 
+computer 
+media 
+enclosed 
+ Whether 
+existing TDS 
+assessee (Y-
+Yes  N-No) 
+ Assessing 
+Officer code 
+ Periodicity2   Media used for 
+the return of 
+statement  
+     
+          
+ 
+ 
+ 
+ Verification 
+I,  ………………………………….. certify that all the particulars furnished above are correct and complete. 
+ 
+ 
+Place  :              Name and signature of the person responsible   
+Date   : 
+           for deducting tax at source ………………………… 
+              Designation   ……………………………. 
+Notes : 
+1.  Please use separate Form 27A for each return of TDS in Form No. 24 or Form No. 26 or Form No. 27, as the case may be. 
+2.   0 for annual, 1 for 1s t  quarter of financial year, 2 for 2n d quarter of financial year, 3 for 3 rd  quarter of financial year, 4 for 4th 
+quarter of financial year 
+3.  Please give complete information.”. 

@@ -1,0 +1,284 @@
+Form No. 49B
+[See section 203A and rule 114A]
+Form of application for allotment of Tax Deduction and Collection Account Number
+under Section 203A of the Income Tax Act, 1961
+To,
+Assessing Officer (TDS / TCS)
+.....................................................
+.....................................................
+Assessing Officer Code (TDS / TCS)
+Area code
+AO Type
+Range Code
+AO Number
+Sir,
+Whereas *I/we *am/are liable to *deduct/collect or deduct tax and collect tax in accordance with Chapter XVII under the heading *‘B. – Deduction
+at source’ or 'BB. -Collection at source' of the Income-tax Act, 1961;
+And whereas no Tax Deduction Account Number/Tax Collection Account Number or Tax Deduction Account Number and Tax Collection Account
+Number has been allotted to *me/us;
+*I/We give below the necessary particulars:
+[ Please refer to instructions before filling up the form ]
+1 Name - (Fill only one of the columns ‘a’ to ‘h’, whichever is applicable.)
+(a) Central / State Government:
+Tick the appropriate entry Central Government    State Government    Local Authority (Central Govt.) 
+Local Authority (State Govt.) 
+Name of Office
+Name of Organisation
+Name of Department
+Name of Ministry
+Designation of the person responsible
+for * making payment / collecting tax
+(b) Statutory / Autonomous Bodies :
+Tick the appropriate entry Statutory Body  Autonomous Body  
+Name of Office
+Name of Organisation
+Designation of the person responsible
+for * making payment / collecting tax
+
+
+
+(c) Company (See Note 1) :
+Tick the appropriate entry Government Company/Corporation     Government Company/Corporation     Other 
+established by a Central Act  established by a State Act Company
+Title (M/s)     (tick if applicable)
+Name of Company
+Designation of the person responsible
+for * making payment / collecting tax
+(d) Branch/Division of a Company:
+Tick the appropriate entry Government Company/Corporation   Government Company/Corporation Other 
+established by a Central Act established by a State Act Company
+Title (M/s)     (tick if applicable)
+Name of Company
+Name of Division
+Name/Location of Branch
+Designation of the person responsible
+for * making payment / collecting tax
+(e) Individual / Hindu Undivided Family (Karta)  - (See Note 2) :
+Tick the appropriate entry Individual   Hindu Undivided Family 
+Title (tick the appropriate entry for individual)  Shri  Smt.             Kumari  
+Last Name / Surname
+First Name
+Middle Name
+(f) Branch of Individual Business (Sole proprietorship concern)/ Hindu Undivided Family (Karta)
+Tick the appropriate entry Branch of Individual business   Branch of Hindu Undivided Family 
+Individual/ Hindu Undivided Family (Karta):
+Title (tick the appropriate entry for individual) Shri    Smt.  Kumari 
+Last Name / Surname
+First Name
+Middle Name
+Name/Location of branch
+(g) Firm / Association of Persons / Association of Persons (Trusts) / Body of Individuals / Artificial Juridical Person (See Note 3) :
+Name
+
+
+
+(h) Branch of Firm / Association of Persons / Association of Persons (Trusts) / Body of Individuals / Artificial Juridical Person:
+Name of Firm / Association of Persons / Association of Persons (Trusts) / Body of Individuals / Artificial Juridical Person:
+Name/Location of branch
+2 Address
+Flat / Door / Block No.
+Name of Premises / Building / Village
+Road / Street / Lane / Post Office
+Area / Locality / Taluka / Sub-Division  
+Town / City / District
+State / Union Territory
+PIN code
+Telephone No.
+ STD Code    Phone No. 
+e-mail IDs a)
+ b)
+3 Nationality of Deductor (Tick the appropriate entry)
+Indian
+Foreign
+4 Permanent Account Number (PAN) - (specify wherever applicable)
+5 Existing Tax Deduction Account Number (if any)
+6 Existing Tax Collection Account Number (if any)
+7 Date (DD-MM-YYYY)
+ -   - 
+ Signed (Applicant)
+Verification
+*I/We,………………………………….. in my/our capacity as……………………….do hereby declare that what is stated above is true
+to the best of my/our knowledge and belief.
+Verified today the    -   - 
+d   d m  m y    y    y   y
+ ………………..........................................………………
+at ………………………………...
+ (Signature/Left Thumb Impression of Applicant)
+Notes :
+1 This column is applicable only if a single TAN is applied for the whole company. If separate TANs are applied for different
+divisions/branches, please fill details in (d).
+2 For branch of Individual business/Hindu Undivided Family, please fill details in (f).
+3 For branch of firm/Association Of Persons/Association Of Persons (Trust) / Body Of Individuals/Artificial Juridical Person,
+please fill details in (h).
+4 * Delete whichever is inapplicable.
+
+
+
+Instructions for filling up Form 49B
+(a) Form is to be filled legibly in ENGLISH  in BLOCK LETTERS and in BLACK INK only.
+(b) Each box, wherever provided, should contain only one character (alphabet/number/punctuation mark) leaving a blank box after each word.
+(c) Thumb impression, if used, should be attested by a Magistrate or a Notary Public or a Gazetted Officer, under official seal and stamp.
+(d) Deductors are required to provide details of Assessing Officer (TDS / TCS) in the application. These details can be obtained from the Income Tax Office.
+(e) The deductor/collector must fill up Area Code, AO Type, Range Code and AO Number. If the applicant is unable to determine the details, TIN Facilitation
+Centre (TIN-FC) may assist it in doing so.
+(f) Form should be filled up completely.
+(g) ‘Designation of the person responsible for making payment/collecting tax’ field is mandatory to fill up, wherever applicable.
+(h) The address of applicant should be an Indian Address only.
+Item No. Item Details
+ Guidelines for filling up the form
+1 Name
+ Deductor/Collector shall fill the details of its name depending on its category in only one of the fields 1 (a) to
+1 (h) specified in the form. If deductor/collector fills details in more than one category, the application form
+will be rejected.
+1 (a)
+ Central / State Government / Local Authority deductor/collector will fill up the name in this field. Name of
+Office is mandatory. Name of Organisation/Department/Ministry may be filled with relevant details.
+For example, if Directorate of Income Tax (systems) in Income Tax Department is applying for a TAN, it
+will fill the Name fields as:
+Name – Central /
+State Government
+Name of Office : DIRECTORATE OF INCOME TAX (SYSTEMS)
+Name of Organisation : INCOME TAX DEPARTMENT
+Name of Department : DEPARTMENT OF REVENUE
+Name of Ministry : MINISTRY OF FINANCE
+Central/State Government/Local Authority Deductor/Collector – will select its appropriate entry by
+ticking in the relevant box for Central Government or State Government or Local Authority (Central Govt) or
+Local Authority  (State Govt.).
+1 (b)
+ Name of Office is Mandatory.
+Relevant Box for Statutory Body or Autonomous Body is to be ticked by the deductor/collector.
+For example, if Bandra office of Brihanmumbai Municipal Corporation is applying for a TAN, it will fill
+the Name fields as:
+Name – Statutory /
+Autonomous Bodies
+Name of Office : BRIHANMUMBAI MUNICIPAL CORPORATION, BANDRA
+Name of Organisation : BRIHANMUMBAI MUNICIPAL CORPORATION
+Statutory/Autonomous Bodies will select its appropriate entry by ticking in the relevant box.
+1 (c) Name – Company If the deductor/collector is a company (e.g. a bank), this point is applicable. It is mandatory to fill the ‘Name
+of Company’.
+This category is to be filled by the company if it is applying TAN for the company as whole. In case company
+wants to apply different TANs for different divisions/branches point 1(d) should be filled.
+Name should be provided without any abbreviations. Different variations of ‘Private Limited’ viz. Pvt Ltd,
+Private Ltd, Pvt Limited, P Ltd, P. Ltd., P. Ltd are not allowed. It should be ‘Private Limited’ or ‘Limited’ only.
+For example,
+Name of Company : ABC PRIVATE LIMITED
+Category of company– Deductor/Collector will select its appropriate entry by ticking in the relevant box.
+1(d) Branch of a company If Branch/Division of a Company is applying for its separate TAN, it will mention the Name and Location of
+the Branch (in whose name TAN is sought) in this field. Different Branches of a company applying for
+separate TANs will fill this field.
+For example, Cement Division of ABC Private Limited located at Andheri will fill as:
+Name of Company : ABC PRIVATE LIMITED
+Name of Division : CEMENT DIVISION
+Name/Location of Branch : ANDHERI BRANCH
+OR,
+ABC Bank of India – Nariman Point Branch, Mumbai will be written as:
+Name of Company : ABC BANK OF INDIA
+Name of Division :
+Name/Location of Branch : NARIMAN POINT BRANCH, MUMBAI
+Category of a company – Deductor/Collector will select its appropriate entry by ticking in the relevant box.
+1 (e)
+ First Name is Mandatory. Name of the deductor/collector should be written in full and not in abbreviated form.
+Name – Individual/Hindu
+Undivided Family (Karta)
+As an exception, very large Middle names may be abbreviated. Name should not be prefixed with Shri, Smt.,
+M/s, Kumari, Late, Major, Dr., etc. In case name is prefixed with Title, application may be rejected.
+Individuals/ HUFs (Karta) must state their full expanded name and fill in the appropriate fields for Last, Middle
+or First Name.
+For example, Dinesh Kumar Garg will be written as:
+Last Name/Surname             First Name           Middle Name
+GARG                                      DINESH                  KUMAR
+Or,  if middle name is not there, it will be left blank. For example, Gunjan Bansal will be written as :
+Last Name/Surname             First Name           Middle Name
+BANSAL                                  GUNJAN
+If a Sole Proprietor/HUF wants to obtain a single TAN in his/her name for all businesses run by him/her/it,
+then he/she/it shall fill name in this field.
+Deductor/Collector will select its appropriate entry (i.e. Individual / Hindu Undivided Family) by ticking in the
+relevant box.
+Individual shall select its appropriate entry by ticking in the relevant box for ‘Shri’, ‘Smt’, ‘Kumari’. HUF will
+leave the mentioned fields blank.
+
+
+
+1(f)
+ This field will be filled only if TAN is being applied for branch of Individual Business (Sole Proprietorship
+Branch of Individual
+Business(Sole Proprietorship
+concern)/ Hindu Undivided
+Family (HUF)
+Concern)/Hindu Undivided Family.
+Other Title (Dr. Late, Smt etc.) related rules given in Item No. 1(e) will be applicable here also.
+In case an Individual/HUF wants to obtain separate TANs for different businesses being run by him/it, this
+category will be applicable. Hence, the name of the concern will be filled in the field for Name/Location of
+Branch. Name of Branch should be entered in the relevant field.
+For example,
+Last Name/Surname First Name Middle Name
+KOHLI
+ BHUWAN
+Name/Location of Branch : WELLWORTH  BOOK HOUSE
+Deductor/Collector will select its appropriate category (i.e. Individual / Hindu Undivided Family) by ticking
+in relevant box for Individual or Hindu Undivided Family
+Firm/Association of persons/
+Association of persons (Trusts)/
+Body of Individuals/Artificial
+Juridical Person.
+1 (g)
+ The Name of the Firm/Association of persons/Association of persons (Trusts)/Body of Individuals/Artificial
+Juridical Person will be written in full in the field provided.
+1(h)
+ If different branches of a firm are applying for separate TANs, this category is applicable. The Name of Firm/
+Branch of Firm/Association of
+Persons/Association of Persons
+(Trusts)/Body of Individuals/
+Artificial Juridical Person
+AOP/etc. will include the description of the branch. Name of Branch should be entered in the relevant field.
+For example,
+Name of Firm : SHAH & COMPANY
+Name/Location of Branch : FORT BRANCH
+2 Address Deductor/Collector shall mention the address of the location where the tax is being deducted. It is compul-
+sory for the deductor/collector to mention at least two details out of four ie (Flat/Door/Block No., Name of
+Premises/Building/Village, Road/Street/Lane/Post Office and Area/Locality/Taluka/Sub Division). Town/City/
+District, State, Union Territory and PIN Code are mandatory. The applicant should not mention a foreign
+address.
+2
+ (1) If Telephone Number is mentioned, STD Code is mandatory,
+(2) In case of mobile number, country code should be mentioned as STD Code.
+Telephone Number and
+e-mail ID
+STD Code Telephone No.
+Where ‘91’ is the country code of India.
+(3) It is mandatory for applicants to mention either their telephone number or an e-mail id so that they can be
+contacted in case of any discrepancy in the application form.
+(4) Applicants may provide their valid e-mail IDs for receiving intimation about the status of their application
+through e-mail
+3 Nationality of Deductor/Collector This field is mandatory for all categories of deductor/collector.
+Permanent Account Number
+(PAN)
+Existing Tax Deduction Account
+Number (TAN)
+4
+ Deductor/Collector will mention the existing 10-digit Permanent Account Number allotted to it, if any, else
+leave this field blank.
+5
+ If a deductor has existing TAN in old format, it will mention the same in this field.
+Existing Tax Collection Account
+Number (TAN)
+6
+ If a collector has Tax Collection Account Number in the old format, it will mention the same in this field.
+GENERAL INFORMATION FOR TAN APPLICANTS
+(a) Deductor/Collector can obtain Form 49B in the format prescribed by Income Tax Department from TIN-FCs, any other stationery
+vendor providing such forms or freely download it from NSDL website (www.tin-nsdl.com) or from Income Tax Department
+website  (www.incometaxindia.gov.in)
+(b ) The fee for processing of TAN application to be paid to TIN-FCs is Rs. 50/- (Plus service tax, as applicable).
+(c) In case the applicant has already been allotted a ten digit alphanumeric TAN, it will not apply again as having or using more than
+TAN is illegal. However, different branches/divisions of a deductor/collector may apply for separate TAN for each branch/
+division.
+(d ) In case deductor/collector has already been allotted TAN and wants any change in particulars (e.g. name, address etc.), it can fill
+up ‘Form for changes for Correction in TAN data for TAN allotted’ and submit the same at any TIN-Facilitation Centre.
+(e) Deductor/Collector will receive an acknowledgment containing a 14 digit unique number from the TIN-FC on submission of
+Form 49B. This acknowledgment number can be used by the deductor/collector for tracking the status of its application.
+(f) For more information
+Visit us at http:\\ www.tin-nsdl.com
+Call TIN Support Desk at 022- 24994650
+e-mail us at tininfo@nsdl.co.in
+Write to : National Securities Depository Limited, A Wing, 3rd Floor, Trade World, Kamala Mills Compound, Senapati Bapat
+Marg, Lower Parel (W), Mumbai – 400 013.

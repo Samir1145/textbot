@@ -1,0 +1,124 @@
+^ Category ^ Title ^
+| company | [[legal_formats:company:agreement_between_two_companies_for_amalgamation_by_sale_of_one_company_to_the_other_company|Agreement Between Two Companies For Amalgamation By Sale Of One Company To The Other Company]] |
+| company | [[legal_formats:company:agreement_by_the_company_adopting_an_agreement_by_the_promoters_on_its_behalf_before_incorporation|Agreement By The Company Adopting An Agreement By The Promoters On Its Behalf Before Incorporation]] |
+| company | [[legal_formats:company:agreement_for_providing_finance_to_a_public_limited_company|Agreement For Providing Finance To A Public Limited Company]] |
+| company | [[legal_formats:company:agreement_for_sale_of_a_business_by_partners_to_a_private_company_already_incorporated|Agreement For Sale Of A Business By Partners To A Private Company Already Incorporated]] |
+| company | [[legal_formats:company:agreement_for_sale_of_equity_shares_in_a_public_company|Agreement For Sale Of Equity Shares In A Public Company]] |
+| company | [[legal_formats:company:agreement_for_sale_of_running_business_to_the_promoters_of_the_company|Agreement For Sale Of Running Business To The Promoters Of The Company]] |
+| company | [[legal_formats:company:agreement_for_sale_of_substantial_number_of_shares_in_a_public_limited_company|Agreement For Sale Of Substantial Number Of Shares In A Public Limited Company]] |
+| company | [[legal_formats:company:application_for_availability_of_name_for_the_company|Application For Availability Of Name For The Company]] |
+| company | [[legal_formats:company:appointment_of_a_new_trustee_of_deed_of_assignment_in_place_of_a_deceased_trustee|Appointment Of A New Trustee Of Deed Of Assignment In Place Of A Deceased Trustee]] |
+| company | [[legal_formats:company:appointment_of_managing_director_of_a_public_company|Appointment Of Managing Director Of A Public Company]] |
+| company | [[legal_formats:company:articles_of_association_of_a_private_company|Articles Of Association Of A Private Company]] |
+| company | [[legal_formats:company:deed_of_composition_to_pay_a_composition_of_seventyfive_per_cent_in_instalments_to_a_trustee_on_behalf_of_the_creditors|Deed Of Composition To Pay A Composition Of Seventyfive Per Cent In Instalments To A Trustee On Behalf Of The Creditors]] |
+| company | [[legal_formats:company:form_7c|Form 7C]] |
+| company | [[legal_formats:company:form_for_declaration_of_compliance_with_the_provisions_of_section_149_of_the_companies_act|Form For Declaration Of Compliance With The Provisions Of Section 149 Of The Companies Act]] |
+| company | [[legal_formats:company:form_for_filing_return_of_appointment_of_managing_directormholetime_director|Form For Filing Return Of Appointment Of Managing Directormholetime Director]] |
+| company | [[legal_formats:company:form_for_giving_notice_of_situation_of_registered_office_of_the_company|Form For Giving Notice Of Situation Of Registered Office Of The Company]] |
+| company | [[legal_formats:company:form_no_10|Form No 10]] |
+| company | [[legal_formats:company:form_no_12|Form No 12]] |
+| company | [[legal_formats:company:form_no_13|Form No 13]] |
+| company | [[legal_formats:company:form_no_15|Form No 15]] |
+| company | [[legal_formats:company:form_no_16|Form No 16]] |
+| company | [[legal_formats:company:form_no_17|Form No 17]] |
+| company | [[legal_formats:company:form_no_18|Form No 18]] |
+| company | [[legal_formats:company:form_no_19|Form No 19]] |
+| company | [[legal_formats:company:form_no_20|Form No 20]] |
+| company | [[legal_formats:company:form_no_20a|Form No 20A]] |
+| company | [[legal_formats:company:form_no_21|Form No 21]] |
+| company | [[legal_formats:company:form_no_21a|Form No 21A]] |
+| company | [[legal_formats:company:form_no_22|Form No 22]] |
+| company | [[legal_formats:company:form_no_22a|Form No 22A]] |
+| company | [[legal_formats:company:form_no_23|Form No 23]] |
+| company | [[legal_formats:company:form_no_23a|Form No 23A]] |
+| company | [[legal_formats:company:form_no_23aa|Form No 23Aa]] |
+| company | [[legal_formats:company:form_no_23ab|Form No 23Ab]] |
+| company | [[legal_formats:company:form_no_23b|Form No 23B]] |
+| company | [[legal_formats:company:form_no_23c|Form No 23C]] |
+| company | [[legal_formats:company:form_no_24|Form No 24]] |
+| company | [[legal_formats:company:form_no_24a|Form No 24A]] |
+| company | [[legal_formats:company:form_no_24aa|Form No 24Aa]] |
+| company | [[legal_formats:company:form_no_24b|Form No 24B]] |
+| company | [[legal_formats:company:form_no_25a|Form No 25A]] |
+| company | [[legal_formats:company:form_no_25b|Form No 25B]] |
+| company | [[legal_formats:company:form_no_25c|Form No 25C]] |
+| company | [[legal_formats:company:form_no_26|Form No 26]] |
+| company | [[legal_formats:company:form_no_32|Form No 32]] |
+| company | [[legal_formats:company:form_no_34|Form No 34]] |
+| company | [[legal_formats:company:form_no_34aa|Form No 34Aa]] |
+| company | [[legal_formats:company:form_no_34b|Form No 34B]] |
+| company | [[legal_formats:company:form_no_35|Form No 35]] |
+| company | [[legal_formats:company:form_no_36|Form No 36]] |
+| company | [[legal_formats:company:form_no_37|Form No 37]] |
+| company | [[legal_formats:company:form_no_38|Form No 38]] |
+| company | [[legal_formats:company:form_no_39|Form No 39]] |
+| company | [[legal_formats:company:form_no_40|Form No 40]] |
+| company | [[legal_formats:company:form_no_41|Form No 41]] |
+| company | [[legal_formats:company:form_no_42|Form No 42]] |
+| company | [[legal_formats:company:form_no_44|Form No 44]] |
+| company | [[legal_formats:company:form_no_49|Form No 49]] |
+| company | [[legal_formats:company:form_no_52|Form No 52]] |
+| company | [[legal_formats:company:form_no_55|Form No 55]] |
+| company | [[legal_formats:company:form_no_56|Form No 56]] |
+| company | [[legal_formats:company:form_no_57|Form No 57]] |
+| company | [[legal_formats:company:form_no_58|Form No 58]] |
+| company | [[legal_formats:company:form_no_59|Form No 59]] |
+| company | [[legal_formats:company:form_no_60|Form No 60]] |
+| company | [[legal_formats:company:form_no_7d|Form No 7D]] |
+| company | [[legal_formats:company:form_no_7e|Form No 7E]] |
+| company | [[legal_formats:company:form_no_8|Form No 8]] |
+| company | [[legal_formats:company:form_of_application_by_an_employee_under_section_202_of_the_minimum_wages_act_1948|Form Of Application By An Employee Under Section 202 Of The Minimum Wages Act 1948]] |
+| company | [[legal_formats:company:form_of_application_to_the_central_government_for_obtaining_approval_of_appointment_reappointment_and_remuneration_payable_to_managing_whole_time_director|Form Of Application To The Central Government For Obtaining Approval Of Appointment Reappointment And Remuneration Payable To Managing Whole Time Director]] |
+| company | [[legal_formats:company:form_of_declaration_of_compliance_with_the_requirements_of_the_compliance_of_the_companies_act_1956|Form Of Declaration Of Compliance With The Requirements Of The Compliance Of The Companies Act 1956]] |
+| company | [[legal_formats:company:form_of_letter_of_application_to_stockexchange_by_nonlisted_companies_for_new_or_further_issues|Form Of Letter Of Application To Stockexchange By Nonlisted Companies For New Or Further Issues]] |
+| company | [[legal_formats:company:form_of_statement_in_lieu_of_prospectus|Form Of Statement In Lieu Of Prospectus]] |
+| company | [[legal_formats:company:form_of_submission_of_consent_to_act_as_a_director|Form Of Submission Of Consent To Act As A Director]] |
+| company | [[legal_formats:company:listing_agreement_between_bombay_stock_exchange_and_the_company_for_the_listing_of_its_shares|Listing Agreement Between Bombay Stock Exchange And The Company For The Listing Of Its Shares]] |
+| company | [[legal_formats:company:main_object_clause_of_a_chemical_manufacturer|Main Object Clause Of A Chemical Manufacturer]] |
+| company | [[legal_formats:company:main_object_clause_of_furnishing|Main Object Clause Of Furnishing]] |
+| company | [[legal_formats:company:main_object_clause_of_jewellers|Main Object Clause Of Jewellers]] |
+| company | [[legal_formats:company:memorandum_of_association_of_a_merchant_banking_company|Memorandum Of Association Of A Merchant Banking Company]] |
+| company | [[legal_formats:company:minutes_of_subsequent_board_meeting|Minutes Of Subsequent Board Meeting]] |
+| company | [[legal_formats:company:minutes_of_the_first_board_meeting_of_the_company|Minutes Of The First Board Meeting Of The Company]] |
+| company | [[legal_formats:company:minutes_of_the_proceedings_of_the_annual_generalmeeting_of_the_company|Minutes Of The Proceedings Of The Annual Generalmeeting Of The Company]] |
+| company | [[legal_formats:company:minutes_of_the_proceedings_of_the_extraordinary_general_meeting_of_the_company|Minutes Of The Proceedings Of The Extraordinary General Meeting Of The Company]] |
+| company | [[legal_formats:company:minutes_of_the_proceedings_of_the_statutory_meeting|Minutes Of The Proceedings Of The Statutory Meeting]] |
+| company | [[legal_formats:company:notice_of_annual_general_meeting_of_the_company|Notice Of Annual General Meeting Of The Company]] |
+| company | [[legal_formats:company:notice_of_extraordinary_general_meeting_convened_by_the_requisionists_on_the_failure_of_board_of_directors_to_convene_the_meeting|Notice Of Extraordinary General Meeting Convened By The Requisionists On The Failure Of Board Of Directors To Convene The Meeting]] |
+| company | [[legal_formats:company:notice_of_extraordinary_general_meeting_to_pass_special_resolution|Notice Of Extraordinary General Meeting To Pass Special Resolution]] |
+| company | [[legal_formats:company:notice_of_first_board_meeting_of_the_company|Notice Of First Board Meeting Of The Company]] |
+| company | [[legal_formats:company:notice_of_statutory_meeting|Notice Of Statutory Meeting]] |
+| company | [[legal_formats:company:notice_of_subsequent_board_meeting|Notice Of Subsequent Board Meeting]] |
+| company | [[legal_formats:company:notice_of_the_extraordinary_general_meeting_convened_by_the_board_of_directors_on_requisition|Notice Of The Extraordinary General Meeting Convened By The Board Of Directors On Requisition]] |
+| company | [[legal_formats:company:power_of_attorney_by_the_company_to_its_managing_director|Power Of Attorney By The Company To Its Managing Director]] |
+| company | [[legal_formats:company:prospectus_of_a_company|Prospectus Of A Company]] |
+| company | [[legal_formats:company:requisition_for_an_extraordinary_general_meeting_of_the_company|Requisition For An Extraordinary General Meeting Of The Company]] |
+| company | [[legal_formats:company:resolution_for_alteration_of_articles_of_association|Resolution For Alteration Of Articles Of Association]] |
+| company | [[legal_formats:company:resolution_for_alteration_of_articles_of_association_where_new_set_of_articles_to_be_adopted|Resolution For Alteration Of Articles Of Association Where New Set Of Articles To Be Adopted]] |
+| company | [[legal_formats:company:resolution_for_alteration_of_memorandum_of_association_amendment_of_an_existing_clause|Resolution For Alteration Of Memorandum Of Association Amendment Of An Existing Clause]] |
+| company | [[legal_formats:company:resolution_for_alteration_of_memorandum_of_association_insertion_of_a_new_clause|Resolution For Alteration Of Memorandum Of Association Insertion Of A New Clause]] |
+| company | [[legal_formats:company:resolution_for_appointing_an_official_for_execution_of_deeds_contracts|Resolution For Appointing An Official For Execution Of Deeds Contracts]] |
+| company | [[legal_formats:company:resolution_for_appointment_of_auditors|Resolution For Appointment Of Auditors]] |
+| company | [[legal_formats:company:resolution_for_appointment_of_managing_director_after_the_amendment_of_schedule_xiii_of_the_companies_act_1956_w_e_f_14_july_1993|Resolution For Appointment Of Managing Director After The Amendment Of Schedule Xiii Of The Companies Act 1956 W E F 14 July 1993]] |
+| company | [[legal_formats:company:resolution_for_appointment_of_sole_selling_agent|Resolution For Appointment Of Sole Selling Agent]] |
+| company | [[legal_formats:company:resolution_for_approval_of_advertisement_for_inviting_deposits|Resolution For Approval Of Advertisement For Inviting Deposits]] |
+| company | [[legal_formats:company:resolution_for_approval_of_annual_accounts|Resolution For Approval Of Annual Accounts]] |
+| company | [[legal_formats:company:resolution_for_approval_of_prospectus|Resolution For Approval Of Prospectus]] |
+| company | [[legal_formats:company:resolution_for_approval_of_transfer_of_shares|Resolution For Approval Of Transfer Of Shares]] |
+| company | [[legal_formats:company:resolution_for_approval_of_transmission_of_shares|Resolution For Approval Of Transmission Of Shares]] |
+| company | [[legal_formats:company:resolution_for_change_of_name_by_the_company|Resolution For Change Of Name By The Company]] |
+| company | [[legal_formats:company:resolution_for_creation_of_mortgage_for_loans|Resolution For Creation Of Mortgage For Loans]] |
+| company | [[legal_formats:company:resolution_for_delegation_of_powers_to_managing_director|Resolution For Delegation Of Powers To Managing Director]] |
+| company | [[legal_formats:company:resolution_for_disposal_of_books_of_accounts|Resolution For Disposal Of Books Of Accounts]] |
+| company | [[legal_formats:company:resolution_for_general_authority_to_board_of_directors_for_investment_in_other_corporate_bodies|Resolution For General Authority To Board Of Directors For Investment In Other Corporate Bodies]] |
+| company | [[legal_formats:company:resolution_for_increase_of_share_capital|Resolution For Increase Of Share Capital]] |
+| company | [[legal_formats:company:resolution_for_investment_in_other_corporate_bodies|Resolution For Investment In Other Corporate Bodies]] |
+| company | [[legal_formats:company:resolution_for_issue_of_bonus_shares|Resolution For Issue Of Bonus Shares]] |
+| company | [[legal_formats:company:resolution_for_issue_of_duplicate_share_certificates|Resolution For Issue Of Duplicate Share Certificates]] |
+| company | [[legal_formats:company:resolution_for_issue_of_equity_shares_at_a_premium_to_be_offered_to_existing_shareholders_on_rights_basis_and_to_employees_of_the_company|Resolution For Issue Of Equity Shares At A Premium To Be Offered To Existing Shareholders On Rights Basis And To Employees Of The Company]] |
+| company | [[legal_formats:company:resolution_for_issue_of_nonconvertible_debentures_with_equity_warrants_on_rights_basis|Resolution For Issue Of Nonconvertible Debentures With Equity Warrants On Rights Basis]] |
+| company | [[legal_formats:company:resolution_for_issue_of_original_share_certificates|Resolution For Issue Of Original Share Certificates]] |
+| company | [[legal_formats:company:resolution_for_mortgage_to_secure_debentures|Resolution For Mortgage To Secure Debentures]] |
+| company | [[legal_formats:company:resolution_for_opening_a_bank_account_for_payment_of_interest_on_deposits|Resolution For Opening A Bank Account For Payment Of Interest On Deposits]] |
+| company | [[legal_formats:company:resolution_for_payment_of_dividend|Resolution For Payment Of Dividend]] |
+| company | [[legal_formats:company:resolution_of_board_of_directors_for_convening_of_annual_general_meeting|Resolution Of Board Of Directors For Convening Of Annual General Meeting]] |

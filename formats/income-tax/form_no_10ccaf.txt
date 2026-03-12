@@ -1,0 +1,96 @@
+FORM NO. 10CCAF
+[See rule 18BBA(7)1
+Report under section 80HHE (4)/ 80HHE(4A) of the Income-tax Act, 1961
+1. I/We have examined the accounts and records of ....................................………………………………
+[name and address of the assessee with permanent account number]
+relating to the business of export out of India of computer software or its transmission from India to a place
+outside India/providing technical service outside India in connection with the development or production of
+computer software during the year ended on 31s t  day of March ………………….
+2. (a) I/We certify that the deduction to be claimed by assessee under sub-section (1) of section 80HHE
+of  the Income-tax Act, 1961, in respect of the assessment year........................ is Rs.......................which has
+been determined on the basis of the consideration in respect of computer software received by the assessee
+in convertible foreign exchange. The said amount has been worked out on the basis of the details given in
+Annexure A to this Form.
+(b) I/We certify that the deduction to be claimed by the assessee, as supporting software developer, under
+sub-section (1A) of section 80HHE of the Income-tax Act, 1961, in respect of the assessment
+year.....................is Rs.................... which has been determined on the basis of sales to exporting companies
+made during the year, in respect of which a certificate has been issued by the exporting company under the
+proviso to sub-section(l) of section 80HHE of the Income-tax Act, 1961. The said amount has been worked
+out on the basis of the details in the Annexure B to this form.
+3. I/We, therefore, certify that the total deduction to be claimed by the assessee under section 80HHE in
+respect of the assessment year.....................is Rs....................
+In my/our opinion and to the best of my/our information and according to the information  given to me/us,
+the particulars given above are true and correct.
+Date :........................
+ …………………………….
+Signed
+Accountant
+Notes:
+1. Delete whichever is not applicable.
+2. This report is to be given by-
+(i) a Chartered Accountant within the meaning of the Chartered Accountants Act, 1949(32 of
+1949); or
+(ii) any person who in relation to any State is by virtue of the provisions in sub-section (2)
+of section 226 of the Companies Act, 1956 (1 of 1956), entitled to be appointed to act
+as auditor of companies registered in that State.
+3. Where any of the matter stated in this report is answered in the negative or with a qualifica-
+tion, the report shall state the reasons therefor.
+
+
+
+ANNEXURE A
+(See paragraph 2(a) of Form No. 10CCAF)
+Details relating to the claim by the exporter of computer software for deduction
+under section 80HHE of the Income-tax Act, 1961
+1. Name of the assessee
+2. Assessment year
+3. Export turnover relating to-
+(i) export of computer software or its transmission to a place
+outside India:
+(ii) providing technical services outside India in connection
+with the development of production of computer soft-
+ware;
+(iii) total export-turnover.
+4. Total turnover of the business of the assessee.
+5. Total profits of the business of the assessee.
+6. Profits derived from the business referred to in sub-sec-
+tion (1) of section 80HHE computed under sub-section
+(3) of the said section (3 - 4 x 5)
+7. Export turnover, deduction in respect of which will be
+claimed by a supporting software developer in accordance
+with proviso to sub-section (1) of section 80HHE.
+8. Profit from the export turnover mentioned in item 7 above,
+calculated in accordance with the proviso to sub-section
+(1) of section 80HHE.
+9. Deduction under section 80HHE to which the assessee is
+entitled (item No. 6 minus item No. 8).
+10. Remarks.
+
+
+
+ANNEXURE B
+(See paragraph 2(b) of Form No. 10CCAF)
+Details relating to the claim by the supporting software developer for deduction
+under section 80HHE of the Income-tax Act, 1961
+Section A
+1. Name of the assessee
+2. Assessment year
+3. Total turnover of the business
+4. The amount of profit under the head “Profits and gains of busi-
+ness or profession”
+5. Total turnover in respect of sale of exporting company for
+which certificate is received from exporting company
+6. Profit from the turnover mentioned in item 5 above, computed
+under sub-section (3A) of section 80HHE.
+7. Remarks.
+ Section B
+Details of sale to exporting company
+Sl. Name and Mode of Sale Mode of export Date of certi- Amount of
+No. address of the transfer to price of the export- ficate issued by disclaimer
+exporting the exporting ing company the exporting
+company to company (identifying company under
+whom the along with DNS No. clause (ii) of sub-
+software date E-Mail section (4A) of
+were sold
+ Address, etc.) section 80HHE
+1 2 3 4 5 6 7

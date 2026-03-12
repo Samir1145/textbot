@@ -1,0 +1,1574 @@
+/* Root PDFApp layout container */
+.pdfapp {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Panel 1: Left Sidebar ───────────────────────────────────── */
+.pdfapp-sidebar {
+  position: relative;
+  flex-shrink: 0;
+  height: 100%;
+  background: var(--bg-sidebar);
+  overflow: hidden;
+  transition: width 200ms ease;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── New sidebar content shell ────────────────────────────────── */
+.pdfapp-sb-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Sidebar header ───────────────────────────────────────────── */
+.pdfapp-sb-header {
+  flex-shrink: 0;
+}
+
+.pdfapp-sb-header-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 10px;
+}
+
+.pdfapp-sb-header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pdfapp-sb-icon-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-2);
+  color: var(--text-muted);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+
+.pdfapp-sb-icon-btn:hover {
+  background: var(--bg-3);
+  border-color: var(--border-2);
+  color: var(--text);
+}
+
+.pdfapp-sb-case-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.pdfapp-sb-litigants-btn {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms;
+}
+
+.pdfapp-sb-litigants-btn:hover {
+  background: #2563eb;
+}
+
+.pdfapp-sb-separator {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
+/* ── Sidebar footer ───────────────────────────────────────────── */
+.pdfapp-sb-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+
+.pdfapp-sb-collapse-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-2);
+  color: var(--text-muted);
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.pdfapp-sb-collapse-btn:hover {
+  background: var(--bg-3);
+  border-color: var(--border-2);
+  color: var(--text);
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+.pdfapp-sb-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+/* ── Collapsed sidebar expand button ──────────────────────────── */
+.pdfapp-sb-expand-btn {
+  margin: 10px auto;
+}
+
+/* ── Document cards ───────────────────────────────────────────── */
+.pdfapp-doc-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 120ms, background 120ms;
+}
+
+.pdfapp-doc-card:hover {
+  border-color: var(--border-2);
+  background: var(--bg-2);
+}
+
+.pdfapp-doc-card:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.pdfapp-doc-card--active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.pdfapp-doc-card-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  background: var(--bg-3);
+  border-radius: 4px;
+}
+
+.pdfapp-doc-card--active .pdfapp-doc-card-icon {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.pdfapp-doc-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pdfapp-doc-card-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdfapp-doc-card-pages {
+  font-size: 0.67rem;
+  color: var(--text-dim);
+}
+
+.pdfapp-doc-card-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pdfapp-doc-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pdfapp-doc-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.pdfapp-doc-dot--done {
+  background: #22c55e;
+}
+
+.pdfapp-doc-dot--loading {
+  background: #f59e0b;
+  animation: dot-pulse 1s ease-in-out infinite;
+}
+
+.pdfapp-doc-dot--error {
+  background: #ef4444;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ── Add document button inside party ─────────────────────────── */
+.pdfapp-doc-add-btn {
+  width: 100%;
+  padding: 5px 8px;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 120ms, color 120ms, background 120ms;
+}
+
+.pdfapp-doc-add-btn:hover {
+  border-color: var(--border-2);
+  color: var(--text-muted);
+  background: var(--bg-2);
+}
+
+.pdfapp-sidebar-toggle {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.pdfapp-sidebar-toggle:hover {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+}
+
+.pdfapp-sidebar-content {
+  padding: 10px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Party list scroll area now sits between header and footer */
+
+.pdfapp-sidebar-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pdfapp-sidebar-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pdfapp-action-btn {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pdfapp-action-btn:hover {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+  color: var(--text);
+}
+
+.pdfapp-back-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-deep);
+  color: var(--text);
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdfapp-back-btn:hover {
+  background: var(--bg);
+  border-color: var(--border-2);
+}
+
+.pdfapp-case-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+/* ── Theme toggle button ────────────────────────────────────── */
+.pdfapp-theme-btn {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--text-muted);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.pdfapp-theme-btn:hover {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+  color: var(--text);
+}
+
+/* ── Party groups ───────────────────────────────────────────────────────── */
+.pdfapp-party-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  gap: 4px;
+}
+
+.pdfapp-party-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdfapp-party-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  border-radius: 0.45rem;
+  background: var(--surface-subtle);
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pdfapp-party-header:hover {
+  background: var(--surface-hover);
+}
+
+.pdfapp-party-header:hover .pdfapp-party-actions {
+  opacity: 1;
+}
+
+.pdfapp-party-header--active {
+  border-color: var(--border);
+  background: var(--surface-active);
+}
+
+.pdfapp-party-chevron {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--border-2);
+  cursor: pointer;
+}
+
+.pdfapp-party-chevron:hover {
+  color: var(--text-muted);
+}
+
+.pdfapp-party-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdfapp-party-rename-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: var(--bg-deep);
+  border: 1px solid #3b82f6;
+  border-radius: 0.3rem;
+  color: var(--text);
+  padding: 1px 5px;
+  outline: none;
+}
+
+.pdfapp-party-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 100ms ease;
+  flex-shrink: 0;
+}
+
+.pdfapp-party-action-btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.3rem;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.pdfapp-party-action-btn:hover {
+  background: var(--bg-2);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.pdfapp-party-action-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.pdfapp-party-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0 6px;
+}
+
+.pdfapp-doc-item--indented {
+  margin-left: 16px;
+  width: calc(100% - 16px);
+}
+
+.pdfapp-no-docs--indented {
+  margin-left: 16px;
+  font-size: 0.75rem;
+  padding: 4px 0;
+}
+
+.pdfapp-add-doc-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.pdfapp-add-doc-btn:hover {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+}
+
+.pdfapp-no-docs {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Document list below Add button */
+.pdfapp-doc-list {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bg);
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdfapp-doc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 0.5rem;
+  background: var(--bg);
+  border: 1px solid transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pdfapp-doc-item:hover {
+  border-color: var(--border);
+  background: var(--bg-deep);
+}
+
+.pdfapp-doc-item:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.pdfapp-doc-item--active {
+  border-color: #3b82f6;
+  background: var(--bg-deep);
+}
+
+.pdfapp-doc-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pdfapp-doc-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 0.375rem;
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.pdfapp-doc-name {
+  font-size: 0.8rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdfapp-doc-pagecount {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.pdfapp-doc-remove {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+
+.pdfapp-doc-remove:hover {
+  border-color: var(--border-2);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Collapsed: vertical icon strip */
+.pdfapp-sidebar-icons {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdfapp-icon-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.pdfapp-icon-btn:hover {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+}
+
+/* ── Panel 2: Center (PDF viewer) ───────────────────────────── */
+.pdfapp-center {
+  position: relative;
+  height: 100%;
+  background: var(--bg-center);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdfapp-center-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.pdfapp-center-placeholder--inline {
+  flex: 0;
+  padding: 8px 0 16px;
+}
+
+.pdfapp-center-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.pdfapp-center-header {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-2);
+  background: var(--bg-2);
+}
+
+.pdfapp-center-filename {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdfapp-center-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.pdfapp-center-pages {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 32px;
+}
+
+.pdfapp-page-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.pdfapp-page-canvas {
+  background: #ffffff;
+  box-shadow: 0 10px 25px var(--shadow);
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Extracted Text Panel ────────────────────────────────────── */
+.pdfapp-extracted-panel {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg-2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pdfapp-extracted-drag {
+  flex-shrink: 0;
+  height: 6px;
+  background: transparent;
+  cursor: row-resize;
+  border-bottom: 1px solid var(--border);
+}
+
+.pdfapp-extracted-drag:hover {
+  background: var(--border);
+}
+
+.pdfapp-extracted-header {
+  flex-shrink: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  cursor: pointer;
+  background: var(--bg-2);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.pdfapp-extracted-header:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.pdfapp-extracted-header-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pdfapp-extracted-arrow {
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.pdfapp-extraction-badge {
+  font-size: 0.64rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+
+.pdfapp-extraction-badge--ocr {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(251, 146, 60, 0.3);
+}
+
+.pdfapp-extraction-badge--text {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.pdfapp-extracted-body {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'SF Mono', 'Fira Code', monospace, system-ui;
+  background: var(--bg);
+}
+
+/* ── Chunk count badge ─────────────────────────────────────────────── */
+.pdfapp-chunk-count {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+/* ── Chunk list body ───────────────────────────────────────────────── */
+.pdfapp-chunks-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg);
+}
+
+/* ── Individual chunk card ─────────────────────────────────────────── */
+.pdfapp-chunk-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 7px 10px 8px;
+  background: var(--bg-2);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: border-color 120ms;
+}
+
+.pdfapp-chunk-card:hover {
+  border-color: var(--border);
+}
+
+.pdfapp-chunk-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pdfapp-chunk-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  font-family: 'SF Mono', 'Fira Code', monospace, system-ui;
+}
+
+.pdfapp-chunk-tag--page {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.pdfapp-chunk-tag--idx {
+  background: rgba(139, 92, 246, 0.12);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.pdfapp-chunk-bbox {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  font-family: 'SF Mono', 'Fira Code', monospace, system-ui;
+  letter-spacing: 0.01em;
+}
+
+.pdfapp-chunk-text {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-2);
+  margin: 0;
+  word-break: break-word;
+}
+
+.pdfapp-chunk-text--pre {
+  white-space: pre-wrap;
+  font-family: 'SF Mono', 'Fira Code', monospace, system-ui;
+  font-size: 0.74rem;
+}
+
+.pdfapp-chunk-card--legacy {
+  background: var(--bg);
+}
+
+.pdfapp-extracted-placeholder {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.pdfapp-extracted-prompt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.pdfapp-extracted-status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.pdfapp-extracted-error {
+  font-size: 0.8rem;
+  color: #f87171;
+}
+
+.pdfapp-extracted-run-btn {
+  padding: 0.35rem 0.9rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.pdfapp-extracted-run-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-2);
+}
+
+.pdfapp-extracted-run-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Divider between center and right ───────────────────────── */
+.pdfapp-divider {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 4px;
+  height: 100%;
+  background: var(--divider-bg);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.pdfapp-divider:hover {
+  background: #3b82f6;
+  box-shadow: 0 0 0 1px #1d4ed8;
+}
+
+.pdfapp-divider-handle {
+  pointer-events: none;
+  font-size: 10px;
+  color: var(--text-2);
+}
+
+/* ── Panel 3: Right Workspace — Summary ─────────────────────── */
+.pdfapp-right {
+  height: 100%;
+  background: var(--bg);
+  overflow-y: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdfapp-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+/* Actions dropdown */
+.pdfapp-actions-dropdown {
+  position: relative;
+  width: 240px;
+}
+
+.pdfapp-actions-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pdfapp-actions-btn:hover:not(:disabled) {
+  background: var(--bg-3);
+  border-color: var(--border-2);
+}
+
+.pdfapp-actions-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pdfapp-actions-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 100%;
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px var(--shadow);
+  z-index: 50;
+}
+
+.pdfapp-actions-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.pdfapp-actions-menu-item:hover {
+  background: var(--bg-3);
+}
+
+.pdfapp-actions-menu-item--saved {
+  color: #93c5fd;
+}
+
+.pdfapp-actions-menu-item--saved:hover {
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.pdfapp-actions-menu-item--saved strong {
+  font-weight: 600;
+}
+
+/* Drafting suggestion items */
+.pdfapp-actions-menu-item--drafting {
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.pdfapp-actions-menu-item--drafting svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #a78bfa;
+}
+
+.pdfapp-drafting-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.pdfapp-drafting-item-text strong {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.pdfapp-drafting-item-text em {
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.pdfapp-actions-menu-item--drafting:hover .pdfapp-drafting-item-text strong {
+  color: var(--text);
+}
+
+/* RAG index button */
+.pdfapp-rag-index-btn {
+  color: #a78bfa;
+  font-weight: 500;
+}
+
+.pdfapp-rag-index-btn:hover {
+  background: rgba(167, 139, 250, 0.1);
+  color: #c4b5fd;
+}
+
+.pdfapp-rag-index-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Drafting loading state */
+.pdfapp-drafting-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+/* Small spinner variant */
+.pdfapp-spinner--small {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  flex-shrink: 0;
+}
+
+.pdfapp-actions-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.pdfapp-actions-menu-section {
+  padding: 6px 14px 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* LexChat button */
+.pdfapp-lexchat-btn {
+  margin-left: auto;
+  flex: 1;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pdfapp-lexchat-btn:hover {
+  background: var(--bg-3);
+  border-color: var(--border-2);
+}
+
+.pdfapp-lexchat-btn--active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.pdfapp-lexchat-btn--active:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+}
+
+/* Green dot shown on LexChat button when RAG is indexed */
+.pdfapp-rag-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  flex-shrink: 0;
+  box-shadow: 0 0 4px #34d399;
+}
+
+/* LexChat pane */
+.pdfapp-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pdfapp-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pdfapp-chat-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.pdfapp-chat-empty p {
+  font-size: 0.88rem;
+  max-width: 200px;
+  line-height: 1.5;
+}
+
+.pdfapp-chat-msg {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.pdfapp-chat-msg--user {
+  flex-direction: row-reverse;
+}
+
+.pdfapp-chat-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pdfapp-chat-bubble {
+  max-width: 82%;
+  padding: 9px 13px;
+  border-radius: 12px;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.pdfapp-chat-msg--user .pdfapp-chat-bubble {
+  background: #1d4ed8;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.pdfapp-chat-msg--assistant .pdfapp-chat-bubble {
+  background: var(--bg-2);
+  color: var(--text-2);
+  border-bottom-left-radius: 4px;
+}
+
+.pdfapp-chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.pdfapp-chat-input {
+  flex: 1;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  padding: 9px 12px;
+  resize: none;
+  max-height: 120px;
+  overflow-y: auto;
+  font-family: inherit;
+}
+
+.pdfapp-chat-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.pdfapp-chat-input::placeholder {
+  color: var(--text-dim);
+}
+
+.pdfapp-chat-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.pdfapp-chat-send:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.pdfapp-chat-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pdfapp-skill-label {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.pdfapp-summarize-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #ef4444;
+  background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdfapp-summarize-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
+  box-shadow: 0 2px 12px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+.pdfapp-summarize-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pdfapp-summarize-btn--green {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #047857 0%, #10b981 100%);
+  cursor: default;
+}
+
+.pdfapp-summarize-btn--green:hover:not(:disabled) {
+  background: linear-gradient(135deg, #047857 0%, #10b981 100%);
+  box-shadow: none;
+  transform: none;
+}
+
+.pdfapp-summarize-btn--stop {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
+}
+
+.pdfapp-summarize-btn--stop:hover {
+  background: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.35);
+}
+
+/* Summary body */
+.pdfapp-summary-body {
+  flex: 1;
+  padding: 16px 14px;
+  overflow-y: auto;
+}
+
+.pdfapp-summary-text {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.pdfapp-cursor {
+  display: inline;
+  color: #3b82f6;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Loading */
+.pdfapp-summary-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 16px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.pdfapp-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error */
+.pdfapp-summary-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.pdfapp-summary-error svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Empty state */
+.pdfapp-summary-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 20px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.pdfapp-summary-empty p {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  max-width: 220px;
+}
+
+.pdfapp-summary-empty strong {
+  color: var(--text-muted);
+}
+
+.pdfapp-summary-model {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  padding: 3px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+/* ── Case search scope toggle ────────────────────────────────── */
+.pdfapp-chat-scope-row {
+  padding: 4px 10px 0;
+  display: flex;
+}
+
+.pdfapp-chat-scope-btn {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-3);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+
+.pdfapp-chat-scope-btn:hover {
+  border-color: var(--border-2);
+  color: var(--text-muted);
+}
+
+.pdfapp-chat-scope-btn--active {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: #3b82f6;
+  color: #3b82f6;
+}

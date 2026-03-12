@@ -1,0 +1,288 @@
+FORM B
+
+
+FORM B[W.T.S.-1A]
+|
+FORM OF RETURN OF NET WEALTH UNDER SUB-SECTION (1) OR SUB-SECTION (2) OF SECTION 14 OF THE WEALTH-TAX ACT, 1957
+[For companies * only]|
+
+WEALTH-TAX ACT, 1957
+||
+
+RULE3(1)(b
+||
+Assessment year |For use in W.T. office|
+Valuation date :||
+Permanent account Number :||
+
+Name in block letters
+Address                                                                                      Telephone
+Place at which the registered office of the company is situated 
+
+
+Whether the company is resident in India or non-resident in India 
+|
+
+STATEMENT OF ASSETS AND DEBTS REFERRED TO IN SUB-SECTIONS (2) AND (3) OF SECTION 40 OF THE FINANCE ACT,1983 (11 OF 1983), AS ON THE VALUATION DATE
+
+|
+PART I
+NET VALUE OF ASSETS LOCATED IN INDIA|
+
+Particular
+|
+Value
+Rs.
+|
+(1)|(2)|
+
+SECTION A – IMMOVABLE PROPERTY
+---As per Annexure I
+
+SECTION B – MOVABLE PROPERTY
+---As per Annexure II
+
+SECTION C –WEALTH IN INDIA
+
+TOTAL OF SECTIONS A AND B
+||
+||
+||
+||
+
+*Note to be filled in if the company is a company in which the public are substantially interested.
+
+
+
+
+
+
+PART II
+NET VALUE OF ASSETS LOCATED OUTSIDE INDIA|
+
+Particular
+|
+Value
+Rs.
+|
+(1)|(2)|
+
+SECTION D – IMMOVABLE PROPERTY
+---As per Annexure III
+
+SECTION E – MOVABLE PROPERTY
+---As per Annexure IV
+
+SECTION F –WEALTH IN INDIA
+
+TOTAL OF SECTIONS A AND B
+||
+||
+||
+||
+
+PART III
+COMPUTATION OF NET WEALTH 
+|
+
+Particular
+|
+Value
+Rs.
+|
+(1)|(2)|
+
+SECTION G – NET WEALTH
+Wealth in India on which tax is payable----As per Section C of Part I
+Wealth outside India on which tax is payable – As per Section F of Part II
+TOTAL 
+NET WEALTH : Total of item (1) and (2) as rounded off to the nearest multiple of one hundred rupees --- Section 44C
+||
+||
+||
+||
+
+PART IV
+ASSETS NOT INCLUDED IN NET WEALTH AND CLAIMED TO BE EXEMPT
+|
+Note : The filling up of this part is optional. In this part may be shown any assets which are not included in parts I and II or the Annexures rederred to therein, but which the company claims to be not taxable for any reason.
+|
+Sl. No. |Description of the asset|Reason whay exemption is claimed|
+
+
+
+|||
+
+
+PART V
+STATEMENT OF TAX PAID ON SELF-ASSESSMENT
+[See Note]
+
+|
+
+Date of payment
+|
+Amount
+Rs.
+|
+
+
+
+||
+|
+Note: If any tax is payable on the basis of this return after taking into account the amount of tax, if any, already paid under any provision of the Wealth-tax Act, 1957, such tax must be paid before furnishing this return and the return should be accompanied by proof of such payment --- Section 15B.
+
+Verification
+
+I, 									son/daughter/wife
+		[Name in block letter]
+of shri 								, being the 
+						     of 						
+	[Designation]						[Name of the company]
+solemnly declare that to the best of knowledge and belief, the information give in this return, and the Annexures and Statements accompanying it, is correct and complete, and that the amount of net wealth and other particulars shown are truly stated and relate to the valuation date relevant to the assessment year commencing on the 1st day of April,19
+
+I further solemnly declare that the said company had no other asset belonging to it which is required to be taken into consideration in computing its net wealth on the said valuation date.
+I further declare that I am making this return in my capacity as 
+									[Designation]
+
+					[Name of the company]
+and that I am competent to make this return and verify it on behalf of the company.
+
+Date:
+Place:										Signature
+
+IMPORTANT: Before signing the verification, the signatory should satisfy himself that this return is correct and complete in every respect .Any person making a false statement in this return shall be liable to prosecution under section 35D of the Wealth-tax Act, 1957 and on conviction be punishable;--
+in a case where the tax sought to be evaded exceeds one lakh rupees, with rigorous imprisonment for a term which shall not be less than six month but which may extend to seven year and with fine;
+in any other case, with rigorous imprisonment for a term which shall not be less than three month months but which may extend to three years and with fine
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ANNEXURE I
+[See Section A of Part I of this return]
+Statement of immovable assets and debts located in India as referred to in sub-section (2) and clauses (v), (vi) and (viii) of sub-section (3) of section 40 of the Finance Act, 1983 (11 of 1983)
+[See Notes]
+
+Sl. No. |Description and situation |Identification No. of property|Land revenue/ municipal tax|Value on valuation date 
+(Rs.)|Debt secured, on or incurred in relation to, the property |Net value (Rs.) (column 5 minus column 6)|
+|||||||
+
+
+
+
+
+
+
+
+|||||||
+
+Total of column (7) taken to Section A of Part I of this return 
+|
+Rs.|
+
+Note 1 : Each item of immovable property should be listed separately. The description and situation of property should be such as to enable the property and its boundaries to be clearly identified.
+Note 2: Land revenue/municipal tax and value in respect of property and debt secured on or incurred in relation to that property should be shown separately in respect of each item of immovable property. If a debt secured on any asset belonging to the assessee is incurred for, or ensures to, the benefit or any other person, or is not represented by any asset belonging to the assessee, the value of such debt should not be taken into accounting computing the net value of the property.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ANNEXURE II
+[See Section B of Part I of this return]
+Statement of immovable assets and debts located in India as referred to in sub-section (2) and clauses (I),to (iv) (vii)and (viii) of sub-section (3) of section 40 of the Finance Act, 1983 (11 of 1983)
+[See Notes]
+Sl. No.|Description of assets|Value on valuation date 
+(Rs.)|Debt secured on, or incurred in relation to, the asset|Net value (Rs.) (column 3 minus column 4)|
+|||||
+
+
+
+
+
+
+|||||
+
+Total of column (5) taken to Section B of Part I of this return 
+|
+Rs.|
+
+Note 1 : Each movable asset should be listed separately.
+Note 2 : Value of an asset and debt secured on or incurred in relation to that asset, should be shown separately in respect of each movable asset. If a debt secured on any asset belonging to the assessee is incurred for, or ensures, to, the benefit of any other person, or is not represented by any asset belonging to the assessee, the value of such debt should not be taken into account in computing the net value of the asset.
+ANNEXURE III
+[See Section D of Part II of this return]
+Statement of immovable assets and debts located in India as referred to in sub-section (2) and clauses (v), (vi) and (viii) of sub-section (3) of section 40 of the Finance Act, 1983 (11 of 1983)
+[See Notes*]
+Sl. No. |Description and situation |Identification No. of property|Land revenue/ municipal tax|Value on valuation date 
+(Rs.)|Debt secured, on or incurred in relation to, the property |Net value (Rs.) (column 5 minus column 6)|
+|||||||
+
+
+
+
+
+
+
+
+|||||||
+
+Total of column (7) taken to Section D of Part II of this return 
+|
+Rs               )|
+
+
+*Please see Notes below Annexure I.
+ANNEXURE IV
+[See Section E of Part II of this return]
+Statement of immovable assets and debts located in India as referred to in sub-section (2) and clauses (I),to (iv) (vii)and (viii) of sub-section (3) of section 40 of the Finance Act, 1983 (11 of 1983)
+[See Notes*]
+Sl. No.|Description of assets|Value on valuation date 
+(Rs.)|Debt secured on, or incurred in relation to, the asset|Net value (Rs.) (column 3 minus column 4)|
+|||||
+
+
+
+
+
+
+|
+
+
+
+
+
+||||
+
+Total of column (5) taken to Section E of Part II of this return 
+|
+Rs.                     ]|
+*Please see Notes below Annexure I.

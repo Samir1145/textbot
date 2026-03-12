@@ -1,0 +1,58 @@
+ FORM NO. 27B 
+ 
+[See rule 37EA ] 
+             Form for furnishing information with the return or statement of deduction of tax at source filed on computer media.  
+ 
+ DETAILS   OF  THE  PERSON  BEING  A  SELLER,  COLLECTING  THE  TAX 
+Tax Deduction Account Number   
+Permanent Account Number 
+  
+Name and Address of Seller 
+   
+Telephone No. 
+ Fax No. 
+ 
+  
+ 
+ 
+OTHER  INFORMATION 
+[Please give the complete information] 
+Return 
+Form 
+No. 
+ Whether existing 
+TDS/tax collected 
+at source assessee 
+(Y - Yes, N - No) 
+ A.O. Code 
+ Period ending  Assessment Yr.  Periodicity  Media used 
+computer media 
+enclosed 
+for the  return  Total number of 
+                      
+ 
+CONTROL  TOTALS  
+S. No.  Control Total required for Form Nos.27EA, 27EB, 27EC and 27ED  Total 
+1.  Gross Amount debited to/received from companies     
+2.  Gross amount debited to/received from non-companies     
+3.  Total amount of tax collected from companies at prescrib ed rates     
+4.  Total amount of tax collected from non-companies at prescribed rates     
+5.  Total number of persons from whom tax was collected    
+ 
+ 
+I,.....................................................................………….....,certify that all the particulars furnished above are correct and complete.   
+  
+ 
+  
+................................................................... 
+ 
+Place : .....................................    
+ Name and signature of the person responsible for            
+deducting tax at source 
+ 
+  
+  
+  
+Designation : ...............................................................……  
+Date     : ……...………….    
+ 

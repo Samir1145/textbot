@@ -1,0 +1,19 @@
+^ Category ^ Title ^
+| indemnity | [[legal_formats:indemnity:deed_of_indemnity_by_a_company_to_its_managing_director|Deed Of Indemnity By A Company To Its Managing Director]] |
+| indemnity | [[legal_formats:indemnity:deed_of_indemnity_by_the_partner_retaining_assets_and_liabilities_to_a_partner_on_the_dissolution_of_the_partnership_firm|Deed Of Indemnity By The Partner Retaining Assets And Liabilities To A Partner On The Dissolution Of The Partnership Firm]] |
+| indemnity | [[legal_formats:indemnity:deed_of_indemnity_by_the_seller_of_a_flat_to_the_purchaser_about_the_doubt_about_the_defence_in_title|Deed Of Indemnity By The Seller Of A Flat To The Purchaser About The Doubt About The Defence In Title]] |
+| indemnity | [[legal_formats:indemnity:deed_of_indemnity_to_a_tenant_for_paying_rent_by_landlord_where_his_title_is_in_dispute|Deed Of Indemnity To A Tenant For Paying Rent By Landlord Where His Title Is In Dispute]] |
+| indemnity | [[legal_formats:indemnity:deed_of_indemnity_with_sureties_to_the_company_for_transfer_of_shares_without_insisting_for_succession_certificate_etc|Deed Of Indemnity With Sureties To The Company For Transfer Of Shares Without Insisting For Succession Certificate Etc]] |
+| indemnity | [[legal_formats:indemnity:indemnity_by_a_land_owner_whose_title_is_in_dispute|Indemnity By A Land Owner Whose Title Is In Dispute]] |
+| indemnity | [[legal_formats:indemnity:indemnity_by_debtor_to_his_guarantor|Indemnity By Debtor To His Guarantor]] |
+| indemnity | [[legal_formats:indemnity:indemnity_by_heirs_for_release_of_provident_funds_gratuity_of_a_deceased_employee_without_production_of_legal_representation|Indemnity By Heirs For Release Of Provident Funds Gratuity Of A Deceased Employee Without Production Of Legal Representation]] |
+| indemnity | [[legal_formats:indemnity:indemnity_for_loss_of_allotment_letter|Indemnity For Loss Of Allotment Letter]] |
+| indemnity | [[legal_formats:indemnity:indemnity_for_loss_of_deposit_receipt|Indemnity For Loss Of Deposit Receipt]] |
+| indemnity | [[legal_formats:indemnity:indemnity_for_loss_of_title_deeds|Indemnity For Loss Of Title Deeds]] |
+| indemnity | [[legal_formats:indemnity:indemnity_for_title|Indemnity For Title]] |
+| indemnity | [[legal_formats:indemnity:indemnity_given_by_a_consignee_to_railway_for_a_loss_of_railway_receipt|Indemnity Given By A Consignee To Railway For A Loss Of Railway Receipt]] |
+| indemnity | [[legal_formats:indemnity:indemnity_given_to_bank_for_issue_of_a_duplicate_bank_draft|Indemnity Given To Bank For Issue Of A Duplicate Bank Draft]] |
+| indemnity | [[legal_formats:indemnity:indemnity_given_to_the_bank_by_the_natural_guardian_of_minor_children|Indemnity Given To The Bank By The Natural Guardian Of Minor Children]] |
+| indemnity | [[legal_formats:indemnity:indemnitydeclaration_to_enable_the_concerned_government_authorities_to_transfer_the_property_in_the_name_of_legal_heirs|Indemnitydeclaration To Enable The Concerned Government Authorities To Transfer The Property In The Name Of Legal Heirs]] |
+| indemnity | [[legal_formats:indemnity:letter_of_guarantee_and_indemnity|Letter Of Guarantee And Indemnity]] |
+| indemnity | [[legal_formats:indemnity:simple_deed_of_indemnity|Simple Deed Of Indemnity]] |

@@ -1,0 +1,48 @@
+^ Category ^ Title ^
+| pleadings | [[legal_formats:pleadings:form1_1|Form1 1]] |
+| pleadings | [[legal_formats:pleadings:interpleader_suit|Interpleader Suit]] |
+| pleadings | [[legal_formats:pleadings:suit_against_a_common_carrier_for_damages_due_to_delay_caused_in_delivery_of_the_goods_sent_through_him|Suit Against A Common Carrier For Damages Due To Delay Caused In Delivery Of The Goods Sent Through Him]] |
+| pleadings | [[legal_formats:pleadings:suit_based_gçö_on_contract_gçö_for_account_against_a_general_attorney|Suit Based Gçö On Contract Gçö For Account Against A General Attorney]] |
+| pleadings | [[legal_formats:pleadings:suit_based_on_a_foreign_judgment|Suit Based On A Foreign Judgment]] |
+| pleadings | [[legal_formats:pleadings:suit_by_a_vendee_against_vendor_for_refund_of_purchase_amount_with_damages_due_to_defect_in_the_vendorgçös_title|Suit By A Vendee Against Vendor For Refund Of Purchase Amount With Damages Due To Defect In The Vendorgçös Title]] |
+| pleadings | [[legal_formats:pleadings:suit_by_an_agent_for_his_commission|Suit By An Agent For His Commission]] |
+| pleadings | [[legal_formats:pleadings:suit_for_account_against_an_exguardian|Suit For Account Against An Exguardian]] |
+| pleadings | [[legal_formats:pleadings:suit_for_account_against_cosharers|Suit For Account Against Cosharers]] |
+| pleadings | [[legal_formats:pleadings:suit_for_administration_another_form|Suit For Administration Another Form]] |
+| pleadings | [[legal_formats:pleadings:suit_for_administration_by_creditor_on_behalf_of_himself_and_all_other_creditors|Suit For Administration By Creditor On Behalf Of Himself And All Other Creditors]] |
+| pleadings | [[legal_formats:pleadings:suit_for_administration_by_specific_legatee|Suit For Administration By Specific Legatee]] |
+| pleadings | [[legal_formats:pleadings:suit_for_cancellation_of_a_document_on_the_ground_of_minority_of_the_plaintiff|Suit For Cancellation Of A Document On The Ground Of Minority Of The Plaintiff]] |
+| pleadings | [[legal_formats:pleadings:suit_for_cancellation_of_a_gift_deed_obtained_by_undue_influence|Suit For Cancellation Of A Gift Deed Obtained By Undue Influence]] |
+| pleadings | [[legal_formats:pleadings:suit_for_cancellation_of_a_sale_deed|Suit For Cancellation Of A Sale Deed]] |
+| pleadings | [[legal_formats:pleadings:suit_for_cancellation_of_a_saledeed_obtained_by_fraud_without_plaintiffgçös_consent|Suit For Cancellation Of A Saledeed Obtained By Fraud Without Plaintiffgçös Consent]] |
+| pleadings | [[legal_formats:pleadings:suit_for_cancellation_of_an_instrument|Suit For Cancellation Of An Instrument]] |
+| pleadings | [[legal_formats:pleadings:suit_for_cancellation_of_deed_of_gift_obtained_by_undueinfluence_or_due_to_the_insanity_of_the_donor|Suit For Cancellation Of Deed Of Gift Obtained By Undueinfluence Or Due To The Insanity Of The Donor]] |
+| pleadings | [[legal_formats:pleadings:suit_for_cancellation_of_will_executed_while_the_executant_was_not_sane|Suit For Cancellation Of Will Executed While The Executant Was Not Sane]] |
+| pleadings | [[legal_formats:pleadings:suit_for_claim_for_settled_or_customary_interest|Suit For Claim For Settled Or Customary Interest]] |
+| pleadings | [[legal_formats:pleadings:suit_for_claim_for_work_done_under_a_contract_between_the_parties|Suit For Claim For Work Done Under A Contract Between The Parties]] |
+| pleadings | [[legal_formats:pleadings:suit_for_compensation_for_failure_to_finish_the_work_according_to_contract|Suit For Compensation For Failure To Finish The Work According To Contract]] |
+| pleadings | [[legal_formats:pleadings:suit_for_contribution_between_cojudgement_debtors|Suit For Contribution Between Cojudgement Debtors]] |
+| pleadings | [[legal_formats:pleadings:suit_for_contribution_between_comortgagors|Suit For Contribution Between Comortgagors]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damage_caused_by_conspiracy_of_the_defendants_to_defraud_the_decreeholder|Suit For Damage Caused By Conspiracy Of The Defendants To Defraud The Decreeholder]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damage_on_an_agreement_of_indemnity|Suit For Damage On An Agreement Of Indemnity]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_and_for_wages_by_a_servant|Suit For Damages And For Wages By A Servant]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_and_injunction_for_obstructing_a_right_to_use_water_for_irrigation|Suit For Damages And Injunction For Obstructing A Right To Use Water For Irrigation]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_by_servant_for_wrongful_dismissal|Suit For Damages By Servant For Wrongful Dismissal]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_caused_by_the_defendantgçös_cattle_to_the_crop_of_the_plaintiff|Suit For Damages Caused By The Defendantgçös Cattle To The Crop Of The Plaintiff]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_caused_to_the_articles_hired|Suit For Damages Caused To The Articles Hired]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_assault_an_battery|Suit For Damages For Assault An Battery]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_being_bitten_by_the_dog_of_the_defendant|Suit For Damages For Being Bitten By The Dog Of The Defendant]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_carrying_on_a_noxious_manufacture_and_for_a_permanent_injunction_restraining_it|Suit For Damages For Carrying On A Noxious Manufacture And For A Permanent Injunction Restraining It]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_converting_goods_entrusted_to_the_defendant|Suit For Damages For Converting Goods Entrusted To The Defendant]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_not_accepting_goods_sent_to_defendant|Suit For Damages For Not Accepting Goods Sent To Defendant]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_not_accepting_goods_sent_to_defendant1|Suit For Damages For Not Accepting Goods Sent To Defendant1]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_obstructing_way_and_for_njunction_to_demolish_the_obstruction|Suit For Damages For Obstructing Way And For Njunction To Demolish The Obstruction]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_for_use_and_occupation|Suit For Damages For Use And Occupation]] |
+| pleadings | [[legal_formats:pleadings:suit_for_damages_on_an_indemnity_bond|Suit For Damages On An Indemnity Bond]] |
+| pleadings | [[legal_formats:pleadings:suit_for_delivery_of_goods_for_compensation_against_a_fraudulent_purchaser_and_his_transferee_with_notice|Suit For Delivery Of Goods For Compensation Against A Fraudulent Purchaser And His Transferee With Notice]] |
+| pleadings | [[legal_formats:pleadings:suit_for_delivery_of_movables_wrongfully_detained_or_for_compensation_therefor|Suit For Delivery Of Movables Wrongfully Detained Or For Compensation Therefor]] |
+| pleadings | [[legal_formats:pleadings:suit_for_enforcement_of_a_charge|Suit For Enforcement Of A Charge]] |
+| pleadings | [[legal_formats:pleadings:suit_for_eviction_of_a_licensee_and_for_damages|Suit For Eviction Of A Licensee And For Damages]] |
+| pleadings | [[legal_formats:pleadings:suit_for_execution_of_trust|Suit For Execution Of Trust]] |
+| pleadings | [[legal_formats:pleadings:suit_for_foreclosure_of_sale|Suit For Foreclosure Of Sale]] |
+| pleadings | [[legal_formats:pleadings:suit_for_injunction_restraining_nuisance|Suit For Injunction Restraining Nuisance]] |

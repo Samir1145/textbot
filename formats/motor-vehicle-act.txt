@@ -1,0 +1,16 @@
+^ Category ^ Title ^
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:appeal_under_section_173_of_motor_vehicles_act_1988|Appeal Under Section 173 Of Motor Vehicles Act 1988]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:application_and_intimation_of_transfer_of_ownership_in_the_name_of_the_person_succeeding_to_the_possession_of_the_vehicle|Application And Intimation Of Transfer Of Ownership In The Name Of The Person Succeeding To The Possession Of The Vehicle]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:application_before_the_authority_of_motor_accident_claims_tribunal|Application Before The Authority Of Motor Accident Claims Tribunal]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:application_for_assignment_of_new_registration_mark_on_removal_of_a_motor_vehicle_to_another_state|Application For Assignment Of New Registration Mark On Removal Of A Motor Vehicle To Another State]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:application_for_grant_of_permit_in_respect_of_tourist_vehicle|Application For Grant Of Permit In Respect Of Tourist Vehicle]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:application_for_registration_of_a_motor_vehicle|Application For Registration Of A Motor Vehicle]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:application_for_the_grant_of_national_permit|Application For The Grant Of National Permit]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:declaration_by_owner_of_a_motor_vehicle_under_section_13|Declaration By Owner Of A Motor Vehicle Under Section 13]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:form_of_application_for_gçÿno_objection_certificategçö_and_grant_of_certificate|Form Of Application For Gçÿno Objection Certificategçö And Grant Of Certificate]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:form_of_application_for_registration_of_a_motor_vehicle|Form Of Application For Registration Of A Motor Vehicle]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:intimation_of_loss_or_destruction_etc_of_the_certificate_of_registration_and_application_for_the_issue_of_duplicate_certificate_of_registration|Intimation Of Loss Or Destruction Etc Of The Certificate Of Registration And Application For The Issue Of Duplicate Certificate Of Registration]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:report_of_transfer_of_ownership_of_a_motor_vehicle|Report Of Transfer Of Ownership Of A Motor Vehicle]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:suit_for_damages_for_injuries_caused_by_negligence_on_a_rail_road|Suit For Damages For Injuries Caused By Negligence On A Rail Road]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:suit_for_damages_for_injuries_caused_by_negligent_driving|Suit For Damages For Injuries Caused By Negligent Driving]] |
+| motor-vehicle-act | [[legal_formats:motor-vehicle-act:surrender_of_registration_certificate_and_tokens|Surrender Of Registration Certificate And Tokens]] |

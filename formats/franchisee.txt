@@ -1,0 +1,4 @@
+^ Category ^ Title ^
+| franchisee | [[legal_formats:franchisee:agreement_between_a_franchisee_and_sub_franchisee_granting_franchise_rights_for_a_territory|Agreement Between A Franchisee And Sub Franchisee Granting Franchise Rights For A Territory]] |
+| franchisee | [[legal_formats:franchisee:agreement_between_a_franchiser_and_franchisee_granting_franchise_rights_with_right_to_appoint_subfranchisees_in_the_territory_allotted|Agreement Between A Franchiser And Franchisee Granting Franchise Rights With Right To Appoint Subfranchisees In The Territory Allotted]] |
+| franchisee | [[legal_formats:franchisee:application_form_for_considering_the_appointment_of_franchisee|Application Form For Considering The Appointment Of Franchisee]] |

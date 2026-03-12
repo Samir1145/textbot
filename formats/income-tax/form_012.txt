@@ -1,0 +1,29 @@
+FORM 0-12
+[See rule of Schedule III]
+Certificate of auditor on valuation of unquoted equity share of an investment company
+*I/We have examined the balance sheet of 
+						[Name and address of the assessee]
+ 						for the period ending 31st March, 19 		
+	[Permanent account number]
+	Which is in agreement with the books of account maintained at the head office 				at 			and branches at 
+*I/We have obtained all the information and explanation which to the best of *my/our knowledge and belief were necessary for the purposes of the audit and valuation of the assets and liabilities:
+The value of assets shown in the balance sheet is ||Rs.|
+Adjusted value of assets shown in the balance sheet is rules of Schedule III to the Wealth-tax Act relevant to that asset**||
+
+Rs.|
+The value of liabilities shown in the balance sheet ||Rs.|
+Total paid-up equity share capital||Rs.|
+The result of b-c
+                              d||
+Rs.|
+Paid up value of each equity share||Rs.|
+Value of each equity share (e+f)||Rs.|
+
+Place
+Date  											Signed
+										Auditors(s)***
+
+Notes:
+*Delete whichever is not applicable.
+**The value of any asset not covered by the rules of valuation in the shcedule shall be the price which it would fetch if sold in the open market on the valuation date.
+***This report has to be given by the auditors appointed under section 224 of the Companies Act, 1956.

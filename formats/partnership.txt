@@ -1,0 +1,10 @@
+^ Category ^ Title ^
+| partnership | [[legal_formats:partnership:another_partnership_deed|Another Partnership Deed]] |
+| partnership | [[legal_formats:partnership:particulars_of_conditions_of_sale_by_auction_of_moveable_property|Particulars Of Conditions Of Sale By Auction Of Moveable Property]] |
+| partnership | [[legal_formats:partnership:partnership_agreement_between_a_partnership_firm_and_a_hindu_joint_family|Partnership Agreement Between A Partnership Firm And A Hindu Joint Family]] |
+| partnership | [[legal_formats:partnership:partnership_agreement_between_advocates|Partnership Agreement Between Advocates]] |
+| partnership | [[legal_formats:partnership:partnership_agreement_between_an_individual_a_partnership_firm_and_a_company|Partnership Agreement Between An Individual A Partnership Firm And A Company]] |
+| partnership | [[legal_formats:partnership:partnership_agreement_between_an_individual_and_a_limited_company|Partnership Agreement Between An Individual And A Limited Company]] |
+| partnership | [[legal_formats:partnership:partnership_agreement_between_two_limited_companies|Partnership Agreement Between Two Limited Companies]] |
+| partnership | [[legal_formats:partnership:partnership_agreement_between_two_partnership_firms|Partnership Agreement Between Two Partnership Firms]] |
+| partnership | [[legal_formats:partnership:partnership_agreement_for_a_single_venture|Partnership Agreement For A Single Venture]] |

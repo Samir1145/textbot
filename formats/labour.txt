@@ -1,0 +1,8 @@
+^ Category ^ Title ^
+| labour | [[legal_formats:labour:agreement_between_a_company_and_a_contractor_for_supplying_labour|Agreement Between A Company And A Contractor For Supplying Labour]] |
+| labour | [[legal_formats:labour:agreement_of_indemnity_by_labour_contractor|Agreement Of Indemnity By Labour Contractor]] |
+| labour | [[legal_formats:labour:agreement_to_refer_disputes_to_arbitration|Agreement To Refer Disputes To Arbitration]] |
+| labour | [[legal_formats:labour:complaint_under_s_33a_of_the_industrial_disputes_act_1947|Complaint Under S 33A Of The Industrial Disputes Act 1947]] |
+| labour | [[legal_formats:labour:form_for_agreement_between_the_employer_and_employees_for_reference_of_disputes_to_arbitration|Form For Agreement Between The Employer And Employees For Reference Of Disputes To Arbitration]] |
+| labour | [[legal_formats:labour:form_of_agreement_between_the_employer_and_workman_regarding_compensation_for_temporary_disablement|Form Of Agreement Between The Employer And Workman Regarding Compensation For Temporary Disablement]] |
+| labour | [[legal_formats:labour:form_of_application_for_reference_of_an_industrial_dispute_to_a_board_of_conciliation|Form Of Application For Reference Of An Industrial Dispute To A Board Of Conciliation]] |

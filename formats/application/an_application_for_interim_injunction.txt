@@ -1,0 +1,38 @@
+An application for interim injunction
+HIGHLIGHTS
+The provision is under Order XXXIX, Rule 1 of the Civil Procedure Code. The meaning of the word interim is in the meanwhile, and an injunction means a written order from the court of law, demanding that something shall be or shall not be done.
+The relevant provisions are as follows:
+TEMPORARY INJUNCTIONS
+1. Cases in which temporary injunction may be granted - Where in any suit, it is proved by affidavit or otherwise-
+(A) That any property in dispute in a suit is in danger of being wasted, damaged or alienated by any party to the suit, or wrongfully sold in execution of a decree, or
+(B) That the defendant threatens, or intends, to remove or dispose of his property with a view to defrauding his creditors, 
+(C) That the defendant threatens to dispossess the plaintiff or otherwise cause injury to the plaintiff in relation to any property in dispute in the suit, the Court may by order grant a temporary injunction to restrain such act, or make such other order for the purpose of staying and preventing the wasting, damaging, alienation, sale, removal or disposition of the property or dispossession of the plaintiff, or otherwise causing injury to the plaintiff in relation to any property in dispute in the suit as the Court thinks fit, until the disposal of the suit or until further orders.
+
+2. Injunction to restrain repetition or continuance of breach -
+(1) In any suit for possession for restraining the defendant from committing a breach of contract or other injury of any kind, whether compensation is claimed in the suit or not, the plaintiff may, at any time after the commencement of the suit,
+and either before or after judgment, apply to the Court for a temporary injunction to restrain the defendant from committing the breach of contract or injury of a like kind arising out of the same contract or relating to the property or right.
+(2) The Court may by order grant such injunction, on such terms as to the duration of the injunction, keeping an account, giving security, or otherwise, as the Court thinks fit.
+
+(2-A) Consequence of disobedience or breach of injunction -
+In the case of disobedience of any injunction granted or other order made under rule 1 or rule 2 or breach of any of the terms on which the injunction was granted or the order made, the Court granting the injunction or making the order, or any Court to which the suit or proceeding is transferred, may order the property of the person guilty of such disobedience or breach to be attached, and may also order such person to be detained in the civil prison for a term not exceeding three months, unless in the meantime the Court directs his release.       
+No attachment made under this rule shall remain in force for more than one year, at the end of which time, if the disobedience or breach continues, the property attached maybe sold and out of the proceeds, the Court may award such compensation as it thinks fit to the injured party and shall pay the balance, if any, to the party entitled thereto.
+
+(3)Before granting injunction, the Court to direct notice to the opposite party - The Court shall in all cases, except where it appears that the object of granting the injunction would be defeated by the delay, before granting an injunction, direct notice of the application for the same to be given to the opposite party:
+Provided that, where it is proposed to grant an injunction without giving notice of the application to the opposite party, the Court shall record the reasons for its opinion that the object of granting the injunction would be defeated by delay, and require the applicant -
+
+(a) to deliver to the opposite party, or to send to him by registered post, immediately after the order granting the injunction has been made, a copy of the application for injunction together with -
+(i) a copy of the affidavit filed in support of the application;
+(ii) a copy of the plaint; and
+(iii) copies of documents on which the applicant relies, and
+
+(b) to file, on the day on which injunction is granted or on the day immediately following that day, an affidavit stating that the copies aforesaid have been so delivered or sent.
+
+(3-A) Court to dispose of application for injunction within thirty days -
+Where an injunction has been granted without giving notice to the opposite party, the Court shall make an endeavour to finally dispose of the application within thirty days from the date on which the injunction was granted; and where it is unable so to do, it shall record its reasons for such inability.
+
+(4) Order for injunction may be discharged, varied or set aside - Any order for an injunction may be discharged, or varied, or set aside by the Court, on application made thereto by any party dissatisfied with such order:
+Provided that if in an application for temporary injunction or in any affidavit supporting such application, a party has knowingly made a false or misleading statement in relation to a material particular and the injunction was granted without giving notice to the opposite party, the Court shall vacate the injunction unless, for reasons to be recorded, it considers that it is not necessary so to do in the interest of justice:
+Provided further that where an order for injunction has been passed after giving to a party an opportunity of being heard, the order shall not be discharged, varied or set aside on the application of that party except where such discharge, variation or setting aside has been necessitated by a change in the circumstances, or unless the Court is satisfied that the order has caused undue hardship to that party.
+
+(5) Injunction to corporation binding on its officers - An injunction directed to a corporation is binding not only on the corporation itself, but also on all members and officers of the corporation whose personal action it seeks to restrain.	
+

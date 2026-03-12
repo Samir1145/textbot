@@ -1,0 +1,11 @@
+^ Category ^ Title ^
+| copyright | [[legal_formats:copyright:application_for_registration_of_copyright|Application For Registration Of Copyright]] |
+| copyright | [[legal_formats:copyright:assignment_of_a_registered_trade_mark|Assignment Of A Registered Trade Mark]] |
+| copyright | [[legal_formats:copyright:complaint_for_infringement_of_trade_mark|Complaint For Infringement Of Trade Mark]] |
+| copyright | [[legal_formats:copyright:form1_1|Form1 1]] |
+| copyright | [[legal_formats:copyright:form1_tm_12_trade_and_merchandise_marks_act_1958|Form1 Tm 12 Trade And Merchandise Marks Act 1958]] |
+| copyright | [[legal_formats:copyright:form_tm_5trade_and_merchandise_marks_act_1958|Form Tm 5Trade And Merchandise Marks Act 1958]] |
+| copyright | [[legal_formats:copyright:licence_to_use_trade_mark|Licence To Use Trade Mark]] |
+| copyright | [[legal_formats:copyright:request_to_registrar_for_particulars_of_advertisement_of_a_mark_rule_50|Request To Registrar For Particulars Of Advertisement Of A Mark Rule 50]] |
+| copyright | [[legal_formats:copyright:trade_and_merchandise_marks_act_1958|Trade And Merchandise Marks Act 1958]] |
+| copyright | [[legal_formats:copyright:trade_mark_passing_off_suit|Trade Mark Passing Off Suit]] |

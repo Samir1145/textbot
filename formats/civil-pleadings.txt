@@ -1,0 +1,232 @@
+^ Category ^ Title ^
+| civil-pleadings | [[legal_formats:civil-pleadings:administration_by_specific_legatee|Administration By Specific Legatee]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit|Affidavit]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_1|Affidavit 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_a|Affidavit A]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_b|Affidavit B]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_c|Affidavit C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_d|Affidavit D]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_e|Affidavit E]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_i|Affidavit I]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_application|Affidavit In Support Of Application]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_stay_application|Affidavit In Support Of Stay Application]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_stay_application_a|Affidavit In Support Of Stay Application A]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_the_application|Affidavit In Support Of The Application]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_the_application_a|Affidavit In Support Of The Application A]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_the_application_ab|Affidavit In Support Of The Application Ab]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_the_application_b|Affidavit In Support Of The Application B]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_in_support_of_the_petition_for_transfer|Affidavit In Support Of The Petition For Transfer]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_j|Affidavit J]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_k|Affidavit K]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_o_7_r_11|Affidavit O 7 R 11]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_of_assets_to_be_made_by_a_judgmentdebtor_order_xxi_rule_412|Affidavit Of Assets To Be Made By A Judgmentdebtor Order Xxi Rule 412]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:affidavit_of_process_server_to_accompany_return_of_a_summons_or_notice|Affidavit Of Process Server To Accompany Return Of A Summons Or Notice]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:against_a_builder_for_defective_workmanship|Against A Builder For Defective Workmanship]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:against_a_fraudulent_purchaser_and_his_transferee_with_notice|Against A Fraudulent Purchaser And His Transferee With Notice]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:against_surety_for_payment_of_rent|Against Surety For Payment Of Rent]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:an_injunction_restraining_waste|An Injunction Restraining Waste]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:another_form_of_caveat|Another Form Of Caveat]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:appeal_1|Appeal 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:appeal_under_section_54_of_land_acquisition_act|Appeal Under Section 54 Of Land Acquisition Act]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:appendix_a_pleadings|Appendix A Pleadings]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_for_adinterim_stay_o_39_rules_1_2_read_with_section_151_c_p_c|Application For Adinterim Stay O 39 Rules 1 2 Read With Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_for_applying_the_procedure_provided_by_the_code_of_civil_procedure|Application For Applying The Procedure Provided By The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_for_counterclaim_of_the_defendant_under_order_8_rule_6a_of_c_p_c|Application For Counterclaim Of The Defendant Under Order 8 Rule 6A Of C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_for_direct_the_listing_of_the_case_before_high_court|Application For Direct The Listing Of The Case Before High Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_for_reference_to_high_court|Application For Reference To High Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_on_behalf_of_the_plaintiffs_for_summoning_the_witnesses|Application On Behalf Of The Plaintiffs For Summoning The Witnesses]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_to_execute_a_decree_against_the_legal_representatives_of_deceased_judgment_debtor|Application To Execute A Decree Against The Legal Representatives Of Deceased Judgment Debtor]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_10_rule_2_c_p_c|Application Under Order 10 Rule 2 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_11_rule_12_c_p_c|Application Under Order 11 Rule 12 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_11_rule_14_c_p_c|Application Under Order 11 Rule 14 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_11_rule_18_c_p_c|Application Under Order 11 Rule 18 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_11_rule_1_c_p_c|Application Under Order 11 Rule 1 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_11_rule_21_c_p_c|Application Under Order 11 Rule 21 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_11_rule_7_c_p_c|Application Under Order 11 Rule 7 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_14_rule_5_c_p_c|Application Under Order 14 Rule 5 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_18_rule_16_c_p_c|Application Under Order 18 Rule 16 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_1_rule_10_civil_procedure_code|Application Under Order 1 Rule 10 Civil Procedure Code]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_1_rule_8_cpc|Application Under Order 1 Rule 8 Cpc]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_21_rule_22_c_p_c|Application Under Order 21 Rule 22 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_21_rule_26_c_p_c|Application Under Order 21 Rule 26 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_21_rule_89_c_p_c|Application Under Order 21 Rule 89 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_21_rule_97_c_p_c|Application Under Order 21 Rule 97 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_22_rule_3_c_p_c|Application Under Order 22 Rule 3 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_22_rule_4_c_p_c|Application Under Order 22 Rule 4 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_22_rule_92_c_p_c|Application Under Order 22 Rule 92 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_23_rule_1_c_p_c|Application Under Order 23 Rule 1 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_23_rule_3_read_with_section_151_cpc_for_recording_compromise|Application Under Order 23 Rule 3 Read With Section 151 Cpc For Recording Compromise]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_25_rule_1_c_p_c|Application Under Order 25 Rule 1 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_25_rule_22_c_p_c|Application Under Order 25 Rule 22 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_26_rule_11_c_p_c|Application Under Order 26 Rule 11 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_26_rule_13_c_p_c|Application Under Order 26 Rule 13 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_26_rule_9_gçö_order_39_rule_7_and_section_151_c_p_c|Application Under Order 26 Rule 9 Gçö Order 39 Rule 7 And Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_26_rule_9_read_with_section_151_c_p_c|Application Under Order 26 Rule 9 Read With Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_34_c_p_c|Application Under Order 34 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_34_rule_31|Application Under Order 34 Rule 31]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_34_rule_6_c_p_c|Application Under Order 34 Rule 6 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_34_rule_81_c_p_c|Application Under Order 34 Rule 81 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_34_rule_83_c_p_c|Application Under Order 34 Rule 83 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_34_rule_8a_c_p_c|Application Under Order 34 Rule 8A C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_37_rule_1_c_p_c_gçö_suit_for_recovery_of_amount_based_on_a_negotiable_instrument|Application Under Order 37 Rule 1 C P C Gçö Suit For Recovery Of Amount Based On A Negotiable Instrument]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_37_rule_1_c_p_c_gçö_suit_for_recovery_of_amount_based_on_a_negotiable_instrument_2|Application Under Order 37 Rule 1 C P C Gçö Suit For Recovery Of Amount Based On A Negotiable Instrument 2]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_38_rule_5_c_p_c|Application Under Order 38 Rule 5 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_39_rule_4_cpc_for_discharge_or_variation_of_interim_injunction_order|Application Under Order 39 Rule 4 Cpc For Discharge Or Variation Of Interim Injunction Order]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_39_rule_7_of_the_c_p_c|Application Under Order 39 Rule 7 Of The C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_39_rules_1_and_2_and_section_151_c_p_c|Application Under Order 39 Rules 1 And 2 And Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_39_rules_1_and_2_read_with_section_151_cpc_for_grant_of_adinterim_exparte_injunction|Application Under Order 39 Rules 1 And 2 Read With Section 151 Cpc For Grant Of Adinterim Exparte Injunction]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_40_rule_1_c_p_c|Application Under Order 40 Rule 1 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_41_rule_27_c_p_c|Application Under Order 41 Rule 27 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_41_rule_52_of_the_c_p_c|Application Under Order 41 Rule 52 Of The C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_5_rule_20_cpc|Application Under Order 5 Rule 20 Cpc]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_6_rule_16_cpc|Application Under Order 6 Rule 16 Cpc]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_6_rule_17_read_with_section_151_c_p_c_for_amendment_of_the_plaint|Application Under Order 6 Rule 17 Read With Section 151 C P C For Amendment Of The Plaint]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_6_rule_5_cpc|Application Under Order 6 Rule 5 Cpc]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_7_rule_11_read_with_section_151_c_p_c_on_behalf_of_the_defendants|Application Under Order 7 Rule 11 Read With Section 151 C P C On Behalf Of The Defendants]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_9_rule_13_cpc_for_setting_aside_exparte_decree|Application Under Order 9 Rule 13 Cpc For Setting Aside Exparte Decree]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_9_rule_4_c_p_c|Application Under Order 9 Rule 4 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_9_rule_4_c_p_c_1|Application Under Order 9 Rule 4 C P C 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_order_9_rule_9_c_p_c|Application Under Order 9 Rule 9 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_rule_159_of_the_rajasthan_high_court_rules_for_entering_into_caveat|Application Under Rule 159 Of The Rajasthan High Court Rules For Entering Into Caveat]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_10_code_of_civil_procedure|Application Under Section 10 Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_10_read_with_section_151_cpc|Application Under Section 10 Read With Section 151 Cpc]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_115_c_p_c_gçö_revision_in_district_court|Application Under Section 115 C P C Gçö Revision In District Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_144_of_the_code_of_civil_procedure_application_for_restitution_of_property|Application Under Section 144 Of The Code Of Civil Procedure Application For Restitution Of Property]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_145_of_the_code_of_civil_procedure|Application Under Section 145 Of The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_146_of_c_p_c|Application Under Section 146 Of C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_148_of_the_code_of_civil_procedure|Application Under Section 148 Of The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_149_of_c_p_c|Application Under Section 149 Of C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_151_c_p_c|Application Under Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_151_c_p_c_1|Application Under Section 151 C P C 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_151_c_p_c_for_adinterim_stay|Application Under Section 151 C P C For Adinterim Stay]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_151_c_p_c_on_behalf_of_the_plaintiff|Application Under Section 151 C P C On Behalf Of The Plaintiff]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_151_cpc_for_variation_of_order|Application Under Section 151 Cpc For Variation Of Order]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_151_of_c_p_c|Application Under Section 151 Of C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_22_code_of_civil_procedure|Application Under Section 22 Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_24_of_the_code_of_civil_procedure|Application Under Section 24 Of The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_25_of_the_code_of_civil_procedure|Application Under Section 25 Of The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_25_provincial_small_cause_courts_act_1887|Application Under Section 25 Provincial Small Cause Courts Act 1887]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_39_rules_1_2_read_with_section_151_c_p_c|Application Under Section 39 Rules 1 2 Read With Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_46_cpc|Application Under Section 46 Cpc]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_4_of_the_code_of_civil_procedure|Application Under Section 4 Of The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_59_code_of_civil_procedure|Application Under Section 59 Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_5_of_limitation_act_along_with_affidavit|Application Under Section 5 Of Limitation Act Along With Affidavit]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_95_cpc|Application Under Section 95 Cpc]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_96_c_p_c|Application Under Section 96 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:application_under_section_9_of_the_code_of_civil_procedure|Application Under Section 9 Of The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:appointment_of_a_receiver_o_40_r_1|Appointment Of A Receiver O 40 R 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:bond_for_safe_custody_of_movable_property_attached_and_left_in_charge_of_any_person_and_sureties|Bond For Safe Custody Of Movable Property Attached And Left In Charge Of Any Person And Sureties]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:bond_for_safe_custody_of_movable_property_attached_and_left_in_charge_of_any_persons_and_sureties|Bond For Safe Custody Of Movable Property Attached And Left In Charge Of Any Persons And Sureties]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:bond_for_safe_custody_of_movable_property_attached_and_left_incharge_of_person_interested_and_sureties|Bond For Safe Custody Of Movable Property Attached And Left Incharge Of Person Interested And Sureties]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:bond_to_be_given_by_receiver_order_40_rule_3|Bond To Be Given By Receiver Order 40 Rule 3]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:bond_to_be_given_by_receiver_order_40_rule_3_gçö_where_immovable_property_is_offered_as_security|Bond To Be Given By Receiver Order 40 Rule 3 Gçö Where Immovable Property Is Offered As Security]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:breach_of_agreement_to_purchase_land|Breach Of Agreement To Purchase Land]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:breach_of_contract_to_serve|Breach Of Contract To Serve]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:by_tenant_against_landlord_with_special_damage|By Tenant Against Landlord With Special Damage]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:carrying_on_a_noxious_manufacture|Carrying On A Noxious Manufacture]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:case_stated_under_order_xxxvi_rules_1_2_c_p_c|Case Stated Under Order Xxxvi Rules 1 2 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:caveat_application_in_appeal|Caveat Application In Appeal]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:civil_drafting_stay_application_in_appeal_under_order_43_of_c_p_c|Civil Drafting Stay Application In Appeal Under Order 43 Of C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:civil_writ_petition_under_article_226|Civil Writ Petition Under Article 226]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:decree_for_foreclosure_order_xxxiv_rule_2|Decree For Foreclosure Order Xxxiv Rule 2]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:decree_for_recovery_of_land_and_mense_profit|Decree For Recovery Of Land And Mense Profit]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:decree_for_redemption_of_prior_mortgage_and_foreclosure_or_sale_on_subsequent_mortgageorder_xxxiv_rules_23_and_4|Decree For Redemption Of Prior Mortgage And Foreclosure Or Sale On Subsequent Mortgageorder Xxxiv Rules 23 And 4]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:decree_for_saleorder_xxxiv_rules_4|Decree For Saleorder Xxxiv Rules 4]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:defence_in_suits_for_goods_sold_and_delivered|Defence In Suits For Goods Sold And Delivered]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:defence_in_suits_on_bonds|Defence In Suits On Bonds]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:deficiency_upon_a_resale_goods_sold_at_auction|Deficiency Upon A Resale Goods Sold At Auction]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:diverting_a_water_course|Diverting A Water Course]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:execution_of_trusts|Execution Of Trusts]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:expedite_application_before_the_high_court|Expedite Application Before The High Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:for_malicious_prosecution|For Malicious Prosecution]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:foreclosure_or_sale|Foreclosure Or Sale]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:form1_1|Form1 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:form_of_appointment_of_commissioner|Form Of Appointment Of Commissioner]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:form_of_first_appeal|Form Of First Appeal]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:form_of_revision_in_district_court|Form Of Revision In District Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:fraudulently_procuring_credit_to_be_given_to_another_person|Fraudulently Procuring Credit To Be Given To Another Person]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:goods_made_at_defendant_s_request_and_not_accepted|Goods Made At Defendant S Request And Not Accepted]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:goods_sold_at_a_fixed_price_and_delivered|Goods Sold At A Fixed Price And Delivered]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:goods_sold_at_a_reasonable_price_and_delivered|Goods Sold At A Reasonable Price And Delivered]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:injunction_against_the_diversion_of_a_watercourse|Injunction Against The Diversion Of A Watercourse]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:injunction_restraining_nuisance|Injunction Restraining Nuisance]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:injuries_caused_by_negligence_on_a_railroad|Injuries Caused By Negligence On A Railroad]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:injuries_caused_by_negligent_driving|Injuries Caused By Negligent Driving]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:interim_written_statement_on_behalf_of_defendants|Interim Written Statement On Behalf Of Defendants]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:interpleader_1|Interpleader 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:jurisdiction_under_art_32_of_the_constitution|Jurisdiction Under Art 32 Of The Constitution]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:list_of_documents_held_in_suit_interim_of_an_application|List Of Documents Held In Suit Interim Of An Application]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:memorandum_of_writ_appeal_under_clause_15_of_the_letter_patent_act|Memorandum Of Writ Appeal Under Clause 15 Of The Letter Patent Act]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:money_overpaid|Money Overpaid]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:movables_wrongfully_detained|Movables Wrongfully Detained]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:no_41_administration_by_creditor_on_behalf_of_himself_and_all_other_creditors|No 41 Administration By Creditor On Behalf Of Himself And All Other Creditors]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:no_43_administration_by_pecuniary_legatee|No 43 Administration By Pecuniary Legatee]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:not_delivering_goods_sold|Not Delivering Goods Sold]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:notice_of_appeal_this_is_not_a_prescribed_form|Notice Of Appeal This Is Not A Prescribed Form]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:notice_to_defendant|Notice To Defendant]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:notice_to_person_who_the_court_considers_should|Notice To Person Who The Court Considers Should]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:objection_as_to_applicability_of_the_code_of_civil_procedure|Objection As To Applicability Of The Code Of Civil Procedure]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:objection_as_to_pecuniary_jurisdiction|Objection As To Pecuniary Jurisdiction]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:obstructing_a_highway|Obstructing A Highway]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:obstructing_a_right_of_way|Obstructing A Right Of Way]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:obstructing_a_right_to_use_water_for_irrigation|Obstructing A Right To Use Water For Irrigation]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:on_a_bond_for_the_fidelity_of_a_clerk|On A Bond For The Fidelity Of A Clerk]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:on_a_foreign_judgment|On A Foreign Judgment]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:on_an_agreement_of_indemnity|On An Agreement Of Indemnity]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:on_an_award|On An Award]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:order_for_transmission_of_summons_for_service_in_the_jurisdiction_of_another_court|Order For Transmission Of Summons For Service In The Jurisdiction Of Another Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:order_for_transmission_of_summons_to_be_served_on_a_prisoner|Order For Transmission Of Summons To Be Served On A Prisoner]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:order_for_transmission_of_summons_to_be_served_on_a_public_servant_or_soldier|Order For Transmission Of Summons To Be Served On A Public Servant Or Soldier]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:partnership_1|Partnership 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:petition_for_a_writ_of_habeas_corpus_under_art_226_of_the_constitution_of_india|Petition For A Writ Of Habeas Corpus Under Art 226 Of The Constitution Of India]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:petition_for_a_writ_of_mandamus_directions_and_appropriate_orders_art_226_of_the_constitution_of_india|Petition For A Writ Of Mandamus Directions And Appropriate Orders Art 226 Of The Constitution Of India]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:petition_for_a_writ_of_mandamus_in_re_art_226_of_the_cosntitution_of_india|Petition For A Writ Of Mandamus In Re Art 226 Of The Cosntitution Of India]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:petition_for_issue_of_appropriate_writ_in_the_matter_of_art_226_of_the_constitution_of_india|Petition For Issue Of Appropriate Writ In The Matter Of Art 226 Of The Constitution Of India]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:petition_for_issue_of_writ_of_mandamus_and_other_direction_or_order_art_226_of_the_constitution_of_india|Petition For Issue Of Writ Of Mandamus And Other Direction Or Order Art 226 Of The Constitution Of India]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:plaint_no_1_money_lent|Plaint No 1 Money Lent]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:polluting_the_water_under_the_plaintiff_s_land|Polluting The Water Under The Plaintiff S Land]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:preliminary_decree_for_sale_order_xxxiv_rule_4|Preliminary Decree For Sale Order Xxxiv Rule 4]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:proclamation_requiring_attendance_of_witness|Proclamation Requiring Attendance Of Witness]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:procuring_property_by_fraud|Procuring Property By Fraud]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:public_nuisance|Public Nuisance]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:redemption_1|Redemption 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:reply_of_the_defendant_to_the_application_of_the_plaintiff_under_section_151_of_c_p_c|Reply Of The Defendant To The Application Of The Plaintiff Under Section 151 Of C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:reply_of_the_defendant_to_the_application_under_order_39_rules_1_2_and_section_151_c_p_c|Reply Of The Defendant To The Application Under Order 39 Rules 1 2 And Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:reply_of_the_plaintiff_to_the_objection_of_the_defendant|Reply Of The Plaintiff To The Objection Of The Defendant]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:reply_to_application_uuder_order_39_rules_1_and_2_section_151_c_p_c|Reply To Application Uuder Order 39 Rules 1 And 2 Section 151 C P C]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:reply_to_the_application_to_return_plaint|Reply To The Application To Return Plaint]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:reply_to_the_objection_of_the_defendant|Reply To The Objection Of The Defendant]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:rescission_of_a_contract_on_the_ground_of_mistake|Rescission Of A Contract On The Ground Of Mistake]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:restoration_application_in_writ_petition|Restoration Application In Writ Petition]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:restoration_of_movable_property_threatened_with|Restoration Of Movable Property Threatened With]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:restoration_of_movable_property_threatened_with_destruction_and_for_an_injuction|Restoration Of Movable Property Threatened With Destruction And For An Injuction]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:second_appeal_in_high_court|Second Appeal In High Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:security_bond_to_be_given_during_the_pendency_of_appeal|Security Bond To Be Given During The Pendency Of Appeal]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:security_bond_to_be_given_on_order_being_made_to_stay_execution_of_decree_o_41_r_5|Security Bond To Be Given On Order Being Made To Stay Execution Of Decree O 41 R 5]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:security_bond_to_be_given_on_order_being_made_to_stay_execution_of_decree_order_xl_rule_5|Security Bond To Be Given On Order Being Made To Stay Execution Of Decree Order Xl Rule 5]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:security_for_costs_of_appeal_order_xli_rule_10|Security For Costs Of Appeal Order Xli Rule 10]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:security_for_the_production_of_property_order_xxxviii_rule_5|Security For The Production Of Property Order Xxxviii Rule 5]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:security_under_order_xxxviii_rule_9|Security Under Order Xxxviii Rule 9]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:services_and_materials_at_a_reasonable_cost|Services And Materials At A Reasonable Cost]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:services_at_a_reasonable_rate|Services At A Reasonable Rate]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:specific_performance_no_1|Specific Performance No 1]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:specific_performance_no_2|Specific Performance No 2]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:suit_for_permanent_injunction_restraining_the_defendants_from_dispossessing_the_plaintiff_without_following_the_process_of_law_from_a_shop_let_to_him_in|Suit For Permanent Injunction Restraining The Defendants From Dispossessing The Plaintiff Without Following The Process Of Law From A Shop Let To Him In]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:summons_for_disposal_of_suit|Summons For Disposal Of Suit]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:summons_for_judgment_in_a_summary_suit|Summons For Judgment In A Summary Suit]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:summons_for_settlement_of_issues|Summons For Settlement Of Issues]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:summons_in_a_summary_suit_o_37_r_2|Summons In A Summary Suit O 37 R 2]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:summons_to_appear_in_person_o_5_r_3|Summons To Appear In Person O 5 R 3]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:summons_to_legal_representative_of_a_deceased_defendant_o_22_r_4|Summons To Legal Representative Of A Deceased Defendant O 22 R 4]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:summons_to_witness_o_16_r_1_5|Summons To Witness O 16 R 1 5]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:the_security_to_be_furnished_under_order_xxxix_rule_22_shall_be_as_far_as_may_be_by_a_bond_in_the_following_form|The Security To Be Furnished Under Order Xxxix Rule 22 Shall Be As Far As May Be By A Bond In The Following Form]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:to_accompany_returns_of_summons_of_another_court|To Accompany Returns Of Summons Of Another Court]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:use_and_occupation|Use And Occupation]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:warrant_of_arrest_of_witness_o_16_r_10|Warrant Of Arrest Of Witness O 16 R 10]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:warrant_of_attachment_of_property_of_witness_o_16_r_10|Warrant Of Attachment Of Property Of Witness O 16 R 10]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:warrant_of_committal_o_16_r_16|Warrant Of Committal O 16 R 16]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:warrant_of_committal_o_16_r_18|Warrant Of Committal O 16 R 18]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:writ_of_habeas_corpus|Writ Of Habeas Corpus]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:written_statement_in_a_service_matter|Written Statement In A Service Matter]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:written_statement_in_an_injunction_matter_relating_to_infringement_of_easement_rights|Written Statement In An Injunction Matter Relating To Infringement Of Easement Rights]] |
+| civil-pleadings | [[legal_formats:civil-pleadings:wrongful_dismissal|Wrongful Dismissal]] |

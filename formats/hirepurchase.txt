@@ -1,0 +1,18 @@
+^ Category ^ Title ^
+| hirepurchase | [[legal_formats:hirepurchase:agreement_for_hire_of_electric_fan|Agreement For Hire Of Electric Fan]] |
+| hirepurchase | [[legal_formats:hirepurchase:agreement_for_hire_of_machinery|Agreement For Hire Of Machinery]] |
+| hirepurchase | [[legal_formats:hirepurchase:agreement_for_hirepurchase_of_a_car_through_a_finance_company|Agreement For Hirepurchase Of A Car Through A Finance Company]] |
+| hirepurchase | [[legal_formats:hirepurchase:agreement_for_hirepurchase_of_a_motor_vehicle|Agreement For Hirepurchase Of A Motor Vehicle]] |
+| hirepurchase | [[legal_formats:hirepurchase:agreement_for_hirepurchase_of_furniture|Agreement For Hirepurchase Of Furniture]] |
+| hirepurchase | [[legal_formats:hirepurchase:agreement_for_hirepurchase_of_machinery|Agreement For Hirepurchase Of Machinery]] |
+| hirepurchase | [[legal_formats:hirepurchase:agreement_for_hirepurchase_of_vcr|Agreement For Hirepurchase Of Vcr]] |
+| hirepurchase | [[legal_formats:hirepurchase:assignment_of_benefit_of_hirepurchase_agreement|Assignment Of Benefit Of Hirepurchase Agreement]] |
+| hirepurchase | [[legal_formats:hirepurchase:guarantee_of_performance_of_hirepurchase_agreement_by_the_hirer|Guarantee Of Performance Of Hirepurchase Agreement By The Hirer]] |
+| hirepurchase | [[legal_formats:hirepurchase:hire_purchase_agreement|Hire Purchase Agreement]] |
+| hirepurchase | [[legal_formats:hirepurchase:hire_purchase_agreement_for_a_t_v_set|Hire Purchase Agreement For A T V Set]] |
+| hirepurchase | [[legal_formats:hirepurchase:hire_purchase_agreement_for_securing_finance_with_guarantee|Hire Purchase Agreement For Securing Finance With Guarantee]] |
+| hirepurchase | [[legal_formats:hirepurchase:hirepurchase_agreement_between_manufacturer|Hirepurchase Agreement Between Manufacturer]] |
+| hirepurchase | [[legal_formats:hirepurchase:hirepurchase_agreement_in_respect_of_sewing_machine|Hirepurchase Agreement In Respect Of Sewing Machine]] |
+| hirepurchase | [[legal_formats:hirepurchase:hirepurchase_agreements|Hirepurchase Agreements]] |
+| hirepurchase | [[legal_formats:hirepurchase:notice_of_assignment_to_hirer_by_assignee|Notice Of Assignment To Hirer By Assignee]] |
+| hirepurchase | [[legal_formats:hirepurchase:notice_of_termination_of_hirepurchase_agreement|Notice Of Termination Of Hirepurchase Agreement]] |

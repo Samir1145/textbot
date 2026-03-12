@@ -1,0 +1,124 @@
+^ Category ^ Title ^
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:accountable_receipt|Accountable Receipt]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:adoption_deed|Adoption Deed]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:an_instrument_for_purchase_of_a_flat_in_resale_where_society_or_limited_company_or_condominium_is_yet_to|An Instrument For Purchase Of A Flat In Resale Where Society Or Limited Company Or Condominium Is Yet To]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:another_deed_of_reconveyance_for_reconveying|Another Deed Of Reconveyance For Reconveying]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:award_by_an_arbitral_tribunal|Award By An Arbitral Tribunal]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:award_made_on_reference_by_court|Award Made On Reference By Court]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:bills_of_exchange|Bills Of Exchange]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:building_lease|Building Lease]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:certificate_of_sale|Certificate Of Sale]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:codicil_substituting_a_trustee|Codicil Substituting A Trustee]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:codicil_substituting_a_trustee_appointed_under_will|Codicil Substituting A Trustee Appointed Under Will]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:confirmation_of_partition_already_made_by_the_joint_hindu_family|Confirmation Of Partition Already Made By The Joint Hindu Family]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:consent_terms_by_which_decree_to_operate_as_a_conveyance_is_passed|Consent Terms By Which Decree To Operate As A Conveyance Is Passed]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:creating_life_estate_for_the_maintenance_of_the_daughter_in_law_by_way_of_gift|Creating Life Estate For The Maintenance Of The Daughter In Law By Way Of Gift]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:cyber_crime|Cyber Crime]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:declaration_of_gift_of_money|Declaration Of Gift Of Money]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_creating_charge_on_the_property|Deed Creating Charge On The Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_evidencing_oral_partition|Deed Evidencing Oral Partition]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_for_modification_of_the_terms_of_the_lease|Deed For Modification Of The Terms Of The Lease]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_in_respect_of_leasehold_land|Deed In Respect Of Leasehold Land]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_a_house|Deed Of A House]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_apartment|Deed Of Apartment]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_assignment_of_business_with_goodwill_and_immovable_property|Deed Of Assignment Of Business With Goodwill And Immovable Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_assignment_of_business_with_goodwill_and_tenancy_rights|Deed Of Assignment Of Business With Goodwill And Tenancy Rights]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_cancellation|Deed Of Cancellation]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conditional_gift|Deed Of Conditional Gift]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_confirmation|Deed Of Confirmation]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance|Deed Of Conveyance]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_by_mortgagee|Deed Of Conveyance By Mortgagee]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_in_favour_of_mortgagee|Deed Of Conveyance In Favour Of Mortgagee]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_of_a_part_of_the_building|Deed Of Conveyance Of A Part Of The Building]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_of_a_property_exclusive_of_a_flat|Deed Of Conveyance Of A Property Exclusive Of A Flat]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_of_an_interest_in_property|Deed Of Conveyance Of An Interest In Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_of_freehold_property|Deed Of Conveyance Of Freehold Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_of_the_reversion|Deed Of Conveyance Of The Reversion]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_subject_to_mortgage|Deed Of Conveyance Subject To Mortgage]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_conveyance_subject_to_right_of_way|Deed Of Conveyance Subject To Right Of Way]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_dissolution_of_partnership|Deed Of Dissolution Of Partnership]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_dissolution_of_partnership_between_two_partners_one_of_them_taking_over_the_business|Deed Of Dissolution Of Partnership Between Two Partners One Of Them Taking Over The Business]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_dissolution_where_one_partner_takes_over_assets_and_liabilities_of_the_business|Deed Of Dissolution Where One Partner Takes Over Assets And Liabilities Of The Business]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_dissolution_where_the_business_is_continued_by_some_partner|Deed Of Dissolution Where The Business Is Continued By Some Partner]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_english_mortgage_between_an_individual_and_a_firm_of_money_lenders|Deed Of English Mortgage Between An Individual And A Firm Of Money Lenders]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_exchange_of_immovable_properties|Deed Of Exchange Of Immovable Properties]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_family_arrangement|Deed Of Family Arrangement]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_family_arrangement_for_release_of_property_in_favour_of_other_beneficiaries_in_consideration_of_annuity|Deed Of Family Arrangement For Release Of Property In Favour Of Other Beneficiaries In Consideration Of Annuity]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_family_settlement_between_rival_claimants|Deed Of Family Settlement Between Rival Claimants]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_family_settlement_between_the_heirs_0f_a_deceased|Deed Of Family Settlement Between The Heirs 0F A Deceased]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_family_settlement_for_division_of_properties_left_by_a_deceased_between_son_and_daughters_where_son_pays_money_to_daughters|Deed Of Family Settlement For Division Of Properties Left By A Deceased Between Son And Daughters Where Son Pays Money To Daughters]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_gift_of_book_debts|Deed Of Gift Of Book Debts]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_gift_of_goodwill_of_business_trade_marks_by_a_father_to_two_sons_in_partnership|Deed Of Gift Of Goodwill Of Business Trade Marks By A Father To Two Sons In Partnership]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_gift_of_immovable_property|Deed Of Gift Of Immovable Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_gift_of_immovable_property_1|Deed Of Gift Of Immovable Property 1]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_gift_of_moveable_property|Deed Of Gift Of Moveable Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_against_the_partnership_liabilities|Deed Of Indemnity Against The Partnership Liabilities]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_by_the_partner_retaining_assets_and_liabilities_to_a_partner_on_the_dissolution_of_the_partnership_firm|Deed Of Indemnity By The Partner Retaining Assets And Liabilities To A Partner On The Dissolution Of The Partnership Firm]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_by_the_seller_of_a_flat_to_the_purchaser_about_the_doubt_about_the_defence_in_title|Deed Of Indemnity By The Seller Of A Flat To The Purchaser About The Doubt About The Defence In Title]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_for_issuance_of_duplicate_share_certificate_by|Deed Of Indemnity For Issuance Of Duplicate Share Certificate By]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_for_issuance_of_duplicate_share_certificate_by_the_cooperative_housing_society|Deed Of Indemnity For Issuance Of Duplicate Share Certificate By The Cooperative Housing Society]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_for_loss_of_title_deeds|Deed Of Indemnity For Loss Of Title Deeds]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_in_respect_of_title_to_the_property|Deed Of Indemnity In Respect Of Title To The Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_indemnity_with_sureties_to_the_company_for_transfer_of_shares_without_insisting_for_succession_certificate_etc|Deed Of Indemnity With Sureties To The Company For Transfer Of Shares Without Insisting For Succession Certificate Etc]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_lease_for_a_term_in_perpetuity|Deed Of Lease For A Term In Perpetuity]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_lease_for_a_term_of_years|Deed Of Lease For A Term Of Years]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_mortgage_by_conditional_sale|Deed Of Mortgage By Conditional Sale]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partial_partition_by_one_member_from_the_other_members_of_joint_hindu_family|Deed Of Partial Partition By One Member From The Other Members Of Joint Hindu Family]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partial_partition_dividing_the_joint_family_business_only_while_other_properties_remaining_joint|Deed Of Partial Partition Dividing The Joint Family Business Only While Other Properties Remaining Joint]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partial_partition_of_hindu_undivide_family_property_in_respect_of_certain_property_only_while_the_rest_of_hindu_undivided_family_continues_to_be_joint|Deed Of Partial Partition Of Hindu Undivide Family Property In Respect Of Certain Property Only While The Rest Of Hindu Undivided Family Continues To Be Joint]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partition|Deed Of Partition]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partition_between_co_owners|Deed Of Partition Between Co Owners]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partition_between_members_of_a_joint_hindu_family|Deed Of Partition Between Members Of A Joint Hindu Family]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partition_between_two_tenants_in_common|Deed Of Partition Between Two Tenants In Common]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partition_dividing_the_joint_family_business_only_while_other_properties_remaining_joint|Deed Of Partition Dividing The Joint Family Business Only While Other Properties Remaining Joint]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partition_with_a_cash_payment_for_equalisation|Deed Of Partition With A Cash Payment For Equalisation]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partnership|Deed Of Partnership]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partnership_1|Deed Of Partnership 1]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_partnership_for_admitting_a_new_partner|Deed Of Partnership For Admitting A New Partner]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_private_family_trust|Deed Of Private Family Trust]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_public_trust|Deed Of Public Trust]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_rectification|Deed Of Rectification]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_release_of_share_in_a_flat_in_cooperative_housing_society|Deed Of Release Of Share In A Flat In Cooperative Housing Society]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_release_of_share_in_immovable_property|Deed Of Release Of Share In Immovable Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_renewal_of_lease|Deed Of Renewal Of Lease]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_retirement|Deed Of Retirement]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_sale_of_movables|Deed Of Sale Of Movables]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_settlement_under_which_a_son_agrees_to_pay_dower_debt_to_his_fathers_widow|Deed Of Settlement Under Which A Son Agrees To Pay Dower Debt To His Fathers Widow]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_simple_mortgage|Deed Of Simple Mortgage]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_simple_mortgage_2|Deed Of Simple Mortgage 2]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_sub_lease|Deed Of Sub Lease]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_surrender_of_lease|Deed Of Surrender Of Lease]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_surrender_of_the_whole_property|Deed Of Surrender Of The Whole Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_transfer_of_a_flat_in_cooperative_housing_society|Deed Of Transfer Of A Flat In Cooperative Housing Society]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:deed_of_transfer_whereby_the_partnership_firm_is_transferring_the_unit_in_the_society_to_the_retiring_partner|Deed Of Transfer Whereby The Partnership Firm Is Transferring The Unit In The Society To The Retiring Partner]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:dna_fingerprinting_examination|Dna Fingerprinting Examination]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:drawn_up_consent_decree_to_operate|Drawn Up Consent Decree To Operate]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:drawn_up_consent_decree_to_operate_as_a_conveyance|Drawn Up Consent Decree To Operate As A Conveyance]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:equal_installment_bond|Equal Installment Bond]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:form_for_furnishing_statement_specifying_alteration|Form For Furnishing Statement Specifying Alteration]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:form_for_memorandum_of_settlement_of_industrial_dispute_between_employer_and_employees|Form For Memorandum Of Settlement Of Industrial Dispute Between Employer And Employees]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:form_for_obtaining_income_tax_clearance_certificate_under_section_230a_income_tax_act_1_9_6_1|Form For Obtaining Income Tax Clearance Certificate Under Section 230A Income Tax Act 1 9 6 1]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:form_of_a_complicated_will|Form Of A Complicated Will]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:general_terms_and_conditions_of_sale_of_the_immovable_property_by_the_court_receiver|General Terms And Conditions Of Sale Of The Immovable Property By The Court Receiver]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:gift_deed_in_respect_of_gift_of_money|Gift Deed In Respect Of Gift Of Money]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:gift_deed_of_a|Gift Deed Of A]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:gift_deed_of_a_flat_in_a_cooperative_society|Gift Deed Of A Flat In A Cooperative Society]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:letter_of_appointment_of_an_officer|Letter Of Appointment Of An Officer]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:medical_jurisprudence_an_indian_law_perspective|Medical Jurisprudence An Indian Law Perspective]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:now_it_is_agreed_by_and_between_the_parties_as_follows|Now It Is Agreed By And Between The Parties As Follows]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:particulars_of_conditions_of_sale_by_auction_of_a_moveable_property|Particulars Of Conditions Of Sale By Auction Of A Moveable Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:partition_deed|Partition Deed]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:preliminary_notice_to_a_partner_to_show_an_opportunity|Preliminary Notice To A Partner To Show An Opportunity]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:reconveyance_deed|Reconveyance Deed]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:regarding_closure_of_business|Regarding Closure Of Business]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:regarding_issue_of_duplicate_licence|Regarding Issue Of Duplicate Licence]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:regarding_non_ownership_of_alleged_business|Regarding Non Ownership Of Alleged Business]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:requisitions_on_the_vendors_title_to_the_property|Requisitions On The Vendors Title To The Property]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:simple_form_for_money_due|Simple Form For Money Due]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:statement_of_transfer_of_immovable_property_for_obtaining_noobjection_certificate_from_appropriate_authority_incometax_department|Statement Of Transfer Of Immovable Property For Obtaining Noobjection Certificate From Appropriate Authority Incometax Department]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:surrender_of_tenancy_rights|Surrender Of Tenancy Rights]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:tenancy_in_the_form_of_letter_by_the_person|Tenancy In The Form Of Letter By The Person]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:terms_of_compromise_in_a_suit|Terms Of Compromise In A Suit]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:the_ten_commandments_of_crossexamination|The Ten Commandments Of Crossexamination]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:transfer_of_a_flat_by_the_vendor_to_a_third_party_on_ownership_basis_subject_to_the_rights_of_an_existing_tenant|Transfer Of A Flat By The Vendor To A Third Party On Ownership Basis Subject To The Rights Of An Existing Tenant]] |
+| miscellaneous-deeds | [[legal_formats:miscellaneous-deeds:transfer_of_a_flat_on_ownership_basis_by_the_vendor_to_the_existing_tenant|Transfer Of A Flat On Ownership Basis By The Vendor To The Existing Tenant]] |

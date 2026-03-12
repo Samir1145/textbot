@@ -1,0 +1,20 @@
+^ Category ^ Title ^
+| composition-deed | [[legal_formats:composition-deed:agreement_for_compromise_between_the_employer_andworkman_for_payment_of_compensation_under_workmen_s_compensation_act|Agreement For Compromise Between The Employer Andworkman For Payment Of Compensation Under Workmen S Compensation Act]] |
+| composition-deed | [[legal_formats:composition-deed:agreement_for_compromise_of_action_for_infringement_of_patent|Agreement For Compromise Of Action For Infringement Of Patent]] |
+| composition-deed | [[legal_formats:composition-deed:appointment_of_a_new_trustee_of_deed_of_assignment_in_place_of_a_deceased_trustee|Appointment Of A New Trustee Of Deed Of Assignment In Place Of A Deceased Trustee]] |
+| composition-deed | [[legal_formats:composition-deed:assent_by_a_creditor_to_deed_of_composition_and_undertaking_to_execute_the_same|Assent By A Creditor To Deed Of Composition And Undertaking To Execute The Same]] |
+| composition-deed | [[legal_formats:composition-deed:composition_deed|Composition Deed]] |
+| composition-deed | [[legal_formats:composition-deed:composition_deed_in_which_the_debtor_agrees_to_carry_on_business_under_the_inspection_of_creditors|Composition Deed In Which The Debtor Agrees To Carry On Business Under The Inspection Of Creditors]] |
+| composition-deed | [[legal_formats:composition-deed:deed_of_compromise_between_claimants_of_estate|Deed Of Compromise Between Claimants Of Estate]] |
+| composition-deed | [[legal_formats:composition-deed:deed_of_compromise_between_legatees_and_heirs|Deed Of Compromise Between Legatees And Heirs]] |
+| composition-deed | [[legal_formats:composition-deed:deed_of_family_arrangement_for_release_of_property_in_favour_of_other_beneficiaries_in_consideration_of_annuity|Deed Of Family Arrangement For Release Of Property In Favour Of Other Beneficiaries In Consideration Of Annuity]] |
+| composition-deed | [[legal_formats:composition-deed:deed_of_family_settlement_between_rival_claimants|Deed Of Family Settlement Between Rival Claimants]] |
+| composition-deed | [[legal_formats:composition-deed:deed_of_family_settlement_between_the_heirs_of_a_deceased|Deed Of Family Settlement Between The Heirs Of A Deceased]] |
+| composition-deed | [[legal_formats:composition-deed:deed_of_family_settlement_for_division_of_properties_left_by_a_deceased_between_son_and_daughters_where_son_pays_money_to_daughters|Deed Of Family Settlement For Division Of Properties Left By A Deceased Between Son And Daughters Where Son Pays Money To Daughters]] |
+| composition-deed | [[legal_formats:composition-deed:deed_of_settlement_under_which_a_son_agrees_to_pay_dower_debt_to_his_father_s_widow|Deed Of Settlement Under Which A Son Agrees To Pay Dower Debt To His Father S Widow]] |
+| composition-deed | [[legal_formats:composition-deed:family_arrangement_in_which_the_daughters_convey_their_shares_in_favour_of_their_brother|Family Arrangement In Which The Daughters Convey Their Shares In Favour Of Their Brother]] |
+| composition-deed | [[legal_formats:composition-deed:family_arrangement_to_adopt_an_unattested_will|Family Arrangement To Adopt An Unattested Will]] |
+| composition-deed | [[legal_formats:composition-deed:form1_1|Form1 1]] |
+| composition-deed | [[legal_formats:composition-deed:reconveyance_by_trustee_of_surplus_property_after_payment_of_all_debts|Reconveyance By Trustee Of Surplus Property After Payment Of All Debts]] |
+| composition-deed | [[legal_formats:composition-deed:simple_compromise_agreement|Simple Compromise Agreement]] |
+| composition-deed | [[legal_formats:composition-deed:terms_of_compromise_in_a_suit|Terms Of Compromise In A Suit]] |

@@ -1,0 +1,11 @@
+^ Category ^ Title ^
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:administration_by_pecuniary_legatee|Administration By Pecuniary Legatee]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:agreement_of_indemnity|Agreement Of Indemnity]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:defence_to_suits_for_specific_performance|Defence To Suits For Specific Performance]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:execution_of_trusts|Execution Of Trusts]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:injunction_restraining_nuisance|Injunction Restraining Nuisance]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:restoration_of_movable_property_threatened_with_destruction_and_for_an_injunction|Restoration Of Movable Property Threatened With Destruction And For An Injunction]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:specific_performance_no_1|Specific Performance No 1]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:specific_performance_no_2|Specific Performance No 2]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:title_of_suits|Title Of Suits]] |
+| plaint-and-written-statement | [[legal_formats:plaint-and-written-statement:written_statements|Written Statements]] |

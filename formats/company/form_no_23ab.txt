@@ -1,0 +1,121 @@
+FORM NO. 23AB
+(See Rule 7A)
+Statement contenting salient features of balance sheet and profit and loss account, etc. as per section 219(1)(b)(iv)
+Form of Abridged Balance Sheet 
+Name of the Company …………………….
+Abridged balance sheet as at …………………
+
+Particulars |Figures at the end of |
+|Current financial year|Previous financial year|
+|||
+I|SOURCES OF FUNDS|||
+|(4)	Shareholders funds|||
+|(a)	Capital |||
+|(i)	Equity|||
+|(ii)	Preference|||
+|(iii)	Reserves and surplus|||
+|(b)	Reserves and surplus| ||
+|(i)	Capital reserve|||
+|(ii)	Revenue reserve |||
+|(iii)	Revaluation reserve|||
+|(iv)	Surplus in profit and loss account |||
+|(v)	Share premium reserve|||
+|(vi)	Investment allowance reserve] |||
+|(5)	Loan funds|||
+|(a)	Debentures (the amount of convertible /partly convertible debentures indicating the date of conversion] |||
+|(b)	Public deposits|||
+|(c)	©Secured loans (other than debentures)|||
+|(d)	Unsecured loans|||
+|Total of (1) and (2)|||
+||||
+II|APPLICATION OF FUNDS|||
+|(4)	Fixed assets|||
+|(a)	Net block ------(Original cost less depreciation)|||
+|(b)	Capital work-in-progress|||
+|(5)	Investments |||
+|(a)	Government securities  |||
+|(b)	Investment in subsidiary companies|||
+|(i)	Quoted |||
+|(ii)	Unquoted|||
+|(c)	©others|||
+|(i)	Quoted |||
+|(ii)	Unquoted|||
+|(6)	(I)  Current assets, loans and advances|||
+|(a)	Inventories|||
+|(b)	Sundry debtors|||
+|(c)	©Cash and bank balances|||
+|(d)	other current assets|||
+|(e)	Loans and advances|||
+|(i)	To subsidiary companies |||
+|(ii)	To others|||
+||||
+||||
+||||
+|Less:|||
+|(i)  Current liabilities and provisions |||
+|(a)	Liabilities|||
+|(b)	Provisions|||
+|Net current assets (I—ii)|||
+|(4)	Miscellaneous expenditure to the extent not written off or adjusted|||
+|(5)	Profit and loss account |||
+|Total of 1 to 5 |||
+||||
+|Abridged profit and loss account for the year ending …………….|
+||||
+Particulars |Figures at the end of |
+||Current financial year|Previous financial year|
+I.|Income |||
+|Sales/services rendered (Details to be given separately as per Annexure)|||
+|Dividend|||
+|Interest |||
+|Other income (See Note 5)|||
+|Total|||
+II|Expenditure|||
+|Cost of goods consumed/sold |||
+|(i)   opening stock|||
+|(ii)   Purchases|||
+|Less: Closing stock||||
+||||
+|Manufacturing expenses|||
+|Selling expenses|||
+|Salaries, wages and other employee|||
+|      benefits managerial remuneration |||
+|Interest |||
+|Depreciation |||
+|Auditor’s remuneration|||
+|Provisions for  (I)   Doubtful debts; and |||
+|                       (ii)   Other contingencies (to be specified)|||
+|Any other expenses (See Note 5)|||
+|Total|||
+||||
+III|Profit/loss before tax (I-II)|||
+IV|Provision for taxation|||
+V|Profit/loss after tax|||
+VI|Proposed dividend:|||
+|---preference shares|||
+|---Equity shares|||
+VII|Transfer to reserves/surplus|||
+||||
+
+Notes to the abridged balance sheet and the abridged profit and loss account.
+The amounts to be shown here should be the same as shown in the corresponding aggregated heads in the accounts as per Schedule VI or as near thereto as possible.
+The total amount of contingent liabilities and that of capital commitments should be shown separately.
+All notes forming part of the  accounts as per Schedule VI to which specific attention has been drawn by the auditors or which form a subject-matter of qualification by the auditor should be reproduced.
+If fixed assets are revalued, the amount of revaluation should be shown separately for the first five years subsequent to the date of revaluation.
+Any item which constitutes 20% or more of the total income of or expenditure (including provision) should be shown separately. 
+Amount , if material, by which any items shown in the profit and loss account are affected by any change in the basis of accounting, should be disclosed  separately.
+If no provision is made for depreciation, the fact that no provision has been made shall be stated along with the quantum of arrears of depreciation computed in accordance with section 205(2) of the Act.
+Market value of quoted investments (both for current year as also of previous year) should be mentioned.
+Any noted forming part of the accounts as per Schedule VI which is in the nature of any explanation regarding  compliance with any law should be reproduced.
+Important ratio performance such as sales/total assets ratio, operating profit/capital employed ratio, return on net worth profit/sales ratio.
+Details of installed capacity and productivity of main items manufactured should be disclosed.
+Notes in the abridged balance sheet should be given the same number as in the main balance sheet.
+	The above stated salient features of balance sheet and profit and loss account should be authenticated in the same manner as the main accounts are to be authenticated.
+	Auditor’s report and the comments, if any, of the Comptroller and Auditor-General of India under sub-section (4) of section 619, in the respect of Government companies and companies under section 619B.
+DIRECTORS REPORT
+	Should be given in full except the information under clause (e) of sub-section (1) and sub-section (2A) of section 217.
+	Subsidiary company/companies--------
+	Every holding company shall give a statement relating to its subsidiary company/companies to be furnished in pursuance of clauses (e), (f) and (g) of sub-section (1) of section 212.
+(Signed by Directors/Secretary in the 
+manner prescribed in section 215(1).
+

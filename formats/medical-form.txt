@@ -1,0 +1,2 @@
+^ Category ^ Title ^
+| medical-form | [[legal_formats:medical-form:patient_rights|Patient Rights]] |

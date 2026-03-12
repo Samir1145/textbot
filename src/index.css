@@ -1,0 +1,97 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* ── Color tokens — dark theme (default) ──────────────────── */
+  --bg: #111827;
+  --bg-2: #1f2937;
+  --bg-3: #374151;
+  --bg-sidebar: #151e2d;
+  --bg-center: #1c2333;
+  --bg-deep: #080e1a;
+  --border: #374151;
+  --border-2: #4b5563;
+  --border-subtle: #1f2937;
+  --text: #e5e7eb;
+  --text-2: #d1d5db;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+  --text-faint: #4b5563;
+  --surface-subtle: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --surface-active: rgba(255,255,255,0.06);
+  --shadow: rgba(0,0,0,0.4);
+  --bg-hover: #253347;
+  --divider-bg: #2d3748;
+}
+
+[data-theme="light"] {
+  --bg: #f8fafc;
+  --bg-2: #ffffff;
+  --bg-3: #f1f5f9;
+  --bg-sidebar: #eef2f8;
+  --bg-center: #e8ecf4;
+  --bg-deep: #dde3ed;
+  --border: #e2e8f0;
+  --border-2: #cbd5e1;
+  --border-subtle: #f1f5f9;
+  --text: #0f172a;
+  --text-2: #1e293b;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+  --text-faint: #cbd5e1;
+  --surface-subtle: rgba(0,0,0,0.03);
+  --surface-hover: rgba(0,0,0,0.05);
+  --surface-active: rgba(0,0,0,0.04);
+  --shadow: rgba(0,0,0,0.12);
+  --bg-hover: #e8f0fe;
+  --divider-bg: #d1d5db;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden; /* prevent outer scrollbars; inner panels will scroll */
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+

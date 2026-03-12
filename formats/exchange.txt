@@ -1,0 +1,8 @@
+^ Category ^ Title ^
+| exchange | [[legal_formats:exchange:agreement_for_exchange|Agreement For Exchange]] |
+| exchange | [[legal_formats:exchange:deed_of_cancellation_of_exchange_and_reconveyance|Deed Of Cancellation Of Exchange And Reconveyance]] |
+| exchange | [[legal_formats:exchange:deed_of_exchange|Deed Of Exchange]] |
+| exchange | [[legal_formats:exchange:deed_of_exchange_of_properties_adjusting_boundaries|Deed Of Exchange Of Properties Adjusting Boundaries]] |
+| exchange | [[legal_formats:exchange:deed_of_exchange_where_money_is_paid_for_equalit|Deed Of Exchange Where Money Is Paid For Equalit]] |
+| exchange | [[legal_formats:exchange:deed_of_exchange_where_one_property_is_subject_to_a_mortgage|Deed Of Exchange Where One Property Is Subject To A Mortgage]] |
+| exchange | [[legal_formats:exchange:exchange_by_two_separate_deeds|Exchange By Two Separate Deeds]] |

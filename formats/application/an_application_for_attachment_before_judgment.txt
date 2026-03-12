@@ -1,0 +1,34 @@
+An application for attachment before judgment
+
+HIGHLIGHTS
+The provision is under Order 38 of the Code of Civil Procedure. The relevant provision reads as follows :
+5. Where defendant may be called upon to furnish security for production of property
+(1) Where, at any stage of a suit, the Court is satisfied, by affidavit or otherwise, that the defendant, with intent to obstruct or delay the execution of any decree that may be passed against him 
+(a) is about to dispose of the whole or any part of his property, or
+(b) is about to remove the whole or any part of his property from the local jurisdiction of the Court, the Court may direct the defendant, within a time to be fixed by it, either to furnish security, in such sum as may be specified in the order, to produce and place at the disposal of the Court, when required, the said property or the value of the same, or such portion thereof as may be sufficient to satisfy the decree, or to appear and show cause why he should not furnish security.
+
+(2) The plaintiff shall, unless the Court otherwise directs, specify the property required to be attached and estimated value thereof.
+
+(3) The Court may also in the order direct the conditional attachment of the whole or any portion of the property so specified.
+(4) If an order of attachment is made without complying with the provisions of sub-rule of this rule, such attachment shall be void.
+
+6. Attachment where cause now shown or security not furnished -
+(1) Where the defendant fails to show cause whey he should not furnish security, or fails to furnish the security required, within the time fixed by the Court, the Court may order that the property specified, or such portion thereof as appears sufficient to satisfy any decree which may be passed in the suit, be attached.
+(2) Where the defendant shows such cause or furnishes the required security, and the property specified or any portion of it has been attached, the Court shall order the attachment to be withdrawn, or make such other order as it thinks fit.
+
+7. Mode of making attachment - Save as otherwise expressly provided, the attachment shall be made in the manner provided for the attachment of property in execution of a decree. 
+
+8. Adjudication of claim to property attached before judgment - Where any claim is preferred to property attached before judgment, such claim shall be adjudicated upon in the manner hereinbefore provided for the adjudication of claims to property attached in execution of a decree for the payment of money.
+
+9. Removal of attachment when security furnished or suit dismissed - Where an order is made for attachment before judgment, the Court shall order the attachment to be withdrawn when the defendant furnishes the security required, together with security for the costs of the attachment, or when the suit is dismissed.
+
+10. Attachment before judgment not to affect rights of strangers, nor bar decree-holder from applying for sale - Attachment before judgment shall not affect the rights, existing prior to the attachment, of persons not parties to the suit, nor bar any person holding a decree against the defendant from applying for the sale of the property under attachment in execution of such decree.
+
+11.Property attached before judgment not to be re-attached in execution of decree - Where property is under attachment by virtue of the provisions of this Order and a decree is subsequently passed in favour of the plaintiff, it shall not be necessary upon an application for execution of such decree to apply for a re-attachment of the property.
+
+11-A. Provisions applicable to attachment- (1) The provisions of this Code applicable to an attachment made in execution of a decree shall, so far as may be, apply to an attachment made before judgment which continues after the judgment by virtue of the provisions of rule 11. (2) An attachment made before judgment in a suit which is dismissed for default shall not become revived merely by reason of the fact that the order for the dismissal of the suit for default has been set aside and the suit has been restored.
+
+12. Agricultural produce not attachable before judgment - Nothing in this Order shall be deemed to authorise the plaintiff to apply for the attachment of any agricultural produce in the possession of an agriculturist, or to empower the Court to order the attachment or production of such produce.
+
+13. Small Cause Court not to attach immovable property - Nothing in this Order shall be deemed to empower any Court of Small Causes to make an order for the attachment of immovable property.
+

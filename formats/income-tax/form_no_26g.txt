@@ -1,0 +1,89 @@
+FORM NO. 26G
+[See section 194F and rule 37]
+Annual return of deduction of tax from payments on repurchase of units by Mutual Funds or Units Trust of India,  under section 206 of the Income-tax, 1961, for the year ending 31st March, 
+
+(a)   Tax Deduction Account Number|||||||||||
+|||||||||||
+        (b)   Permanent Account Number|||||||||||
+||||||||||||||||||
+2.  Details of the person responsible for paying any amount referred to section 80CCB(2)|
+        (a)   Name /Designation||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+        (b)   Address||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Flat/Door/Block No.||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Name of premises/Building||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Road/Street/Lane||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                  Area/Locality||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                Town/City/District||||||||||||||||||||||||||
+||||||||||||||||||||||||||
+                   State||||||||||||||||||||||||||
+||||||||||||||||||
+                Pin Code|||||||
+|||||||
+
+©	Has address of the person responsible for paying any amount referred to 		Tick 	as applicable Yes           No.
+	In section 80CCB(2) changed since submitting the last return 
+
+
+
+
+
+Gross amount of payment made and tax deducted thereon :
+
+Payee|Gross amount paid during the year.  
+ (Rs.)|Total amount of payment   on which no tax deducted  
+(Rs.)|Total amount of payment   on which  tax deducted 
+(Rs.)|Total amount of tax deducted|
+||||Income-tax (Rs.)|Surcharge (Rs.)|Total 
+ (Rs.)|
+|(1)|(2)|(3)|(4)|(5)|(6)|
+1. Companies|||||||
+2. Person other than companies|||||||
+Total|||||||
+
+Details of tax deducted and paid to the credit of Central Government 
+Sl. No.|Challan No.|Date of payment|Amount of tax paid
+(Rs.)|Name and address of bank|
+(1)|(2)|(3)|(4)|(5)|
+|||||
+|||||
+|||||
+|||||
+Total|||
+
+Details of payments made under section 80CCB(2) during the year and of tax deducted at source 
+ In the case of companies :
+Sl No.|Permanent Account Number (PAN)|Name of company|Address of the company|Amount paid during the year
+(Rs.)|Date on which  payment made|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credited of Central Government|Tax deduction Certificate Number|Date of furnishing of tax deduction Certificate to the company|
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+Total|||||
+
+In the case of persons/payee other than companies:
+
+Sl No.|Permanent Account Number (PAN)|Name of person / payee |Address of the person / payee |Amount paid during the year
+(Rs.)|Date on which  payment made|Amount of tax deducted (Rs.)|Date on which tax deducted|Date on which tax was paid to the credited of Central Government|Tax deduction Certificate Number|Date of furnishing of tax deduction Certificate to the person / payee |
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+|||||||||||
+Total|||||
+
+
+
+Verification
+
+I,							certify that all the particulars furnished above are correct and complete
+Place: 				Name and signature of the person responsible for deducting tax at source...
+Date: 				Designation 
