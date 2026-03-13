@@ -1,12 +1,13 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react'
 import { flushSync } from 'react-dom'
 import { useTheme } from '../useTheme.js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { uploadCaseBlob, loadCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes } from '../db.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
-import { getDocRagStatus, indexDocPages, pruneDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
-import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF } from '../utils/pdfExtract.js'
+import { getDocRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
+import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupIntoParagraphs } from '../utils/pdfExtract.js'
+import { getCachedThumb, setCachedThumb } from '../utils/thumbnailCache.js'
 import { buildEvidenceBlock, parseCitations, tokeniseMessage, narrowCitations, distanceToScore } from '../utils/parseCitations.js'
 import { streamOllamaChat, callOllama } from '../utils/ollamaStream.js'
 import './PDFApp.css'
@@ -26,6 +27,43 @@ async function _fetchSuggestions(question, answer) {
     const parsed = JSON.parse(match[0])
     return Array.isArray(parsed) ? parsed.slice(0, 3).map(String) : []
   } catch { return [] }
+}
+
+// ── Word-count-based chunk merging ──────────────────────────────────────────
+// Merges paragraph chunks so each resulting chunk is ≤ targetWords words.
+function estimateTokens(text) {
+  return text.trim().split(/\s+/).length
+}
+
+function mergeChunksByTokens(pages, targetTokens) {
+  const merged = []
+  for (const page of pages) {
+    let buf = []
+    let bufTokens = 0
+    const flush = () => {
+      if (!buf.length) return
+      const text = buf.map(c => c.text).join(' ')
+      const hasBbox = buf.every(c => c.bbox)
+      const bbox = hasBbox ? [
+        Math.min(...buf.map(c => c.bbox[0])),
+        Math.min(...buf.map(c => c.bbox[1])),
+        Math.max(...buf.map(c => c.bbox[2])),
+        Math.max(...buf.map(c => c.bbox[3])),
+      ] : null
+      merged.push({ pageNum: page.pageNum, text, bbox })
+      buf = []
+      bufTokens = 0
+    }
+    for (const chunk of page.chunks) {
+      if (!chunk.text?.trim() || chunk.text.length < 15) continue
+      const t = estimateTokens(chunk.text)
+      if (buf.length > 0 && bufTokens + t > targetTokens) flush()
+      buf.push(chunk)
+      bufTokens += t
+    }
+    flush()
+  }
+  return merged
 }
 
 // Configure pdfjs worker for bundlers like Vite
@@ -64,9 +102,15 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   })
   const [activePartyId, setActivePartyId] = useState(null)
   const [collapsedParties, setCollapsedParties] = useState({})
-  const [docStatuses, setDocStatuses] = useState({})
+  const [docStatuses, setDocStatuses] = useState(() => {
+    if (!caseId) return {}
+    try { return JSON.parse(localStorage.getItem(`pdf-statuses-${caseId}`) || '{}') } catch { return {} }
+  })
   const [renamingPartyId, setRenamingPartyId] = useState(null)
   const pendingAddPartyRef = useRef(null) // partyId to assign the next file upload to
+
+  // ── RAG query result cache — avoids re-hitting sqlite-vec for repeated questions ──
+  const ragQueryCacheRef = useRef(new Map()) // key → rawChunks[]
 
   // Flat document list derived from parties — used by all existing pdf/extraction/chat logic
   const documents = useMemo(() => parties.flatMap(p => p.documents), [parties])
@@ -77,7 +121,10 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   })
   const [activeDocUrl, setActiveDocUrl] = useState(null)
   const [pageCount, setPageCount] = useState(null)
-  const [pageCountsById, setPageCountsById] = useState({})
+  const [pageCountsById, setPageCountsById] = useState(() => {
+    if (!caseId) return {}
+    try { return JSON.parse(localStorage.getItem(`pdf-pagecounts-${caseId}`) || '{}') } catch { return {} }
+  })
   const [pageDims, setPageDims] = useState({})   // pageNum → {w,h} — drives skeleton sizing
   const [renderScale, setRenderScale] = useState(1.0)
   const [pdfLoading, setPdfLoading] = useState(false)
@@ -101,35 +148,63 @@ const fileInputRef = useRef(null)
     } else {
       top = container.scrollTop + elRect.top - cRect.top
     }
+    addLogRef.current(`[SCROLL] → page ${pageNum} (${block}) scrollTop: ${Math.round(top)}`, 'info')
     container.scrollTo({ top, behavior: 'smooth' })
   }, [])
   // ── Auto-fit: scale PDF to fill container width ────────────────────────
   const recalcScale = useCallback(() => {
     const container = pagesContainerRef.current
     const naturalW = pageDimsRef.current[1]?.w / renderScaleRef.current
-    if (!container || !naturalW) return
+    if (!container || !naturalW) {
+      addLogRef.current(`[SCALE] skip — container=${!!container} naturalW=${naturalW}`, 'info')
+      return
+    }
     const available = container.clientWidth - 32 // subtract 16px padding each side
     const newScale = Math.max(0.4, +(available / naturalW).toFixed(2))
-    if (Math.abs(newScale - renderScaleRef.current) > 0.03) setRenderScale(newScale)
+    const willUpdate = Math.abs(newScale - renderScaleRef.current) > 0.03
+    addLogRef.current(
+      `[SCALE] clientW=${container.clientWidth} naturalW=${Math.round(naturalW)} cur=${renderScaleRef.current.toFixed(2)} → new=${newScale.toFixed(2)} ${willUpdate ? '✦ UPDATING' : '(no change)'}`,
+      willUpdate ? 'ok' : 'info'
+    )
+    if (willUpdate) setRenderScale(newScale)
   }, [])
 
-  // Re-fit when container is resized (panel drag)
+  // Re-fit when panel split or sidebar changes (divider drag / sidebar toggle).
+  // rAF defers until after the browser has applied the new flex layout so
+  // container.clientWidth reflects the settled width.
   useEffect(() => {
-    const container = pagesContainerRef.current
-    if (!container) return
-    let timer = null
-    const observer = new ResizeObserver(() => {
-      clearTimeout(timer)
-      timer = setTimeout(recalcScale, 120)
-    })
-    observer.observe(container)
-    return () => { observer.disconnect(); clearTimeout(timer) }
+    addLogRef.current(`[EFFECT] centerSplit/sidebarOpen changed → recalcScale (split=${centerSplit.toFixed(1)} sidebar=${sidebarOpen})`, 'info')
+    const id = requestAnimationFrame(recalcScale)
+    return () => cancelAnimationFrame(id)
+  }, [centerSplit, sidebarOpen, recalcScale])
+
+  // Re-fit when first page dims arrive (new doc loaded).
+  useEffect(() => {
+    if (!pageDims[1]) return
+    addLogRef.current(`[EFFECT] pageDims[1].w changed (${pageDims[1]?.w}) → recalcScale`, 'info')
+    const id = requestAnimationFrame(recalcScale)
+    return () => cancelAnimationFrame(id)
+  }, [pageDims[1]?.w, recalcScale]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-fit on window resize (browser window resize / DevTools open-close).
+  useEffect(() => {
+    const onResize = () => {
+      addLogRef.current('[EFFECT] window resize → recalcScale', 'info')
+      requestAnimationFrame(recalcScale)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
   }, [recalcScale])
 
-  // Re-fit when first page dims arrive (new doc loaded)
+  // ── Persist doc statuses + page counts to localStorage ──────────────────
+  // Placed here — after docStatuses AND pageCountsById are both declared —
+  // to avoid a temporal dead zone reference in the dep arrays.
   useEffect(() => {
-    if (pageDims[1]) recalcScale()
-  }, [pageDims[1]?.w]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (caseId) localStorage.setItem(`pdf-statuses-${caseId}`, JSON.stringify(docStatuses))
+  }, [docStatuses, caseId])
+  useEffect(() => {
+    if (caseId) localStorage.setItem(`pdf-pagecounts-${caseId}`, JSON.stringify(pageCountsById))
+  }, [pageCountsById, caseId])
 
   // ── PDF Notes ──
   const [notes, setNotes] = useState([])          // [{id, pageNum, x, y, text, createdAt}]
@@ -144,6 +219,8 @@ const fileInputRef = useRef(null)
   const observerRef = useRef(null)
   const thumbObserverRef = useRef(null)
   const renderScaleRef = useRef(1.0)
+  // DEV: ref so pre-addLog callbacks can log into the activity panel
+  const addLogRef = useRef(() => {})
   const pdfBufferRef = useRef(null)      // cached PDF bytes for zoom re-renders
   const prevActiveDocUrlRef = useRef(null)
   const prevActiveDocIdRef = useRef(null)
@@ -369,14 +446,22 @@ const fileInputRef = useRef(null)
 
     function setupObserver() {
       if (cancelled) return
+      addLogRef.current(`[OBSERVER] setupObserver called — watching ${pagesContainerRef.current?.querySelectorAll('.pdfapp-page-canvas').length ?? 0} canvases`, 'info')
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (!entry.isIntersecting) return
           const canvas = entry.target
-          if (canvas.dataset.transferred || !canvas.isConnected) return
-          canvas.dataset.transferred = 'true'
-
           const pageNum = parseInt(canvas.dataset.page, 10)
+          if (canvas.dataset.transferred) {
+            addLogRef.current(`[INTERSECT] page ${pageNum} in view — already transferred (skip)`, 'info')
+            return
+          }
+          if (!canvas.isConnected) {
+            addLogRef.current(`[INTERSECT] page ${pageNum} in view — not connected (skip)`, 'error')
+            return
+          }
+          canvas.dataset.transferred = 'true'
+          addLogRef.current(`[INTERSECT] page ${pageNum} in view → transferring to worker`, 'ok')
           canvas.style.backgroundColor = 'transparent'
           try {
             const offscreen = canvas.transferControlToOffscreen()
@@ -385,6 +470,7 @@ const fileInputRef = useRef(null)
               [offscreen]
             )
           } catch (err) {
+            addLogRef.current(`[INTERSECT] page ${pageNum} OffscreenCanvas transfer FAILED: ${err.message}`, 'error')
             console.warn(`[PDF] OffscreenCanvas unavailable for page ${pageNum}:`, err)
           }
         })
@@ -404,6 +490,7 @@ const fileInputRef = useRef(null)
       if (cancelled) return
       if (msg.type === 'ready') {
         const { numPages, dims } = msg
+        addLogRef.current(`[WORKER] ready — ${numPages} pages, dims[1]=${dims[1]?.w}×${dims[1]?.h}`, 'ok')
         pageDimsRef.current = dims
         // flushSync forces React to commit dim/size state to DOM before the
         // observer fires — prevents the canvas from displaying at raw physical-
@@ -421,11 +508,13 @@ const fileInputRef = useRef(null)
       } else if (msg.type === 'dims-update') {
         // Some pages have different dimensions from page 1 — patch them
         const updated = { ...pageDimsRef.current, ...msg.dims }
+        addLogRef.current(`[WORKER] dims-update for pages: ${Object.keys(msg.dims).join(', ')}`, 'info')
         pageDimsRef.current = updated
         setPageDims(updated)
       } else if (msg.type === 'rendered') {
         // Build text layer imperatively after the worker finishes drawing a page
         const { pageNum } = msg
+        addLogRef.current(`[WORKER] rendered page ${pageNum}`, 'info')
         if (!pdfDocRef.current) return
         const scale = renderScaleRef.current
         pdfDocRef.current.getPage(pageNum).then(page => {
@@ -505,19 +594,46 @@ const fileInputRef = useRef(null)
     thumbWorkerRef.current = worker
 
     worker.onmessage = ({ data: msg }) => {
-      if (cancelled || msg.type !== 'ready') return
+      if (cancelled) return
+
+      // Worker sends back a JPEG buffer for thumbnails — persist to IDB for next session.
+      if (msg.type === 'rendered' && msg.thumbBuffer && activeDocumentId) {
+        const blob = new Blob([msg.thumbBuffer], { type: 'image/jpeg' })
+        setCachedThumb(activeDocumentId, msg.pageNum, blob)
+      }
+
+      if (msg.type !== 'ready') return
       requestAnimationFrame(() => requestAnimationFrame(() => {
         if (cancelled || !thumbsContainerRef.current) return
         const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
+          entries.forEach(async entry => {
             if (!entry.isIntersecting) return
             const canvas = entry.target
-            if (canvas.dataset.transferred || !canvas.isConnected) return
-            canvas.dataset.transferred = 'true'
+            if (canvas.dataset.rendered || !canvas.isConnected) return
+            canvas.dataset.rendered = 'true' // claim immediately to prevent double-processing
+
+            const pageNum = parseInt(canvas.dataset.page, 10)
+
+            // Check IDB cache — draw directly without involving the worker
+            const cached = await getCachedThumb(activeDocumentId, pageNum)
+            if (cached && canvas.isConnected) {
+              try {
+                const bmp = await createImageBitmap(cached)
+                const ctx = canvas.getContext('2d')
+                canvas.width  = bmp.width
+                canvas.height = bmp.height
+                ctx?.drawImage(bmp, 0, 0)
+                bmp.close()
+                return
+              } catch { /* fall through to worker if IDB blob is corrupt */ }
+            }
+
+            // Not cached — transfer canvas to worker for rendering
+            if (!canvas.isConnected) return
             try {
               const offscreen = canvas.transferControlToOffscreen()
               thumbWorkerRef.current?.postMessage(
-                { type: 'render', pageNum: parseInt(canvas.dataset.page, 10), canvas: offscreen, dpr: 1 },
+                { type: 'render', pageNum, canvas: offscreen, dpr: 1 },
                 [offscreen]
               )
             } catch { /* OffscreenCanvas not supported */ }
@@ -550,11 +666,22 @@ const fileInputRef = useRef(null)
   // ── RAG state ──
   const [ragStatus, setRagStatus] = useState(null)   // null | 'indexing' | 'indexed'
   const [ragProgress, setRagProgress] = useState('')
+  const [chunkTokenSize, setChunkTokenSize] = useState(100)
+
+  // ── Evidence (starred sources + notes → report) ──
+  const [starredSources, setStarredSources] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
+  })
+  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'evidence' | 'report'
+  const [reportFormat, setReportFormat] = useState('')
+  const [reportContent, setReportContent] = useState('')
+  const [reportLoading, setReportLoading] = useState(false)
+  const reportAbortRef = useRef(null)
 
   // ── Activity log ──
   const [logs, setLogs] = useState([])
   const [logOpen, setLogOpen] = useState(true)
-  const logBottomRef = useRef(null)
+  const logEntriesRef = useRef(null)
 
   const addLog = useCallback((msg, level = 'info') => {
     if (!msg?.trim()) return
@@ -563,10 +690,20 @@ const fileInputRef = useRef(null)
       { id: crypto.randomUUID(), time: new Date(), msg: msg.trim(), level },
     ])
   }, [])
+  // DEV: wire ref so pre-addLog callbacks can reach the activity log
+  addLogRef.current = addLog
+
+  // DEV: log whenever renderScale state actually changes
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    addLog(`[RENDERSCALE] changed → ${renderScale.toFixed(3)}`, 'ok')
+  }, [renderScale]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll log to bottom when new entries arrive
   useEffect(() => {
-    if (logOpen) logBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (logOpen && logEntriesRef.current) {
+      logEntriesRef.current.scrollTop = logEntriesRef.current.scrollHeight
+    }
   }, [logs, logOpen])
 
   // ── LexChat ──
@@ -580,14 +717,25 @@ const fileInputRef = useRef(null)
   useEffect(() => {
     if (!activeCitations.size) return
     const firstChunk = activeCitations.values().next().value
+    const bbox = firstChunk.bbox
+    const narrowBbox = firstChunk.narrowBbox
+    const bboxStr = bbox ? `[${bbox.map(v => v.toFixed(3)).join(', ')}]` : 'none'
+    const bboxArea = bbox ? ((bbox[2] - bbox[0]) * (bbox[3] - bbox[1])).toFixed(3) : 'n/a'
+    const isLarge = bbox && (bbox[2] - bbox[0]) > 0.8 && (bbox[3] - bbox[1]) > 0.5
+    addLog(
+      `[CITATION] page=${firstChunk.page_num} bbox=${bboxStr} area=${bboxArea}${isLarge ? ' ⚠ LARGE BBOX (covers most of page)' : ''} narrowBbox=${narrowBbox ? `[${narrowBbox.map(v => v.toFixed(3)).join(', ')}]` : 'none'}`,
+      isLarge ? 'error' : 'ok'
+    )
     scrollPageIntoView(firstChunk.page_num, 'center')
   }, [activeCitations])
   const chatAbortRef = useRef(null)
-  const chatBottomRef = useRef(null)
+  const chatMessagesRef = useRef(null)
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight
+    }
   }, [chatMessages])
 
   // Reset chat + RAG state when document changes; load persisted chat history
@@ -597,6 +745,7 @@ const fileInputRef = useRef(null)
     setRagStatus(null)
     setRagProgress('')
     setActiveCitations(new Map())
+    ragQueryCacheRef.current.clear() // invalidate cached search results for previous doc
 
     if (!activeDocumentId) return
 
@@ -622,6 +771,74 @@ const fileInputRef = useRef(null)
   const persistNotes = useCallback((next, docId) => {
     saveNotes(docId, next, { caseId }).catch(() => {})
   }, [caseId])
+
+  // ── Starred source handlers ──
+  const _starKey = (chunk) => `${chunk.page_num}::${chunk.text.slice(0, 60)}`
+
+  const handleToggleStar = useCallback((chunk, question = '') => {
+    setStarredSources(prev => {
+      const k = _starKey(chunk)
+      const exists = prev.findIndex(s => s.key === k)
+      const next = exists >= 0
+        ? prev.filter((_, i) => i !== exists)
+        : [...prev, {
+            id: crypto.randomUUID(),
+            key: k,
+            docId: activeDocumentId,
+            chunkText: chunk.text,
+            pageNum: chunk.page_num,
+            bbox: chunk.bbox || null,
+            narrowBbox: chunk.narrowBbox || null,
+            score: chunk.distance != null ? distanceToScore(chunk.distance) : null,
+            question: question.slice(0, 120),
+            starredAt: new Date().toISOString(),
+          }]
+      localStorage.setItem(`starred-${caseId || 'solo'}`, JSON.stringify(next))
+      return next
+    })
+  }, [activeDocumentId, caseId])
+
+  const handleRemoveStar = useCallback((id) => {
+    setStarredSources(prev => {
+      const next = prev.filter(s => s.id !== id)
+      localStorage.setItem(`starred-${caseId || 'solo'}`, JSON.stringify(next))
+      return next
+    })
+  }, [caseId])
+
+  const handleGenerateReport = useCallback(async () => {
+    if (reportLoading) { reportAbortRef.current?.abort(); return }
+    const filledNotes = notes.filter(n => n.text?.trim())
+    if (!starredSources.length && !filledNotes.length) return
+    setReportContent('')
+    setReportLoading(true)
+    const controller = new AbortController()
+    reportAbortRef.current = controller
+    const evidenceBlock = [
+      starredSources.length > 0
+        ? '## Starred Sources\n' + starredSources.map((s, i) =>
+            `[${i + 1}] p.${s.pageNum}${s.question ? ` (context: "${s.question}")` : ''}:\n"${s.chunkText.slice(0, 400)}"`
+          ).join('\n\n')
+        : '',
+      filledNotes.length > 0
+        ? '## User Notes\n' + filledNotes.map(n => `p.${n.pageNum}: ${n.text}`).join('\n')
+        : '',
+    ].filter(Boolean).join('\n\n')
+    try {
+      await streamOllamaChat({
+        messages: [
+          { role: 'system', content: 'You are a professional analyst. Generate a well-structured report from the provided evidence. Use headings, bullet points, and cite page numbers where relevant.' },
+          { role: 'user', content: `${reportFormat.trim() ? `Format instructions: ${reportFormat}\n\n` : ''}Evidence:\n\n${evidenceBlock}\n\nGenerate the report.` },
+        ],
+        signal: controller.signal,
+        onChunk: text => setReportContent(text),
+      })
+    } catch (err) {
+      if (err.name !== 'AbortError') setReportContent(prev => prev + `\n\n[Error: ${err.message}]`)
+    } finally {
+      setReportLoading(false)
+    }
+  }, [starredSources, notes, reportFormat, reportLoading])
 
   const handlePageClick = useCallback((e, pageNum) => {
     if (!noteMode) return
@@ -668,13 +885,19 @@ const fileInputRef = useRef(null)
     chatAbortRef.current = controller
 
     // RAG: retrieve relevant chunks and build numbered evidence block
+    // Results are cached per (doc/case + query text) to avoid redundant vector searches.
     let ragContext = ''
     let chunkMap = new Map()
     if (ragStatus === 'indexed' && activeDocumentId) {
-      const rawChunks = caseSearchActive && caseId
-        ? await searchCaseChunks(caseId, text, 5)
-        : await searchDocChunks(activeDocumentId, text, 3, { caseId });
-      ({ ragContext, chunkMap } = buildEvidenceBlock(rawChunks))
+      const cacheKey = `${caseSearchActive ? `case:${caseId}` : `doc:${activeDocumentId}`}::${text}`
+      let rawChunks = ragQueryCacheRef.current.get(cacheKey)
+      if (!rawChunks) {
+        rawChunks = caseSearchActive && caseId
+          ? await searchCaseChunks(caseId, text, 5)
+          : await searchDocChunks(activeDocumentId, text, 3, { caseId })
+        if (rawChunks?.length) ragQueryCacheRef.current.set(cacheKey, rawChunks)
+      }
+      ;({ ragContext, chunkMap } = buildEvidenceBlock(rawChunks))
     }
 
     // Fallback: when not indexed, include full extracted text (truncated) so the model has document context
@@ -748,7 +971,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       setChatLoading(false)
     }
   }, [chatInput, chatLoading, chatMessages, ragStatus, activeDocumentId, caseSearchActive, caseId, addLog])
-  const handleIndexDocument = useCallback(async () => {
+  const handleIndexDocument = useCallback(async ({ forceClear = false } = {}) => {
     if (ragStatus === 'indexing') return
     const cached = lastExtractionPagesRef.current
     const hasCachedPages = cached.docId === activeDocumentId && cached.pages
@@ -757,11 +980,17 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
     setRagStatus('indexing')
     try {
-      // Step 1 — index format categories (skips already-done ones)
+      // Step 1 — optionally clear existing chunks (re-index with new token size)
+      if (forceClear) {
+        setRagProgress('Clearing previous index…')
+        await clearDocChunks(activeDocumentId, { caseId })
+      }
+
+      // Step 2 — index format categories (skips already-done ones)
       setRagProgress('Setting up categories (first time only)…')
       await initFormatCategories(FORMAT_CATEGORIES)
 
-      // Step 2 — get bbox-aware paragraph chunks
+      // Step 3 — get bbox-aware paragraph chunks
       // Prefer cached pages from extraction (has OCR bboxes too); fallback to native re-extract
       let pages
       if (hasCachedPages) {
@@ -772,13 +1001,22 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         pages = await extractPageChunksFromPDF(pdf, { onStatus: setRagProgress })
       }
 
-      const allChunks = pages.flatMap(p =>
-        p.chunks
-          .filter(c => c.text.length > 15)
-          .map((c, idx) => ({ pageNum: p.pageNum, chunkIdx: idx, text: c.text, bbox: c.bbox }))
+      // Step 4 — re-chunk from raw words if available (free re-grouping — no re-OCR needed),
+      //           otherwise fall back to the pre-grouped paragraph chunks.
+      const paragraphPages = pages.map(p =>
+        p.rawWords?.length
+          ? { pageNum: p.pageNum, chunks: groupIntoParagraphs(p.rawWords) }
+          : p
       )
+      const mergedChunks = mergeChunksByTokens(paragraphPages, chunkTokenSize)
+      const allChunks = mergedChunks.map((c, idx) => ({
+        pageNum: c.pageNum,
+        chunkIdx: idx,
+        text: c.text,
+        bbox: c.bbox,
+      }))
 
-      // Step 3 — incremental embed + store in batches (server skips unchanged hashes)
+      // Step 5 — embed + store in batches (server skips unchanged hashes)
       const BATCH = 10
       for (let i = 0; i < allChunks.length; i += BATCH) {
         const batch = allChunks.slice(i, i + BATCH)
@@ -787,8 +1025,10 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       }
 
       // Prune stale chunks (from previous versions with different chunk count/layout)
-      setRagProgress('Pruning stale chunks…')
-      await pruneDocChunks(activeDocumentId, allChunks.map(c => ({ pageNum: c.pageNum, chunkIdx: c.chunkIdx })), { caseId })
+      if (!forceClear) {
+        setRagProgress('Pruning stale chunks…')
+        await pruneDocChunks(activeDocumentId, allChunks.map(c => ({ pageNum: c.pageNum, chunkIdx: c.chunkIdx })), { caseId })
+      }
 
       setRagStatus('indexed')
 
@@ -798,7 +1038,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     } finally {
       setRagProgress('')
     }
-  }, [activeDocumentId, ragStatus, caseId])
+  }, [activeDocumentId, ragStatus, caseId, chunkTokenSize])
 
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
@@ -1016,7 +1256,10 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 key={i}
                 className={`pdfapp-citation-chip${activeCitations.has(token) ? ' pdfapp-citation-chip--active' : ''}`}
                 title={`Page ${chunk.page_num} — ${chunk.text.slice(0, 120)}${chunk.text.length > 120 ? '…' : ''}`}
-                onClick={() => setActiveCitations(new Map([[token, chunk]]))}
+                onClick={() => {
+                  addLog(`[CLICK] citation chip [${token}] → page ${chunk.page_num}`, 'info')
+                  setActiveCitations(new Map([[token, chunk]]))
+                }}
               >
                 {token}
               </button>
@@ -1269,7 +1512,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 <span className="pdfapp-log-chevron">{logOpen ? '▾' : '▸'}</span>
               </button>
               {logOpen && (
-                <div className="pdfapp-log-entries">
+                <div className="pdfapp-log-entries" ref={logEntriesRef}>
                   {logs.length === 0 && (
                     <div className="pdfapp-log-empty">No activity yet</div>
                   )}
@@ -1281,7 +1524,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                       <span className="pdfapp-log-msg">{entry.msg}</span>
                     </div>
                   ))}
-                  <div ref={logBottomRef} />
                 </div>
               )}
             </div>
@@ -1523,6 +1765,30 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
                   {/* ── Extraction controls ── */}
                   <div className="pdfapp-extract-controls" onClick={e => e.stopPropagation()}>
+                    {/* Chunk word size control */}
+                    <label className="pdfapp-token-label" title="Target words per chunk (30–200). Changing this and clicking Re-index rebuilds the entire embedding index.">
+                      <span>Words</span>
+                      <input
+                        className="pdfapp-token-input"
+                        type="number"
+                        min={30}
+                        max={200}
+                        step={10}
+                        value={chunkTokenSize}
+                        onChange={e => setChunkTokenSize(Math.max(30, Math.min(200, Number(e.target.value) || 100)))}
+                        disabled={ragStatus === 'indexing'}
+                      />
+                    </label>
+                    {/* Re-index button — clear + rebuild with new token size */}
+                    <button
+                      className="pdfapp-extract-btn pdfapp-extract-btn--reindex"
+                      title="Clear existing index and re-embed with current token size"
+                      disabled={ragStatus === 'indexing' || (!extractedPages && !lastExtractionPagesRef.current?.pages) || !activeDocumentId}
+                      onClick={() => handleIndexDocument({ forceClear: true })}
+                    >
+                      ⟳ Re-index
+                    </button>
+                    <span className="pdfapp-extract-sep" />
                     {extractingText ? (
                       <button
                         className="pdfapp-extract-btn pdfapp-extract-btn--stop"
@@ -1633,10 +1899,20 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         </div>
       </div>
 
-      {/* ── Panel 3: Right Workspace — Summary ── */}
+      {/* ── Panel 3: Right Workspace ── */}
       <div className="pdfapp-right" style={{ flex: rightFlex }}>
-        <div className="pdfapp-chat">
-          <div className="pdfapp-chat-messages">
+        {/* Tab bar */}
+        <div className="pdfapp-right-tabs">
+          <button className={`pdfapp-right-tab${rightTab === 'chat' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('chat')}>Chat</button>
+          <button className={`pdfapp-right-tab${rightTab === 'evidence' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('evidence')}>
+            Evidence{starredSources.length + notes.filter(n => n.text?.trim()).length > 0 ? ` (${starredSources.length + notes.filter(n => n.text?.trim()).length})` : ''}
+          </button>
+          <button className={`pdfapp-right-tab${rightTab === 'report' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('report')}>Report</button>
+        </div>
+
+        {/* ── Chat tab ── */}
+        {rightTab === 'chat' && <div className="pdfapp-chat">
+          <div className="pdfapp-chat-messages" ref={chatMessagesRef}>
               {chatMessages.length === 0 && (
                 <div className="pdfapp-chat-empty">
                   <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#4b5563" strokeWidth="1.2">
@@ -1660,25 +1936,36 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                         {[...msg.citations.entries()].map(([n, chunk]) => {
                           const score = chunk.distance != null ? distanceToScore(chunk.distance) : null
                           const hasNarrow = !!chunk.narrowBbox
+                          const isStarred = starredSources.some(s => s.key === `${chunk.page_num}::${chunk.text.slice(0, 60)}`)
+                          const questionCtx = chatMessages[i - 1]?.content || ''
                           return (
-                            <button
-                              key={n}
-                              className={`pdfapp-source-item${activeCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
-                              onClick={() => setActiveCitations(new Map([[n, chunk]]))}
-                              title={hasNarrow ? 'Sentence-level highlight available' : 'Paragraph highlight'}
-                            >
-                              <span className="pdfapp-source-num">[{n}]</span>
-                              <span className="pdfapp-source-page">p.{chunk.page_num}</span>
-                              {score != null && (
-                                <span className={`pdfapp-source-score pdfapp-source-score--${score >= 70 ? 'high' : score >= 40 ? 'mid' : 'low'}`}>
-                                  {score}%
+                            <div key={n} className="pdfapp-source-row">
+                              <button
+                                className={`pdfapp-source-item${activeCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
+                                onClick={() => {
+                                  addLog(`[CLICK] source [${n}] → page ${chunk.page_num}`, 'info')
+                                  setActiveCitations(new Map([[n, chunk]]))
+                                }}
+                                title={hasNarrow ? 'Sentence-level highlight available' : 'Paragraph highlight'}
+                              >
+                                <span className="pdfapp-source-num">[{n}]</span>
+                                <span className="pdfapp-source-page">p.{chunk.page_num}</span>
+                                {score != null && (
+                                  <span className={`pdfapp-source-score pdfapp-source-score--${score >= 70 ? 'high' : score >= 40 ? 'mid' : 'low'}`}>
+                                    {score}%
+                                  </span>
+                                )}
+                                {hasNarrow && <span className="pdfapp-source-narrow" title="Sentence-level">◈</span>}
+                                <span className="pdfapp-source-excerpt">
+                                  {chunk.text.slice(0, 100)}{chunk.text.length > 100 ? '…' : ''}
                                 </span>
-                              )}
-                              {hasNarrow && <span className="pdfapp-source-narrow" title="Sentence-level">◈</span>}
-                              <span className="pdfapp-source-excerpt">
-                                {chunk.text.slice(0, 100)}{chunk.text.length > 100 ? '…' : ''}
-                              </span>
-                            </button>
+                              </button>
+                              <button
+                                className={`pdfapp-source-star${isStarred ? ' pdfapp-source-star--active' : ''}`}
+                                title={isStarred ? 'Remove from evidence' : 'Add to evidence'}
+                                onClick={() => handleToggleStar(chunk, questionCtx)}
+                              >★</button>
+                            </div>
                           )
                         })}
                       </div>
@@ -1699,7 +1986,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   </div>
                 </div>
               ))}
-              <div ref={chatBottomRef} />
             </div>
             {caseId && (
               <div className="pdfapp-chat-scope-row">
@@ -1735,7 +2021,88 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 </svg>
               </button>
             </div>
+          </div>}
+
+        {/* ── Evidence tab ── */}
+        {rightTab === 'evidence' && (
+          <div className="pdfapp-evidence">
+            {starredSources.length === 0 && notes.filter(n => n.text?.trim()).length === 0 && (
+              <div className="pdfapp-evidence-empty">
+                Star sources (★) from chat responses, or add page notes via the pencil tool, to build your evidence collection.
+              </div>
+            )}
+            {starredSources.length > 0 && (
+              <div className="pdfapp-evidence-section">
+                <div className="pdfapp-evidence-section-title">⭐ Starred Sources ({starredSources.length})</div>
+                {starredSources.map(s => (
+                  <div key={s.id} className="pdfapp-evidence-item">
+                    <div className="pdfapp-evidence-item-meta">
+                      <span className="pdfapp-evidence-item-page">p.{s.pageNum}</span>
+                      {s.score != null && <span className="pdfapp-evidence-item-score">{s.score}%</span>}
+                      <button className="pdfapp-evidence-goto" title="Go to page" onClick={() => { scrollPageIntoView(s.pageNum, 'center'); setActiveCitations(new Map([[1, { text: s.chunkText, page_num: s.pageNum, bbox: s.bbox, narrowBbox: s.narrowBbox }]])) }}>→</button>
+                      <button className="pdfapp-evidence-remove" title="Remove" onClick={() => handleRemoveStar(s.id)}>✕</button>
+                    </div>
+                    {s.question && <div className="pdfapp-evidence-item-q">"{s.question.slice(0, 100)}{s.question.length > 100 ? '…' : ''}"</div>}
+                    <div className="pdfapp-evidence-item-text">{s.chunkText.slice(0, 220)}{s.chunkText.length > 220 ? '…' : ''}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {notes.filter(n => n.text?.trim()).length > 0 && (
+              <div className="pdfapp-evidence-section">
+                <div className="pdfapp-evidence-section-title">📝 Notes ({notes.filter(n => n.text?.trim()).length})</div>
+                {notes.filter(n => n.text?.trim()).map(n => (
+                  <div key={n.id} className="pdfapp-evidence-item">
+                    <div className="pdfapp-evidence-item-meta">
+                      <span className="pdfapp-evidence-item-page">p.{n.pageNum}</span>
+                      <button className="pdfapp-evidence-goto" title="Go to page" onClick={() => scrollPageIntoView(n.pageNum, 'center')}>→</button>
+                    </div>
+                    <div className="pdfapp-evidence-item-text">{n.text}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+        )}
+
+        {/* ── Report tab ── */}
+        {rightTab === 'report' && (
+          <div className="pdfapp-report-panel">
+            <div className="pdfapp-report-format">
+              <textarea
+                className="pdfapp-report-format-input"
+                placeholder="Describe the report format… e.g. 'Executive summary with: Background, Key Findings, Risk Assessment, Recommendations'"
+                value={reportFormat}
+                rows={3}
+                onChange={e => setReportFormat(e.target.value)}
+              />
+              <button
+                className={`pdfapp-report-btn${reportLoading ? ' pdfapp-report-btn--stop' : ''}`}
+                onClick={handleGenerateReport}
+                disabled={!reportLoading && !starredSources.length && !notes.filter(n => n.text?.trim()).length}
+              >
+                {reportLoading
+                  ? '■ Stop'
+                  : `Generate Report${starredSources.length + notes.filter(n => n.text?.trim()).length > 0 ? ` (${starredSources.length + notes.filter(n => n.text?.trim()).length} items)` : ''}`}
+              </button>
+            </div>
+            {!reportContent && !reportLoading && (
+              <div className="pdfapp-evidence-empty">
+                Add starred sources and notes in the Evidence tab, then generate your report here.
+              </div>
+            )}
+            {reportContent && (
+              <div className="pdfapp-report-output-wrap">
+                <div className="pdfapp-report-output-actions">
+                  <button className="pdfapp-report-copy" onClick={() => navigator.clipboard.writeText(reportContent).catch(() => {})}>Copy</button>
+                  <button className="pdfapp-report-clear" onClick={() => setReportContent('')}>Clear</button>
+                </div>
+                <div className="pdfapp-report-output">{reportContent}</div>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
 
     </div>

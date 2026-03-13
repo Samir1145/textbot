@@ -958,6 +958,48 @@
   color: var(--text);
 }
 
+.pdfapp-extract-btn--reindex {
+  background: #1a2f4a;
+  color: #60a5fa;
+  border-color: #2d4a6b;
+}
+.pdfapp-extract-btn--reindex:not(:disabled):hover {
+  background: #22406e;
+  border-color: #3a66a0;
+}
+
+.pdfapp-token-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.pdfapp-token-input {
+  width: 52px;
+  padding: 1px 4px;
+  font-size: 10px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.pdfapp-token-input::-webkit-inner-spin-button,
+.pdfapp-token-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.pdfapp-token-input:focus { outline: none; border-color: #60a5fa; }
+.pdfapp-token-input:disabled { opacity: 0.4; }
+
+.pdfapp-extract-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
 .pdfapp-extracted-header-left {
   display: flex;
   align-items: center;
@@ -2255,4 +2297,217 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ── Right panel tabs ────────────────────────────────────────────────────── */
+.pdfapp-right-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  background: var(--bg);
+}
+.pdfapp-right-tab {
+  flex: 1;
+  padding: 9px 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 120ms;
+  white-space: nowrap;
+}
+.pdfapp-right-tab:hover { color: var(--text); }
+.pdfapp-right-tab--active { color: #60a5fa; border-bottom-color: #60a5fa; }
+
+/* ── Star button on source items ─────────────────────────────────────────── */
+.pdfapp-source-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.pdfapp-source-row .pdfapp-source-item { flex: 1; min-width: 0; }
+.pdfapp-source-star {
+  flex-shrink: 0;
+  width: 28px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  transition: color 120ms, background 120ms, border-color 120ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.pdfapp-source-star:hover { color: #eab308; background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.4); }
+.pdfapp-source-star--active { color: #eab308; border-color: rgba(234,179,8,0.4); }
+
+/* ── Evidence panel ──────────────────────────────────────────────────────── */
+.pdfapp-evidence {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pdfapp-evidence-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+.pdfapp-evidence-section { display: flex; flex-direction: column; }
+.pdfapp-evidence-section-title {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.pdfapp-evidence-item {
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background: var(--bg-2);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.pdfapp-evidence-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pdfapp-evidence-item-page {
+  font-size: 0.63rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: #60a5fa;
+}
+.pdfapp-evidence-item-score {
+  font-size: 0.63rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(234,179,8,0.15);
+  color: #eab308;
+  font-weight: 600;
+}
+.pdfapp-evidence-item-q {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-style: italic;
+  line-height: 1.4;
+}
+.pdfapp-evidence-item-text {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.pdfapp-evidence-goto {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #60a5fa;
+  font-size: 0.85rem;
+  padding: 0 4px;
+  opacity: 0.8;
+  transition: opacity 120ms;
+}
+.pdfapp-evidence-goto:hover { opacity: 1; }
+.pdfapp-evidence-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  padding: 0 2px;
+  opacity: 0.5;
+  transition: color 120ms, opacity 120ms;
+}
+.pdfapp-evidence-remove:hover { color: #ef4444; opacity: 1; }
+
+/* ── Report panel ────────────────────────────────────────────────────────── */
+.pdfapp-report-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 12px;
+  gap: 10px;
+}
+.pdfapp-report-format { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.pdfapp-report-format-input {
+  resize: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 0.78rem;
+  padding: 8px 10px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.pdfapp-report-format-input:focus { outline: none; border-color: rgba(96,165,250,0.6); }
+.pdfapp-report-btn {
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: #1a3a5c;
+  color: #60a5fa;
+  transition: background 120ms;
+}
+.pdfapp-report-btn:hover:not(:disabled) { background: #1f4572; }
+.pdfapp-report-btn--stop { background: rgba(239,68,68,0.15); color: #ef4444; }
+.pdfapp-report-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pdfapp-report-output-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--bg-2);
+}
+.pdfapp-report-output-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+.pdfapp-report-copy, .pdfapp-report-clear {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 120ms, border-color 120ms;
+}
+.pdfapp-report-copy:hover { color: #60a5fa; border-color: rgba(96,165,250,0.5); }
+.pdfapp-report-clear:hover { color: #ef4444; border-color: rgba(239,68,68,0.5); }
+.pdfapp-report-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  font-size: 0.78rem;
+  line-height: 1.75;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
 }

@@ -168,8 +168,9 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
     isOcr = false
     onStatus?.('Extracting text…')
     pages = nativePages.map(p => ({
-      pageNum: p.pageNum,
-      chunks: p.words.length ? groupIntoParagraphs(p.words) : [],
+      pageNum:  p.pageNum,
+      chunks:   p.words.length ? groupIntoParagraphs(p.words) : [],
+      rawWords: p.words,   // kept so re-chunking with a different word size is free
     }))
     fullText = nativePages
       .filter(p => p.text)
@@ -214,7 +215,7 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
           y2_pct: clamp01(w.bbox.y1 / canvas.height),
         }))
       const chunks = words.length ? groupIntoParagraphs(words) : []
-      ocrResults.push({ pageNum: i, text: data.text.trim(), chunks })
+      ocrResults.push({ pageNum: i, text: data.text.trim(), chunks, rawWords: words })
 
       // Emit partial results progressively so LexChat can answer as OCR completes
       if (onPartialResult) {
@@ -225,7 +226,7 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
     }
 
     await worker.terminate()
-    pages = ocrResults.map(p => ({ pageNum: p.pageNum, chunks: p.chunks }))
+    pages = ocrResults.map(p => ({ pageNum: p.pageNum, chunks: p.chunks, rawWords: p.rawWords || [] }))
     fullText = ocrResults
       .map(p => `--- Page ${p.pageNum} ---\n${p.text}`)
       .join('\n\n')
@@ -242,8 +243,9 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
     ? `/api/cases/${encodeURIComponent(caseId)}/extractions/${docId}`
     : `/api/extractions/${docId}`
   const pagesForCache = pages.map(p => ({
-    pageNum: p.pageNum,
-    chunks: p.chunks.map(({ text, bbox }) => ({ text, bbox })),
+    pageNum:  p.pageNum,
+    chunks:   p.chunks.map(({ text, bbox }) => ({ text, bbox })),
+    rawWords: p.rawWords || [],   // persisted so re-chunking never requires re-OCR/re-extraction
   }))
   await fetch(saveUrl, {
     method: 'POST',

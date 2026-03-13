@@ -531,14 +531,25 @@ app.post('/api/rag/search-case', async (req, res) => {
 })
 
 // POST /api/rag/init-categories  — index format categories (skips already-indexed)
+// Uses a hash of the full categories list stored in rag_meta to short-circuit the
+// entire loop when nothing has changed — avoids per-row SELECT on every index run.
 app.post('/api/rag/init-categories', async (req, res) => {
     try {
         const { categories } = req.body   // [{name, description}]
         if (!Array.isArray(categories)) return res.status(400).json({ error: 'Missing categories' })
 
         const { db } = await getRagDb()
-        let indexed = 0
 
+        // Fast path: if the categories list hash matches the stored hash, nothing to do.
+        const catHash = createHash('sha256')
+            .update(categories.map(c => `${c.name}::${c.description}`).join('|'))
+            .digest('hex')
+        const stored = db.prepare("SELECT value FROM rag_meta WHERE key = 'categories_hash'").get()
+        if (stored?.value === catHash) {
+            return res.json({ ok: true, indexed: 0, cached: true })
+        }
+
+        let indexed = 0
         for (const { name, description } of categories) {
             const existing = db.prepare('SELECT id FROM format_cats WHERE name = ?').get(name)
             if (existing) continue
@@ -552,6 +563,9 @@ app.post('/api/rag/init-categories', async (req, res) => {
                 indexed++
             }
         }
+
+        // Store the hash so subsequent calls with the same categories are instant.
+        db.prepare("INSERT OR REPLACE INTO rag_meta VALUES ('categories_hash', ?)").run(catHash)
         res.json({ ok: true, indexed })
     } catch (err) {
         console.error('[RAG] init-categories error:', err.message)

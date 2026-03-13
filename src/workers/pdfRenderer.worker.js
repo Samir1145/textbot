@@ -134,7 +134,19 @@ self.onmessage = async ({ data }) => {
       await page.render({ canvasContext: ctx, viewport }).promise
       page.cleanup()
 
-      self.postMessage({ type: 'rendered', pageNum })
+      // For thumbnails (scale < 0.5), send back a JPEG blob so the main
+      // thread can persist it in IndexedDB and skip re-rendering on next load.
+      if (RENDER_SCALE < 0.5) {
+        try {
+          const blob   = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.82 })
+          const buffer = await blob.arrayBuffer()
+          self.postMessage({ type: 'rendered', pageNum, thumbBuffer: buffer }, [buffer])
+        } catch {
+          self.postMessage({ type: 'rendered', pageNum })
+        }
+      } else {
+        self.postMessage({ type: 'rendered', pageNum })
+      }
     }
   } catch (err) {
     self.postMessage({ type: 'error', error: err?.message ?? String(err) })
