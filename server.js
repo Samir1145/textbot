@@ -170,6 +170,22 @@ app.put('/api/cases/:caseId/blobs/:docId', express.raw({ type: 'application/octe
   res.json({ ok: true })
 })
 
+// ── Case-scoped PDF Notes ──
+
+app.get('/api/cases/:caseId/notes/:docId', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'notes'), `${safeId(req.params.docId)}.json`)
+  if (!fs.existsSync(filePath)) return res.json([])
+  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+})
+
+app.post('/api/cases/:caseId/notes/:docId', (req, res) => {
+  fs.writeFileSync(
+    path.join(getCaseSubdir(req.params.caseId, 'notes'), `${safeId(req.params.docId)}.json`),
+    JSON.stringify(req.body)
+  )
+  res.json({ ok: true })
+})
+
 // ── Case Delete (cascade) ──
 
 app.delete('/api/cases/:caseId', (req, res) => {

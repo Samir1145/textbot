@@ -798,10 +798,14 @@
 }
 
 .pdfapp-center-filename {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text);
   white-space: nowrap;
+  pointer-events: none;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
@@ -819,8 +823,6 @@
 
 .pdfapp-center-pages {
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
   padding-top: 24px;
   display: flex;
   flex-direction: column;
@@ -2005,6 +2007,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
   gap: 8px;
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);
@@ -2044,37 +2047,99 @@
 .pdfapp-toolbar-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .pdfapp-toolbar-btn--active  { background: var(--bg-3); color: var(--text); }
 
-.pdfapp-toolbar-zoom {
-  font-size: 0.72rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
-  min-width: 34px;
-  text-align: center;
+.pdfapp-toolbar-btn--thumb { background: #dc2626; color: #fff; border-color: #b91c1c; }
+.pdfapp-toolbar-btn--thumb:hover:not(:disabled) { background: #b91c1c; color: #fff; }
+.pdfapp-toolbar-btn--thumb.pdfapp-toolbar-btn--active { background: #b91c1c; color: #fff; }
+
+.pdfapp-toolbar-btn--annot { background: #16a34a; color: #fff; border-color: #15803d; }
+.pdfapp-toolbar-btn--annot:hover:not(:disabled) { background: #15803d; color: #fff; }
+.pdfapp-toolbar-btn--annot.pdfapp-toolbar-btn--active { background: #166534; color: #fff; border-color: #14532d; }
+
+.pdfapp-toolbar-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+  margin: 0 2px;
   flex-shrink: 0;
 }
 
-.pdfapp-toolbar-page-input {
-  width: 44px;
-  height: 22px;
-  padding: 0 4px;
-  font-size: 0.72rem;
-  text-align: center;
-  background: var(--bg-2);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  outline: none;
-  -moz-appearance: textfield;
-}
-.pdfapp-toolbar-page-input::-webkit-inner-spin-button,
-.pdfapp-toolbar-page-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-.pdfapp-toolbar-page-input:focus { border-color: var(--border-2); }
+/* ── Annotation tool buttons width ──────────────────────────────────────── */
+.pdfapp-toolbar-btn--annot { width: 30px; }
 
-.pdfapp-toolbar-page-total {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  white-space: nowrap;
+
+/* ── Note pins & popover ─────────────────────────────────────────────────── */
+.pdfapp-page-wrapper--note-mode { cursor: crosshair; }
+
+.pdfapp-note-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  z-index: 20;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  background: #f59e0b;
+  border-radius: 50% 50% 50% 0;
+  rotate: -45deg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  transition: background 120ms, transform 120ms;
+  pointer-events: all;
 }
+.pdfapp-note-pin:hover { background: #d97706; }
+.pdfapp-note-pin--open { background: #2563eb; }
+.pdfapp-note-pin svg  { rotate: 45deg; }
+
+.pdfapp-note-popover {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 220px;
+  background: var(--bg-2, #1e2330);
+  border: 1px solid var(--border-2, #3a4060);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+  padding: 10px;
+  z-index: 30;
+  pointer-events: all;
+}
+.pdfapp-note-textarea {
+  width: 100%;
+  min-height: 90px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text, #e2e8f0);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+}
+.pdfapp-note-popover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  border-top: 1px solid var(--border, #2d3550);
+  padding-top: 6px;
+}
+.pdfapp-note-date {
+  font-size: 0.7rem;
+  color: var(--text-muted, #64748b);
+}
+.pdfapp-note-delete-btn {
+  font-size: 0.7rem;
+  color: #f87171;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.pdfapp-note-delete-btn:hover { text-decoration: underline; }
+
+
 
 /* ── RAG status tri-state dot ─────────────────────────────────────────────── */
 .pdfapp-rag-status-dot {
@@ -2121,21 +2186,6 @@
 .pdfapp-text-layer .highlight { background: rgba(180,0,170,0.25); }
 .pdfapp-text-layer ::selection { background: rgba(59,130,246,0.3); color: transparent; }
 
-/* ── Chunk overlay ──────────────────────────────────────────────────────── */
-.pdfapp-chunk-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  border-radius: 0.75rem;
-  overflow: hidden;
-}
-.pdfapp-chunk-overlay-rect {
-  position: absolute;
-  background: rgba(16,185,129,0.07);
-  border: 1px solid rgba(16,185,129,0.45);
-  border-radius: 2px;
-}
 
 /* ── Thumbnails strip ────────────────────────────────────────────────────── */
 .pdfapp-thumbs {

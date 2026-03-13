@@ -141,6 +141,22 @@ export async function saveChatHistory(docId, messages, { caseId } = {}) {
     await postJSON(`/api/cases/${encodeURIComponent(caseId)}/chat/${encodeURIComponent(docId)}`, serializable)
 }
 
+// ── PDF Notes ──
+
+export async function loadNotes(docId, { caseId } = {}) {
+    if (!caseId) return []
+    try {
+        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}`)
+        if (!res.ok) return []
+        return res.json()
+    } catch { return [] }
+}
+
+export async function saveNotes(docId, notes, { caseId } = {}) {
+    if (!caseId) return
+    await postJSON(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}`, notes)
+}
+
 // ── Case Delete ──
 
 export async function deleteCase(caseId) {

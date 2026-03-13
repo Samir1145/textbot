@@ -3,9 +3,7 @@ import { flushSync } from 'react-dom'
 import { useTheme } from '../useTheme.js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-import { createWorker } from 'tesseract.js'
-import { loadSummary, saveSummary, saveSkillResult, loadSkillResult, loadSavedSkillIds, uploadCaseBlob, loadCaseBlob, loadChatHistory, saveChatHistory } from '../db.js'
-import { LEGAL_SKILLS } from '../skills/legalSkills.js'
+import { uploadCaseBlob, loadCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes } from '../db.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
 import { getDocRagStatus, indexDocPages, pruneDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF } from '../utils/pdfExtract.js'
@@ -28,46 +26,6 @@ async function _fetchSuggestions(question, answer) {
     const parsed = JSON.parse(match[0])
     return Array.isArray(parsed) ? parsed.slice(0, 3).map(String) : []
   } catch { return [] }
-}
-
-// ── Shared PDF text extraction (used by both summarize and skill runs) ──
-async function extractTextFromPDF(pdf, { onStatus, signal }) {
-  const allPageTexts = []
-  const ocrPages = []
-
-  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    if (signal?.aborted) return null
-    onStatus(`Extracting text — page ${pageNum} of ${pdf.numPages}…`)
-    const page = await pdf.getPage(pageNum)
-    const textContent = await page.getTextContent()
-    const pageText = textContent.items.map(item => item.str).join(' ').trim()
-    if (pageText.length > 20) {
-      allPageTexts.push({ pageNum, text: pageText })
-    } else {
-      ocrPages.push(pageNum)
-    }
-  }
-
-  if (ocrPages.length > 0) {
-    onStatus(`Running OCR on ${ocrPages.length} scanned page(s)…`)
-    const worker = await createWorker('eng')
-    for (const pageNum of ocrPages) {
-      if (signal?.aborted) { await worker.terminate(); return null }
-      onStatus(`OCR — page ${pageNum} of ${pdf.numPages}…`)
-      const page = await pdf.getPage(pageNum)
-      const viewport = page.getViewport({ scale: 1.5 })
-      const canvas = document.createElement('canvas')
-      canvas.width = viewport.width
-      canvas.height = viewport.height
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise
-      const { data: { text } } = await worker.recognize(canvas)
-      allPageTexts.push({ pageNum, text: text.trim() })
-    }
-    await worker.terminate()
-  }
-
-  allPageTexts.sort((a, b) => a.pageNum - b.pageNum)
-  return allPageTexts.map(p => `--- Page ${p.pageNum} ---\n${p.text}`).join('\n\n')
 }
 
 // Configure pdfjs worker for bundlers like Vite
@@ -121,14 +79,63 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   const [pageCount, setPageCount] = useState(null)
   const [pageCountsById, setPageCountsById] = useState({})
   const [pageDims, setPageDims] = useState({})   // pageNum → {w,h} — drives skeleton sizing
-  const [renderScale, setRenderScale] = useState(1.25)
+  const [renderScale, setRenderScale] = useState(1.0)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [pdfError, setPdfError] = useState(null)
   const [thumbsOpen, setThumbsOpen] = useState(false)
-  const [showChunkOverlay, setShowChunkOverlay] = useState(false)
-  const [jumpPage, setJumpPage] = useState('')
-  const fileInputRef = useRef(null)
+const fileInputRef = useRef(null)
   const pagesContainerRef = useRef(null)
+
+  // Scroll a page canvas into view within the pages container only,
+  // avoiding scrollIntoView which propagates to overflow:hidden ancestors (Chrome bug).
+  const scrollPageIntoView = useCallback((pageNum, block = 'start') => {
+    const container = pagesContainerRef.current
+    if (!container) return
+    const el = container.querySelector(`[data-page="${pageNum}"]`)
+    if (!el) return
+    const elRect = el.getBoundingClientRect()
+    const cRect = container.getBoundingClientRect()
+    let top
+    if (block === 'center') {
+      top = container.scrollTop + elRect.top - cRect.top - cRect.height / 2 + elRect.height / 2
+    } else {
+      top = container.scrollTop + elRect.top - cRect.top
+    }
+    container.scrollTo({ top, behavior: 'smooth' })
+  }, [])
+  // ── Auto-fit: scale PDF to fill container width ────────────────────────
+  const recalcScale = useCallback(() => {
+    const container = pagesContainerRef.current
+    const naturalW = pageDimsRef.current[1]?.w / renderScaleRef.current
+    if (!container || !naturalW) return
+    const available = container.clientWidth - 32 // subtract 16px padding each side
+    const newScale = Math.max(0.4, +(available / naturalW).toFixed(2))
+    if (Math.abs(newScale - renderScaleRef.current) > 0.03) setRenderScale(newScale)
+  }, [])
+
+  // Re-fit when container is resized (panel drag)
+  useEffect(() => {
+    const container = pagesContainerRef.current
+    if (!container) return
+    let timer = null
+    const observer = new ResizeObserver(() => {
+      clearTimeout(timer)
+      timer = setTimeout(recalcScale, 120)
+    })
+    observer.observe(container)
+    return () => { observer.disconnect(); clearTimeout(timer) }
+  }, [recalcScale])
+
+  // Re-fit when first page dims arrive (new doc loaded)
+  useEffect(() => {
+    if (pageDims[1]) recalcScale()
+  }, [pageDims[1]?.w]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── PDF Notes ──
+  const [notes, setNotes] = useState([])          // [{id, pageNum, x, y, text, createdAt}]
+  const [noteMode, setNoteMode] = useState(false) // true = click-to-place mode
+  const [openNoteId, setOpenNoteId] = useState(null)
+
   const thumbsContainerRef = useRef(null)
   const pdfDocRef = useRef(null)         // main-thread pdf instance for text extraction
   const pageDimsRef = useRef({})         // mirror of pageDims state, readable inside callbacks
@@ -136,7 +143,7 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   const thumbWorkerRef = useRef(null)
   const observerRef = useRef(null)
   const thumbObserverRef = useRef(null)
-  const renderScaleRef = useRef(1.25)
+  const renderScaleRef = useRef(1.0)
   const pdfBufferRef = useRef(null)      // cached PDF bytes for zoom re-renders
   const prevActiveDocUrlRef = useRef(null)
   const prevActiveDocIdRef = useRef(null)
@@ -409,10 +416,6 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
             setPdfLoading(false)
           }
         })
-        // Only persist dims at default scale (avoid caching zoom-specific sizes)
-        if (renderScale === 1.25) {
-          try { localStorage.setItem(`pdf-dims-${activeDocumentId}`, JSON.stringify(dims)) } catch { /* quota */ }
-        }
         // DOM is already updated — single rAF to let the browser paint before observing
         requestAnimationFrame(() => setupObserver())
       } else if (msg.type === 'dims-update') {
@@ -420,9 +423,6 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
         const updated = { ...pageDimsRef.current, ...msg.dims }
         pageDimsRef.current = updated
         setPageDims(updated)
-        if (renderScale === 1.25) {
-          try { localStorage.setItem(`pdf-dims-${activeDocumentId}`, JSON.stringify(updated)) } catch { /* quota */ }
-        }
       } else if (msg.type === 'rendered') {
         // Build text layer imperatively after the worker finishes drawing a page
         const { pageNum } = msg
@@ -542,14 +542,6 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   }, [thumbsOpen, pageCount])
 
   // ── Summarize (OCR + Text LLM) ────────────────
-  const [summary, setSummary] = useState('')
-  const [savedSummaryText, setSavedSummaryText] = useState(null)
-  const [summarizing, setSummarizing] = useState(false)
-  const [summaryError, setSummaryError] = useState(null)
-  const [summaryStatus, setSummaryStatus] = useState('')
-  const [activeSkillName, setActiveSkillName] = useState(null)
-  const [savedSkillIds, setSavedSkillIds] = useState([])
-  const abortRef = useRef(null)
 
   // Stores bbox-rich pages from the most recent extraction for this doc (avoids re-OCR when indexing)
   const lastExtractionPagesRef = useRef({ docId: null, pages: null })
@@ -578,7 +570,6 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   }, [logs, logOpen])
 
   // ── LexChat ──
-  const [lexChatOpen, setLexChatOpen] = useState(false)
   const [caseSearchActive, setCaseSearchActive] = useState(false)
   const [chatMessages, setChatMessages] = useState([])
   const [chatInput, setChatInput] = useState('')
@@ -589,16 +580,15 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   useEffect(() => {
     if (!activeCitations.size) return
     const firstChunk = activeCitations.values().next().value
-    const canvas = pagesContainerRef.current?.querySelector(`[data-page="${firstChunk.page_num}"]`)
-    canvas?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    scrollPageIntoView(firstChunk.page_num, 'center')
   }, [activeCitations])
   const chatAbortRef = useRef(null)
   const chatBottomRef = useRef(null)
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
-    if (lexChatOpen) chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [chatMessages, lexChatOpen])
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages])
 
   // Reset chat + RAG state when document changes; load persisted chat history
   useEffect(() => {
@@ -622,6 +612,43 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     }).catch(() => {})
   }, [activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Load notes when active doc changes
+  useEffect(() => {
+    if (!activeDocumentId || !caseId) { setNotes([]); return }
+    loadNotes(activeDocumentId, { caseId }).then(setNotes).catch(() => setNotes([]))
+    setOpenNoteId(null)
+  }, [activeDocumentId, caseId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const persistNotes = useCallback((next, docId) => {
+    saveNotes(docId, next, { caseId }).catch(() => {})
+  }, [caseId])
+
+  const handlePageClick = useCallback((e, pageNum) => {
+    if (!noteMode) return
+    const wrapper = e.currentTarget
+    const rect = wrapper.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top)  / rect.height
+    const note = { id: crypto.randomUUID(), pageNum, x, y, text: '', createdAt: new Date().toISOString() }
+    const next = [...notes, note]
+    setNotes(next)
+    persistNotes(next, activeDocumentId)
+    setOpenNoteId(note.id)
+    setNoteMode(false)
+  }, [noteMode, notes, activeDocumentId, persistNotes])
+
+  const handleNoteTextSave = useCallback((id, text) => {
+    const next = notes.map(n => n.id === id ? { ...n, text } : n)
+    setNotes(next)
+    persistNotes(next, activeDocumentId)
+  }, [notes, activeDocumentId, persistNotes])
+
+  const handleNoteDelete = useCallback((id) => {
+    const next = notes.filter(n => n.id !== id)
+    setNotes(next)
+    persistNotes(next, activeDocumentId)
+    setOpenNoteId(null)
+  }, [notes, activeDocumentId, persistNotes])
 
   const handleChatSend = useCallback(async () => {
     const text = chatInput.trim()
@@ -659,7 +686,7 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
         : ''
 
     // Build message history for Ollama
-    const systemPrompt = `You are LexChat, an expert legal AI assistant. You help legal professionals analyze documents, answer legal questions, and provide guidance on legal matters.${summary ? `\n\nDocument analysis:\n${summary}` : ''}${docContext}
+    const systemPrompt = `You are LexChat, an expert legal AI assistant. You help legal professionals analyze documents, answer legal questions, and provide guidance on legal matters.${docContext}
 
 Important: You assist with legal workflows but do not provide legal advice. Always recommend qualified legal professionals for final decisions.`
 
@@ -720,42 +747,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     } finally {
       setChatLoading(false)
     }
-  }, [chatInput, chatLoading, chatMessages, summary, ragStatus, activeDocumentId, caseSearchActive, caseId, addLog])
-  const [lexAgentOpen, setLexAgentOpen] = useState(true)
-  const [lexAgentMessages, setLexAgentMessages] = useState([])
-  const [lexAgentInput, setLexAgentInput] = useState('')
-  const [lexAgentLoading, setLexAgentLoading] = useState(false)
-  const lexAgentAbortRef = useRef(null)
-  const lexAgentBottomRef = useRef(null)
-
-  // Load existing summary + saved skill IDs when document changes
-  useEffect(() => {
-    if (!activeDocumentId) {
-      setSummary('')
-      setSavedSummaryText(null)
-      setSavedSkillIds([])
-      return
-    }
-    let cancelled = false
-    setSummary('')
-    setSavedSummaryText(null)
-    setSummaryError(null)
-    setSummaryStatus('')
-    setSavedSkillIds([])
-
-    Promise.all([
-      loadSummary(activeDocumentId, { caseId }),
-      loadSavedSkillIds(activeDocumentId, { caseId }),
-    ]).then(([savedText, skillIds]) => {
-      if (cancelled) return
-      if (savedText) setSavedSummaryText(savedText)
-      setSavedSkillIds(skillIds || [])
-    }).catch(err => console.error('Failed to load saved data:', err))
-
-    return () => { cancelled = true }
-  }, [activeDocumentId])
-
-
+  }, [chatInput, chatLoading, chatMessages, ragStatus, activeDocumentId, caseSearchActive, caseId, addLog])
   const handleIndexDocument = useCallback(async () => {
     if (ragStatus === 'indexing') return
     const cached = lastExtractionPagesRef.current
@@ -807,202 +799,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       setRagProgress('')
     }
   }, [activeDocumentId, ragStatus, caseId])
-
-  const handleSummarize = useCallback(async () => {
-    if (savedSummaryText) {
-      setSummary(savedSummaryText)
-      setActiveSkillName(null)
-      return
-    }
-
-    const pdf = pdfDocRef.current
-    if (!pdf) {
-      setSummaryError('No PDF loaded yet. Please wait for the PDF to finish loading.')
-      return
-    }
-
-    if (abortRef.current) abortRef.current.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    setSummary('')
-    setActiveSkillName(null)
-    setSummarizing(true)
-    setSummaryError(null)
-    setSummaryStatus('Extracting text from PDF…')
-
-    try {
-      const fullText = await extractTextFromPDF(pdf, {
-        onStatus: setSummaryStatus,
-        signal: controller.signal,
-      })
-      if (!fullText || !fullText.trim()) {
-        setSummaryError('Could not extract any text from this PDF.')
-        return
-      }
-
-      setSummaryStatus('Generating summary…')
-      const accumulated = await streamOllamaChat({
-        messages: [{ role: 'user', content: `You are a document analysis assistant. Summarize the following document text. Include all key points, important details, and notable information. Format the summary clearly with sections if the document covers multiple topics.\n\n${fullText}` }],
-        signal: controller.signal,
-        onChunk: setSummary,
-      })
-      if (accumulated) {
-        saveSummary(activeDocumentId, accumulated, { caseId }).catch(console.error)
-        setSavedSummaryText(accumulated)
-      }
-    } catch (err) {
-      if (err.name === 'AbortError') return
-      setSummaryError(err.message || 'Failed to connect to Ollama. Is it running?')
-    } finally {
-      setSummarizing(false)
-      setSummaryStatus('')
-    }
-  }, [savedSummaryText, activeDocumentId])
-
-  const handleRunSkill = useCallback(async (skill) => {
-    const pdf = pdfDocRef.current
-    if (!pdf) {
-      setSummaryError('No PDF loaded yet. Please wait for the PDF to finish loading.')
-      return
-    }
-
-    if (abortRef.current) abortRef.current.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    setSummary('')
-    setActiveSkillName(skill.name)
-    setSummarizing(true)
-    setSummaryError(null)
-    setSummaryStatus('Extracting text from PDF…')
-
-    try {
-      const fullText = await extractTextFromPDF(pdf, {
-        onStatus: setSummaryStatus,
-        signal: controller.signal,
-      })
-      if (!fullText || !fullText.trim()) {
-        setSummaryError('Could not extract any text from this PDF.')
-        return
-      }
-
-      setSummaryStatus(`Running ${skill.name}…`)
-      const accumulated = await streamOllamaChat({
-        messages: [
-          { role: 'system', content: skill.systemPrompt },
-          { role: 'user', content: `Please analyze the following document:\n\n${fullText}` },
-        ],
-        signal: controller.signal,
-        onChunk: setSummary,
-      })
-
-      // Save result and mark skill as saved for this document
-      if (accumulated && activeDocumentId) {
-        saveSkillResult(activeDocumentId, skill.id, accumulated, { caseId }).catch(console.error)
-        setSavedSkillIds(prev => prev.includes(skill.id) ? prev : [...prev, skill.id])
-      }
-    } catch (err) {
-      if (err.name === 'AbortError') return
-      setSummaryError(err.message || 'Failed to connect to Ollama. Is it running?')
-    } finally {
-      setSummarizing(false)
-      setSummaryStatus('')
-    }
-  }, [activeDocumentId])
-
-  const handleStopSummarize = useCallback(() => {
-    if (abortRef.current) {
-      abortRef.current.abort()
-      abortRef.current = null
-    }
-    setSummarizing(false)
-  }, [])
-
-
-  // ── LexAgent — scroll to bottom when messages update ──────────────────
-  useEffect(() => {
-    if (lexAgentOpen) lexAgentBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [lexAgentMessages, lexAgentOpen])
-
-  // ── LexAgent — reset messages when doc changes ─────────────────────────
-  useEffect(() => {
-    setLexAgentMessages([])
-    setLexAgentInput('')
-  }, [activeDocumentId])
-
-  // Run a skill inside the LexAgent chat panel
-  const handleLexAgentSkill = useCallback(async (skill) => {
-    if (lexAgentLoading) return
-    const fullText = extractedTextRef.current
-    if (!fullText?.trim()) {
-      setLexAgentMessages(prev => [...prev, { role: 'assistant', id: crypto.randomUUID(), content: 'Document text not yet extracted. Please wait for extraction to finish.' }])
-      return
-    }
-
-    if (lexAgentAbortRef.current) lexAgentAbortRef.current.abort()
-    const controller = new AbortController()
-    lexAgentAbortRef.current = controller
-
-    const userMsg = { role: 'user', id: crypto.randomUUID(), content: `Run: **${skill.name}**` }
-    const assistantId = crypto.randomUUID()
-    setLexAgentMessages(prev => [...prev, userMsg, { role: 'assistant', id: assistantId, content: '' }])
-    setLexAgentLoading(true)
-
-    try {
-      const accumulated = await streamOllamaChat({
-        messages: [
-          { role: 'system', content: skill.systemPrompt },
-          { role: 'user', content: `Please analyze the following document:\n\n${fullText}` },
-        ],
-        signal: controller.signal,
-        onChunk: text => setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: text }]),
-      })
-
-      if (accumulated && activeDocumentId) {
-        saveSkillResult(activeDocumentId, skill.id, accumulated, { caseId }).catch(console.error)
-        setSavedSkillIds(prev => prev.includes(skill.id) ? prev : [...prev, skill.id])
-      }
-    } catch (err) {
-      if (err.name === 'AbortError') return
-      setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: `Error: ${err.message}` }])
-    } finally {
-      setLexAgentLoading(false)
-    }
-  }, [lexAgentLoading, activeDocumentId, caseId])
-
-  // Send a follow-up message in LexAgent
-  const handleLexAgentSend = useCallback(async () => {
-    const text = lexAgentInput.trim()
-    if (!text || lexAgentLoading) return
-
-    if (lexAgentAbortRef.current) lexAgentAbortRef.current.abort()
-    const controller = new AbortController()
-    lexAgentAbortRef.current = controller
-
-    const userMsg = { role: 'user', id: crypto.randomUUID(), content: text }
-    const assistantId = crypto.randomUUID()
-    const history = [...lexAgentMessages, userMsg]
-    setLexAgentMessages([...history, { role: 'assistant', id: assistantId, content: '' }])
-    setLexAgentInput('')
-    setLexAgentLoading(true)
-
-    try {
-      await streamOllamaChat({
-        messages: [
-          { role: 'system', content: 'You are LexAgent, a legal AI assistant. Answer questions about the document analysis above. Be concise and cite the relevant parts of the analysis.' },
-          ...history.map(m => ({ role: m.role, content: m.content })),
-        ],
-        signal: controller.signal,
-        onChunk: text => setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: text }]),
-      })
-    } catch (err) {
-      if (err.name === 'AbortError') return
-      setLexAgentMessages(prev => [...prev.slice(0, -1), { role: 'assistant', id: assistantId, content: `Error: ${err.message}` }])
-    } finally {
-      setLexAgentLoading(false)
-    }
-  }, [lexAgentInput, lexAgentLoading, lexAgentMessages, caseId])
 
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
@@ -1529,9 +1325,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 key={`thumb-${activeDocumentId}-${n}`}
                 className="pdfapp-thumb-item"
                 onClick={() => {
-                  pagesContainerRef.current
-                    ?.querySelector(`[data-page="${n}"]`)
-                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  scrollPageIntoView(n, 'start')
                 }}
               >
                 <canvas
@@ -1563,7 +1357,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 <div className="pdfapp-toolbar-left">
                   {/* Thumbnail toggle */}
                   <button
-                    className={`pdfapp-toolbar-btn${thumbsOpen ? ' pdfapp-toolbar-btn--active' : ''}`}
+                    className={`pdfapp-toolbar-btn pdfapp-toolbar-btn--thumb${thumbsOpen ? ' pdfapp-toolbar-btn--active' : ''}`}
                     onClick={() => setThumbsOpen(o => !o)}
                     title={thumbsOpen ? 'Hide thumbnails' : 'Show page thumbnails'}
                     disabled={!pageCount}
@@ -1573,62 +1367,28 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                       <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
                     </svg>
                   </button>
-                  <span className="pdfapp-center-filename" title={activeDoc.name}>
-                    {activeDoc.name}
-                  </span>
                 </div>
+                <span className="pdfapp-center-filename" title={activeDoc.name}>
+                  {activeDoc.name.length > 50 ? activeDoc.name.slice(0, 50) + '…' : activeDoc.name}
+                </span>
                 <div className="pdfapp-toolbar-right">
-                  {/* Chunk overlay toggle */}
+                  {/* Note tool */}
                   <button
-                    className={`pdfapp-toolbar-btn${showChunkOverlay ? ' pdfapp-toolbar-btn--active' : ''}`}
-                    onClick={() => setShowChunkOverlay(o => !o)}
-                    title={showChunkOverlay ? 'Hide chunk bboxes' : 'Show chunk bboxes'}
-                    disabled={!extractedPages}
+                    className={`pdfapp-toolbar-btn pdfapp-toolbar-btn--annot${noteMode ? ' pdfapp-toolbar-btn--active' : ''}`}
+                    title={noteMode ? 'Note mode on — click anywhere on the PDF to place a note' : 'Add note'}
+                    disabled={!pageCount}
+                    onClick={() => { setNoteMode(m => !m); setOpenNoteId(null) }}
                   >
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/>
-                      <rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/>
+                    <svg viewBox="0 0 20 20" width="15" height="15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="3" y="1" width="11" height="14" rx="1.5" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.4"/>
+                      <path d="M14 1v4h4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+                      <rect x="3" y="1" width="11" height="14" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.4" clipPath="none"/>
+                      <path d="M3 1 h8 l4 4 v11 a1.5 1.5 0 0 1-1.5 1.5 H4.5 A1.5 1.5 0 0 1 3 16.5 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+                      <line x1="6" y1="8"  x2="13" y2="8"  stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                      <line x1="6" y1="11" x2="13" y2="11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                      <line x1="6" y1="14" x2="10" y2="14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                     </svg>
                   </button>
-                  {/* Zoom controls */}
-                  <button
-                    className="pdfapp-toolbar-btn"
-                    onClick={() => setRenderScale(s => Math.max(0.5, +((s - 0.25).toFixed(2))))}
-                    title="Zoom out"
-                    disabled={renderScale <= 0.5}
-                  >−</button>
-                  <span className="pdfapp-toolbar-zoom">{Math.round(renderScale * 100)}%</span>
-                  <button
-                    className="pdfapp-toolbar-btn"
-                    onClick={() => setRenderScale(s => Math.min(3.0, +((s + 0.25).toFixed(2))))}
-                    title="Zoom in"
-                    disabled={renderScale >= 3.0}
-                  >+</button>
-                  {/* Jump to page */}
-                  {pageCount && (
-                    <>
-                      <input
-                        type="number"
-                        className="pdfapp-toolbar-page-input"
-                        min={1}
-                        max={pageCount}
-                        value={jumpPage}
-                        placeholder="pg"
-                        onChange={e => setJumpPage(e.target.value)}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            const n = parseInt(jumpPage, 10)
-                            if (n >= 1 && n <= pageCount) {
-                              pagesContainerRef.current
-                                ?.querySelector(`[data-page="${n}"]`)
-                                ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                            }
-                          }
-                        }}
-                      />
-                      <span className="pdfapp-toolbar-page-total">/ {pageCount}</span>
-                    </>
-                  )}
                 </div>
               </div>
               <div className="pdfapp-center-body" ref={pagesContainerRef}>
@@ -1648,9 +1408,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                       const pageNum = index + 1
                       const dim = pageDims[pageNum]
                       const pageHighlights = [...activeCitations.values()].filter(c => c.page_num === pageNum && c.bbox)
-                      const chunkData = showChunkOverlay && extractedPages?.find(p => p.pageNum === pageNum)
+                      const pageNotes = notes.filter(n => n.pageNum === pageNum)
                       return (
-                        <div key={`${activeDocumentId}-${pageNum}-${renderScale}`} className="pdfapp-page-wrapper">
+                        <div
+                          key={`${activeDocumentId}-${pageNum}-${renderScale}`}
+                          className={`pdfapp-page-wrapper${noteMode ? ' pdfapp-page-wrapper--note-mode' : ''}`}
+                          onClick={noteMode ? (e) => handlePageClick(e, pageNum) : undefined}
+                        >
                           <canvas
                             data-page={pageNum}
                             className="pdfapp-page-canvas"
@@ -1681,27 +1445,41 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                               })}
                             </div>
                           )}
-                          {/* Chunk bbox overlay (toggle) */}
-                          {chunkData && chunkData.chunks?.length > 0 && (
-                            <div className="pdfapp-chunk-overlay">
-                              {chunkData.chunks.map((chunk, ci) => {
-                                const b = chunk.bbox
-                                if (!b) return null
-                                return (
-                                  <div
-                                    key={ci}
-                                    className="pdfapp-chunk-overlay-rect"
-                                    style={{
-                                      left:   `${b[0] * 100}%`,
-                                      top:    `${b[1] * 100}%`,
-                                      width:  `${(b[2] - b[0]) * 100}%`,
-                                      height: `${(b[3] - b[1]) * 100}%`,
-                                    }}
+                          {/* Note pins */}
+                          {pageNotes.map(note => (
+                            <div
+                              key={note.id}
+                              className={`pdfapp-note-pin${openNoteId === note.id ? ' pdfapp-note-pin--open' : ''}`}
+                              style={{ left: `${note.x * 100}%`, top: `${note.y * 100}%` }}
+                              onClick={e => { e.stopPropagation(); setOpenNoteId(id => id === note.id ? null : note.id) }}
+                              title={note.text || 'Click to view note'}
+                            >
+                              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="white" strokeWidth="1.5" fill="none"/>
+                              </svg>
+                              {openNoteId === note.id && (
+                                <div className="pdfapp-note-popover" onClick={e => e.stopPropagation()}>
+                                  <textarea
+                                    className="pdfapp-note-textarea"
+                                    defaultValue={note.text}
+                                    placeholder="Type your note…"
+                                    autoFocus
+                                    onBlur={e => handleNoteTextSave(note.id, e.target.value)}
                                   />
-                                )
-                              })}
+                                  <div className="pdfapp-note-popover-footer">
+                                    <span className="pdfapp-note-date">
+                                      {new Date(note.createdAt).toLocaleDateString()}
+                                    </span>
+                                    <button
+                                      className="pdfapp-note-delete-btn"
+                                      onClick={() => handleNoteDelete(note.id)}
+                                      title="Delete note"
+                                    >Delete</button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          ))}
                         </div>
                       )
                     })}
@@ -1857,123 +1635,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
       {/* ── Panel 3: Right Workspace — Summary ── */}
       <div className="pdfapp-right" style={{ flex: rightFlex }}>
-        {lexAgentOpen && (
-          <div className="pdfapp-lexagent">
-            <div className="pdfapp-lexagent-header">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
-              </svg>
-              <span>Agents</span>
-              {lexAgentLoading && <div className="pdfapp-spinner pdfapp-spinner--small" />}
-            </div>
-
-            <div className="pdfapp-lexagent-messages">
-              {/* Skill picker — always visible at top */}
-              <div className="pdfapp-lexagent-skills">
-                <p className="pdfapp-lexagent-intro">
-                  {lexAgentMessages.length === 0
-                    ? "Select a skill to analyze this document:"
-                    : "Run another skill:"}
-                </p>
-                <div className="pdfapp-lexagent-skill-grid">
-                  {LEGAL_SKILLS.map(skill => (
-                    <button
-                      key={skill.id}
-                      className={`pdfapp-lexagent-skill-card${savedSkillIds.includes(skill.id) ? ' pdfapp-lexagent-skill-card--done' : ''}`}
-                      onClick={() => handleLexAgentSkill(skill)}
-                      disabled={lexAgentLoading || !activeDocumentId}
-                    >
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                      </svg>
-                      <span>{skill.name}</span>
-                      {savedSkillIds.includes(skill.id) && (
-                        <span className="pdfapp-lexagent-skill-done" title="Saved result available">✓</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chat messages */}
-              {lexAgentMessages.map((msg, i) => (
-                <div key={msg.id ?? i} className={`pdfapp-chat-msg pdfapp-chat-msg--${msg.role}`}>
-                  {msg.role === 'assistant' && <div className="pdfapp-chat-avatar">A</div>}
-                  <div className="pdfapp-chat-msg-body">
-                    <div className="pdfapp-chat-bubble">
-                      {msg.content}
-                      {msg.role === 'assistant' && lexAgentLoading && i === lexAgentMessages.length - 1 && (
-                        <span className="pdfapp-cursor">▌</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <div ref={lexAgentBottomRef} />
-            </div>
-
-            {lexAgentMessages.length > 0 && (
-              <div className="pdfapp-chat-input-row">
-                <textarea
-                  className="pdfapp-chat-input"
-                  value={lexAgentInput}
-                  onChange={e => setLexAgentInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleLexAgentSend() } }}
-                  placeholder="Ask a follow-up question…"
-                  rows={1}
-                  disabled={lexAgentLoading}
-                />
-                <button
-                  className="pdfapp-chat-send"
-                  onClick={handleLexAgentSend}
-                  disabled={lexAgentLoading || !lexAgentInput.trim()}
-                >
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="22" y1="2" x2="11" y2="13" />
-                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                  </svg>
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="pdfapp-summary-header">
-          {summarizing ? (
-            <button
-              className="pdfapp-summarize-btn pdfapp-summarize-btn--stop"
-              onClick={handleStopSummarize}
-            >
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="none">
-                <rect x="6" y="6" width="12" height="12" rx="2" />
-              </svg>
-              Stop
-            </button>
-          ) : (
-            <>
-            <button
-              className={`pdfapp-actions-btn${lexAgentOpen ? ' pdfapp-actions-btn--active' : ''}`}
-              onClick={() => setLexAgentOpen(o => !o)}
-              disabled={!activeDocumentId || pdfLoading}
-              title="Agents — run legal skills and ask follow-up questions"
-            >
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
-              </svg>
-              Agents
-            </button>
-            </>
-          )}
-        </div>
-
-        {lexChatOpen ? (
-          <div className="pdfapp-chat">
-            <div className="pdfapp-chat-messages">
+        <div className="pdfapp-chat">
+          <div className="pdfapp-chat-messages">
               {chatMessages.length === 0 && (
                 <div className="pdfapp-chat-empty">
                   <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#4b5563" strokeWidth="1.2">
@@ -2073,50 +1736,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               </button>
             </div>
           </div>
-        ) : (
-          <div className="pdfapp-summary-body">
-            {summaryError && (
-              <div className="pdfapp-summary-error">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="15" y1="9" x2="9" y2="15" />
-                  <line x1="9" y1="9" x2="15" y2="15" />
-                </svg>
-                <span>{summaryError}</span>
-              </div>
-            )}
-
-            {summarizing && !summary && (
-              <div className="pdfapp-summary-loading">
-                <div className="pdfapp-spinner" />
-                <span>{summaryStatus || 'Analyzing document…'}</span>
-              </div>
-            )}
-
-            {summary ? (
-              <div className="pdfapp-summary-text">
-                {activeSkillName && (
-                  <div className="pdfapp-skill-label">{activeSkillName}</div>
-                )}
-                {summary}
-                {summarizing && <span className="pdfapp-cursor">▌</span>}
-              </div>
-            ) : (
-              !summarizing && !summaryError && (
-                <div className="pdfapp-summary-empty">
-                  <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#4b5563" strokeWidth="1.2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <line x1="16" y1="13" x2="8" y2="13" />
-                    <line x1="16" y1="17" x2="8" y2="17" />
-                  </svg>
-                  <p>Open <strong>LexAgent</strong> to run skills on this document</p>
-                  <span className="pdfapp-summary-model">OCR + qwen3.5 cloud via Ollama</span>
-                </div>
-              )
-            )}
-          </div>
-        )}
       </div>
 
     </div>
