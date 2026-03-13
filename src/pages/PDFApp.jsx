@@ -209,12 +209,8 @@ const fileInputRef = useRef(null)
   useEffect(() => {
     if (caseId) localStorage.setItem(`pdf-pagecounts-${caseId}`, JSON.stringify(pageCountsById))
   }, [pageCountsById, caseId])
-  useEffect(() => {
-    if (caseId) localStorage.setItem(`chunking-${caseId}`, chunkingStrategy)
-  }, [chunkingStrategy, caseId])
-  useEffect(() => {
-    if (caseId) localStorage.setItem(`pdf-chunkcounts-${caseId}`, JSON.stringify(docChunkCountsById))
-  }, [docChunkCountsById, caseId])
+  // NOTE: chunking persistence useEffect is placed AFTER chunkingStrategy declaration (below)
+  // to avoid TDZ — dep arrays are evaluated immediately when useEffect() is called.
 
   // ── PDF Notes ──
   const [notes, setNotes] = useState([])          // [{id, pageNum, x, y, text, createdAt}]
@@ -699,6 +695,13 @@ const fileInputRef = useRef(null)
   )
   const [caseSettingsOpen, setCaseSettingsOpen] = useState(false)
   const [reprocessMenuOpen, setReprocessMenuOpen] = useState(false)
+  // Persistence effects for chunking + chunk counts — must be after their declarations (TDZ)
+  useEffect(() => {
+    if (caseId) localStorage.setItem(`chunking-${caseId}`, chunkingStrategy)
+  }, [chunkingStrategy, caseId])
+  useEffect(() => {
+    if (caseId) localStorage.setItem(`pdf-chunkcounts-${caseId}`, JSON.stringify(docChunkCountsById))
+  }, [docChunkCountsById, caseId])
 
   // ── Evidence (starred sources + notes → report) ──
   const [starredSources, setStarredSources] = useState(() => {
