@@ -312,30 +312,30 @@
   gap: 5px;
 }
 
-.pdfapp-doc-dots {
-  display: flex;
-  align-items: center;
-  gap: 3px;
+/* ── Doc status pill (replaces dot) ─────────────────────────────────── */
+.pdfapp-doc-pill {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
-
-.pdfapp-doc-dot {
-  display: block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+.pdfapp-doc-pill--loading {
+  background: rgba(245,158,11,0.15);
+  color: #f59e0b;
 }
-
-.pdfapp-doc-dot--done {
-  background: #22c55e;
+.pdfapp-doc-pill--ready {
+  background: rgba(96,165,250,0.15);
+  color: #60a5fa;
 }
-
-.pdfapp-doc-dot--loading {
-  background: #f59e0b;
-  animation: dot-pulse 1s ease-in-out infinite;
+.pdfapp-doc-pill--indexed {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
 }
-
-.pdfapp-doc-dot--error {
-  background: #ef4444;
+.pdfapp-doc-pill--error {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
 }
 
 @keyframes dot-pulse {
@@ -910,6 +910,96 @@
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+}
+
+/* ── Contextual action button (Option C) ─────────────────────────────── */
+.pdfapp-action-btn {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.pdfapp-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pdfapp-action-btn--extract {
+  background: #1a2f4a; color: #60a5fa; border-color: #2d4a6b;
+}
+.pdfapp-action-btn--extract:not(:disabled):hover { background: #22406e; }
+
+.pdfapp-action-btn--index {
+  background: #1a4a2e; color: #4ade80; border-color: #2d6b42;
+}
+.pdfapp-action-btn--index:hover { background: #225e39; }
+
+.pdfapp-action-btn--stop {
+  background: #4a1a1a; color: #f87171; border-color: #6b2d2d;
+}
+.pdfapp-action-btn--stop:hover { background: #5e2222; }
+
+.pdfapp-action-btn--menu {
+  background: var(--bg-3); color: var(--text-muted); border-color: var(--border);
+  letter-spacing: 2px; padding: 3px 7px;
+}
+.pdfapp-action-btn--menu:hover { background: var(--bg-hover); color: var(--text); }
+
+.pdfapp-reprocess-dropdown {
+  position: absolute;
+  right: 0; top: calc(100% + 4px);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  z-index: 100;
+  min-width: 140px;
+  overflow: hidden;
+}
+.pdfapp-reprocess-dropdown button {
+  display: block; width: 100%;
+  padding: 7px 12px;
+  text-align: left;
+  background: none; border: none; color: var(--text);
+  font-size: 11px; cursor: pointer;
+}
+.pdfapp-reprocess-dropdown button:hover { background: var(--bg-hover); }
+
+/* ── Case Settings — Search Precision (Option D) ─────────────────────── */
+.pdfapp-case-settings {
+  border-top: 1px solid var(--border);
+}
+.pdfapp-case-settings-header {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 7px 12px;
+  background: none; border: none; color: var(--text-muted);
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  text-align: left;
+}
+.pdfapp-case-settings-header:hover { color: var(--text); }
+.pdfapp-case-settings-body {
+  padding: 6px 12px 10px;
+}
+.pdfapp-strategy-hint {
+  font-size: 10px; color: var(--text-dim); margin-bottom: 6px;
+}
+.pdfapp-strategy-btns {
+  display: flex; gap: 4px; margin-bottom: 6px;
+}
+.pdfapp-strategy-btn {
+  flex: 1; padding: 4px 6px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text-muted);
+  font-size: 10px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+}
+.pdfapp-strategy-btn:hover { background: var(--bg-hover); color: var(--text); }
+.pdfapp-strategy-btn--active {
+  background: #1a2f4a; border-color: #2d4a6b; color: #60a5fa;
+}
+.pdfapp-strategy-desc {
+  font-size: 10px; color: var(--text-dim); font-style: italic;
 }
 
 .pdfapp-extract-btn {

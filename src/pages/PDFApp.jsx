@@ -125,6 +125,10 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     if (!caseId) return {}
     try { return JSON.parse(localStorage.getItem(`pdf-pagecounts-${caseId}`) || '{}') } catch { return {} }
   })
+  const [docChunkCountsById, setDocChunkCountsById] = useState(() => {
+    if (!caseId) return {}
+    try { return JSON.parse(localStorage.getItem(`pdf-chunkcounts-${caseId}`) || '{}') } catch { return {} }
+  })
   const [pageDims, setPageDims] = useState({})   // pageNum → {w,h} — drives skeleton sizing
   const [renderScale, setRenderScale] = useState(1.0)
   const [pdfLoading, setPdfLoading] = useState(false)
@@ -205,6 +209,12 @@ const fileInputRef = useRef(null)
   useEffect(() => {
     if (caseId) localStorage.setItem(`pdf-pagecounts-${caseId}`, JSON.stringify(pageCountsById))
   }, [pageCountsById, caseId])
+  useEffect(() => {
+    if (caseId) localStorage.setItem(`chunking-${caseId}`, chunkingStrategy)
+  }, [chunkingStrategy, caseId])
+  useEffect(() => {
+    if (caseId) localStorage.setItem(`pdf-chunkcounts-${caseId}`, JSON.stringify(docChunkCountsById))
+  }, [docChunkCountsById, caseId])
 
   // ── PDF Notes ──
   const [notes, setNotes] = useState([])          // [{id, pageNum, x, y, text, createdAt}]
@@ -677,7 +687,18 @@ const fileInputRef = useRef(null)
   // ── RAG state ──
   const [ragStatus, setRagStatus] = useState(null)   // null | 'indexing' | 'indexed'
   const [ragProgress, setRagProgress] = useState('')
-  const [chunkTokenSize, setChunkTokenSize] = useState(100)
+
+  // ── Chunking strategy (Option D — case-level setting) ──────────────────
+  const CHUNKING_STRATEGIES = {
+    fine:     { label: 'Fine',     words: 50 },
+    balanced: { label: 'Balanced', words: 100 },
+    broad:    { label: 'Broad',    words: 200 },
+  }
+  const [chunkingStrategy, setChunkingStrategy] = useState(() =>
+    (caseId && localStorage.getItem(`chunking-${caseId}`)) || 'balanced'
+  )
+  const [caseSettingsOpen, setCaseSettingsOpen] = useState(false)
+  const [reprocessMenuOpen, setReprocessMenuOpen] = useState(false)
 
   // ── Evidence (starred sources + notes → report) ──
   const [starredSources, setStarredSources] = useState(() => {
@@ -768,8 +789,12 @@ const fileInputRef = useRef(null)
       }).catch(() => {})
     }
 
-    getDocRagStatus(activeDocumentId, { caseId }).then(({ indexed }) => {
-      if (indexed) setRagStatus('indexed')
+    getDocRagStatus(activeDocumentId, { caseId }).then(({ indexed, chunks }) => {
+      if (indexed) {
+        setRagStatus('indexed')
+        setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'indexed' }))
+        if (chunks) setDocChunkCountsById(prev => ({ ...prev, [activeDocumentId]: chunks }))
+      }
     }).catch(() => {})
   }, [activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1019,8 +1044,9 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     if (!hasCachedPages && !pdfDocRef.current) return
 
     setRagStatus('indexing')
+    setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'indexing' }))
     try {
-      // Step 1 — optionally clear existing chunks (re-index with new token size)
+      // Step 1 — optionally clear existing chunks (re-index with new strategy)
       if (forceClear) {
         setRagProgress('Clearing previous index…')
         await clearDocChunks(activeDocumentId, { caseId })
@@ -1048,7 +1074,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           ? { pageNum: p.pageNum, chunks: groupIntoParagraphs(p.rawWords) }
           : p
       )
-      const mergedChunks = mergeChunksByTokens(paragraphPages, chunkTokenSize)
+      const mergedChunks = mergeChunksByTokens(paragraphPages, CHUNKING_STRATEGIES[chunkingStrategy].words)
       const allChunks = mergedChunks.map((c, idx) => ({
         pageNum: c.pageNum,
         chunkIdx: idx,
@@ -1071,14 +1097,21 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       }
 
       setRagStatus('indexed')
+      setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'indexed' }))
+      setDocChunkCountsById(prev => ({ ...prev, [activeDocumentId]: allChunks.length }))
 
     } catch (err) {
       console.error('[RAG] indexing failed:', err)
       setRagStatus(null)
+      setDocStatuses(prev => {
+        const cur = prev[activeDocumentId]
+        // Revert to 'extracted' if we had text, otherwise clear
+        return { ...prev, [activeDocumentId]: cur === 'indexing' ? 'extracted' : cur }
+      })
     } finally {
       setRagProgress('')
     }
-  }, [activeDocumentId, ragStatus, caseId, chunkTokenSize])
+  }, [activeDocumentId, ragStatus, caseId, chunkingStrategy])
 
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
@@ -1113,7 +1146,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     setExtractionError(null)
     setExtractionSource(null)
     setExtractionStatus('Detecting PDF type…')
-    setDocStatuses(prev => ({ ...prev, [docId]: 'loading' }))
+    setDocStatuses(prev => ({ ...prev, [docId]: 'extracting' }))
     try {
       const result = await extractAndSaveText(docId, file, {
         onStatus: setExtractionStatus,
@@ -1132,7 +1165,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         extractedTextRef.current = result.text
         setExtractedPages(result.pages ?? null)
         setExtractionSource(result.isOcr ? 'ocr' : 'text')
-        setDocStatuses(prev => ({ ...prev, [docId]: 'done' }))
+        setDocStatuses(prev => ({ ...prev, [docId]: 'extracted' }))
         lastExtractionPagesRef.current = { docId, pages: result.pages }
       }
     } catch (err) {
@@ -1159,7 +1192,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         setExtractedText(saved.text)
         extractedTextRef.current = saved.text
         setExtractionSource(saved.isOcr ? 'ocr' : 'text')
-        setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'done' }))
+        setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'extracted' }))
         if (saved.pages) {
           setExtractedPages(saved.pages)
           lastExtractionPagesRef.current = { docId: activeDocumentId, pages: saved.pages }
@@ -1507,11 +1540,22 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                       )}
                                     </div>
                                     <div className="pdfapp-doc-card-right">
-                                      {status && (
-                                        <div className="pdfapp-doc-dots">
-                                          <span className={`pdfapp-doc-dot pdfapp-doc-dot--${status}`} title={status} />
-                                        </div>
-                                      )}
+                                      {(() => {
+                                        const st = docStatuses[doc.id]
+                                        const cc = docChunkCountsById[doc.id]
+                                        if (!st) return null
+                                        const MAP = {
+                                          extracting: { label: 'Reading…',   cls: 'loading'   },
+                                          extracted:  { label: 'Text ready',  cls: 'ready'     },
+                                          indexing:   { label: 'Indexing…',   cls: 'loading'   },
+                                          indexed:    { label: cc ? `✓ ${cc}` : '✓ Ready', cls: 'indexed'  },
+                                          error:      { label: '⚠ Error',     cls: 'error'     },
+                                        }
+                                        const p = MAP[st]
+                                        return p ? (
+                                          <span className={`pdfapp-doc-pill pdfapp-doc-pill--${p.cls}`}>{p.label}</span>
+                                        ) : null
+                                      })()}
                                       <button
                                         type="button"
                                         className="pdfapp-doc-remove"
@@ -1540,6 +1584,39 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 })
               )}
             </div>
+
+            {/* ── Case Settings (Option D — chunking strategy) ── */}
+            {caseId && (
+              <div className="pdfapp-case-settings">
+                <button
+                  type="button"
+                  className="pdfapp-case-settings-header"
+                  onClick={() => setCaseSettingsOpen(o => !o)}
+                >
+                  <span>⚙ Search Precision</span>
+                  <span className="pdfapp-log-chevron">{caseSettingsOpen ? '▾' : '▸'}</span>
+                </button>
+                {caseSettingsOpen && (
+                  <div className="pdfapp-case-settings-body">
+                    <div className="pdfapp-strategy-hint">Chunk size — affects all future indexing</div>
+                    <div className="pdfapp-strategy-btns">
+                      {Object.entries(CHUNKING_STRATEGIES).map(([key, { label }]) => (
+                        <button
+                          key={key}
+                          className={`pdfapp-strategy-btn${chunkingStrategy === key ? ' pdfapp-strategy-btn--active' : ''}`}
+                          onClick={() => setChunkingStrategy(key)}
+                        >{label}</button>
+                      ))}
+                    </div>
+                    <div className="pdfapp-strategy-desc">
+                      {chunkingStrategy === 'fine'     && 'Fine (~50 words) — best for precise quotes'}
+                      {chunkingStrategy === 'balanced' && 'Balanced (~100 words) — best for Q&A'}
+                      {chunkingStrategy === 'broad'    && 'Broad (~200 words) — best for summaries'}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* ── Activity Log ── */}
             <div className="pdfapp-log-panel">
@@ -1803,58 +1880,47 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     )}
                   </div>
 
-                  {/* ── Extraction controls ── */}
+                  {/* ── Contextual single action (Option C) ── */}
                   <div className="pdfapp-extract-controls" onClick={e => e.stopPropagation()}>
-                    {/* Chunk word size control */}
-                    <label className="pdfapp-token-label" title="Target words per chunk (30–200). Changing this and clicking Re-index rebuilds the entire embedding index.">
-                      <span>Words</span>
-                      <input
-                        className="pdfapp-token-input"
-                        type="number"
-                        min={30}
-                        max={200}
-                        step={10}
-                        value={chunkTokenSize}
-                        onChange={e => setChunkTokenSize(Math.max(30, Math.min(200, Number(e.target.value) || 100)))}
-                        disabled={ragStatus === 'indexing'}
-                      />
-                    </label>
-                    {/* Re-index button — clear + rebuild with new token size */}
-                    <button
-                      className="pdfapp-extract-btn pdfapp-extract-btn--reindex"
-                      title="Clear existing index and re-embed with current token size"
-                      disabled={ragStatus === 'indexing' || (!extractedPages && !lastExtractionPagesRef.current?.pages) || !activeDocumentId}
-                      onClick={() => handleIndexDocument({ forceClear: true })}
-                    >
-                      ⟳ Re-index
-                    </button>
-                    <span className="pdfapp-extract-sep" />
                     {extractingText ? (
                       <button
-                        className="pdfapp-extract-btn pdfapp-extract-btn--stop"
-                        title="Stop extraction"
+                        className="pdfapp-action-btn pdfapp-action-btn--stop"
                         onClick={() => { extractionAbortRef.current?.abort(); setExtractingText(false); setExtractionStatus('') }}
-                      >
-                        ■ Stop
-                      </button>
+                      >■ Cancel</button>
+                    ) : ragStatus === 'indexing' ? (
+                      <button
+                        className="pdfapp-action-btn pdfapp-action-btn--stop"
+                        onClick={() => { setRagStatus(null); setRagProgress('') }}
+                      >■ Cancel</button>
+                    ) : ragStatus === 'indexed' ? (
+                      <div className="pdfapp-reprocess-wrap" style={{ position: 'relative' }}>
+                        <button
+                          className="pdfapp-action-btn pdfapp-action-btn--menu"
+                          title="Re-process options"
+                          onClick={() => setReprocessMenuOpen(v => !v)}
+                        >···</button>
+                        {reprocessMenuOpen && (
+                          <div className="pdfapp-reprocess-dropdown" onMouseLeave={() => setReprocessMenuOpen(false)}>
+                            <button onClick={() => { setReprocessMenuOpen(false); activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file) }}>
+                              Re-extract text
+                            </button>
+                            <button onClick={() => { setReprocessMenuOpen(false); handleIndexDocument({ forceClear: true }) }}>
+                              Re-index
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     ) : extractedPages ? (
                       <button
-                        className="pdfapp-extract-btn pdfapp-extract-btn--rerun"
-                        title="Re-run extraction"
-                        disabled={!activeDoc?.file || pdfLoading}
-                        onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
-                      >
-                        ↺ Re-run
-                      </button>
+                        className="pdfapp-action-btn pdfapp-action-btn--index"
+                        onClick={handleIndexDocument}
+                      >Index for search →</button>
                     ) : (
                       <button
-                        className="pdfapp-extract-btn pdfapp-extract-btn--start"
-                        title="Start text extraction / OCR"
+                        className="pdfapp-action-btn pdfapp-action-btn--extract"
                         disabled={!activeDoc?.file || pdfLoading}
                         onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
-                      >
-                        ▶ Extract
-                      </button>
+                      >{extractionSource === 'ocr' ? 'Re-scan pages' : activeDoc?.file ? 'Prepare for search' : 'No file loaded'}</button>
                     )}
                   </div>
 
@@ -1904,7 +1970,9 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   ) : (
                     <div className="pdfapp-extracted-prompt">
                       <span className="pdfapp-extracted-placeholder">
-                        Press <strong>▶ Extract</strong> to run text extraction{activeDoc?.file ? '' : ' (no file loaded)'}.
+                        {activeDoc?.file
+                          ? <>Press <strong>Prepare for search</strong> above to start extraction.</>
+                          : 'No file loaded — upload a PDF to get started.'}
                       </span>
                     </div>
                   )
