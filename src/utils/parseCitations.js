@@ -8,16 +8,25 @@
 /**
  * Build a numbered evidence block for the LLM prompt.
  * Returns { ragContext: string, chunkMap: Map<number, chunk> }
+ *
+ * When chunks carry a `doc_id` field (case-wide search), the label includes
+ * a provenance prefix so the LLM can cite which document each passage is from.
+ * `docLabels` is an optional Map<doc_id, string> for human-readable names.
  */
-export function buildEvidenceBlock(chunks) {
+export function buildEvidenceBlock(chunks, { docLabels } = {}) {
   const chunkMap = new Map()
   if (!chunks.length) return { ragContext: '', chunkMap }
 
   chunks.forEach((chunk, i) => chunkMap.set(i + 1, chunk))
 
-  const lines = chunks.map((c, i) =>
-    `[${i + 1}] Page ${c.page_num}:\n${c.text}`
-  )
+  const lines = chunks.map((c, i) => {
+    const provenance = c.doc_id && docLabels?.get(c.doc_id)
+      ? `[${docLabels.get(c.doc_id)}] `
+      : c.doc_id
+        ? `[${c.doc_id}] `
+        : ''
+    return `[${i + 1}] ${provenance}Page ${c.page_num}:\n${c.text}`
+  })
 
   const ragContext =
     '\n\nEvidence — cite inline as [1], [2], etc. when drawing on these sections:\n' +

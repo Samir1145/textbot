@@ -1645,6 +1645,8 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+.pdfapp-chat-send--stop { background: #ef4444; }
+.pdfapp-chat-send--stop:hover { background: #dc2626; }
 
 .pdfapp-skill-label {
   display: inline-block;
@@ -2510,4 +2512,38 @@
   color: var(--text);
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* ── Evidence panel — party / doc grouping ──────────────────────────────── */
+.pdfapp-evidence-party-header {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: 6px 0 4px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.pdfapp-evidence-doc-header {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  padding: 3px 0 3px 8px;
+  margin-bottom: 4px;
+  border-left: 2px solid var(--border-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pdfapp-evidence-item-docname {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+  flex-shrink: 1;
+}
+/* Items from a different (non-active) document get a subtle left accent */
+.pdfapp-evidence-item--other-doc {
+  border-left: 2px solid rgba(96, 165, 250, 0.35);
 }

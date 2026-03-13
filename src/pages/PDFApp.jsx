@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom'
 import { useTheme } from '../useTheme.js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-import { uploadCaseBlob, loadCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes } from '../db.js'
+import { uploadCaseBlob, loadCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes, loadAllNotes } from '../db.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
 import { getDocRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupIntoParagraphs } from '../utils/pdfExtract.js'
@@ -221,6 +221,8 @@ const fileInputRef = useRef(null)
   const renderScaleRef = useRef(1.0)
   // DEV: ref so pre-addLog callbacks can log into the activity panel
   const addLogRef = useRef(() => {})
+  // Cross-doc navigation: set before switching activeDocumentId; consumed when new PDF is ready
+  const pendingNavRef = useRef(null) // { pageNum, chunkText, bbox, narrowBbox }
   const pdfBufferRef = useRef(null)      // cached PDF bytes for zoom re-renders
   const prevActiveDocUrlRef = useRef(null)
   const prevActiveDocIdRef = useRef(null)
@@ -504,7 +506,16 @@ const fileInputRef = useRef(null)
           }
         })
         // DOM is already updated — single rAF to let the browser paint before observing
-        requestAnimationFrame(() => setupObserver())
+        requestAnimationFrame(() => {
+          setupObserver()
+          // Consume any pending cross-doc navigation (set before switching activeDocumentId)
+          if (pendingNavRef.current) {
+            const { pageNum, chunkText, bbox, narrowBbox } = pendingNavRef.current
+            pendingNavRef.current = null
+            scrollPageIntoView(pageNum, 'center')
+            setActiveCitations(new Map([[1, { text: chunkText, page_num: pageNum, bbox, narrowBbox }]]))
+          }
+        })
       } else if (msg.type === 'dims-update') {
         // Some pages have different dimensions from page 1 — patch them
         const updated = { ...pageDimsRef.current, ...msg.dims }
@@ -672,6 +683,7 @@ const fileInputRef = useRef(null)
   const [starredSources, setStarredSources] = useState(() => {
     try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
   })
+  const [allCaseNotes, setAllCaseNotes] = useState({}) // { [docId]: NoteObject[] }
   const [rightTab, setRightTab] = useState('chat') // 'chat' | 'evidence' | 'report'
   const [reportFormat, setReportFormat] = useState('')
   const [reportContent, setReportContent] = useState('')
@@ -707,7 +719,7 @@ const fileInputRef = useRef(null)
   }, [logs, logOpen])
 
   // ── LexChat ──
-  const [caseSearchActive, setCaseSearchActive] = useState(false)
+  const [caseSearchActive, setCaseSearchActive] = useState(!!caseId) // default ON in case mode
   const [chatMessages, setChatMessages] = useState([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
@@ -769,7 +781,15 @@ const fileInputRef = useRef(null)
   }, [activeDocumentId, caseId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const persistNotes = useCallback((next, docId) => {
-    saveNotes(docId, next, { caseId }).catch(() => {})
+    saveNotes(docId, next, { caseId })
+      .then(() => loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {}))
+      .catch(() => {})
+  }, [caseId])
+
+  // Load all notes for the whole case whenever the case changes
+  useEffect(() => {
+    if (!caseId) return
+    loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {})
   }, [caseId])
 
   // ── Starred source handlers ──
@@ -779,12 +799,16 @@ const fileInputRef = useRef(null)
     setStarredSources(prev => {
       const k = _starKey(chunk)
       const exists = prev.findIndex(s => s.key === k)
+      const ownerParty = parties.find(p => (p.documents || []).some(d => d.id === activeDocumentId))
+      const ownerDoc   = ownerParty?.documents?.find(d => d.id === activeDocumentId)
       const next = exists >= 0
         ? prev.filter((_, i) => i !== exists)
         : [...prev, {
             id: crypto.randomUUID(),
             key: k,
             docId: activeDocumentId,
+            docName:   ownerDoc?.name   || null,
+            partyName: ownerParty?.name || null,
             chunkText: chunk.text,
             pageNum: chunk.page_num,
             bbox: chunk.bbox || null,
@@ -796,7 +820,7 @@ const fileInputRef = useRef(null)
       localStorage.setItem(`starred-${caseId || 'solo'}`, JSON.stringify(next))
       return next
     })
-  }, [activeDocumentId, caseId])
+  }, [activeDocumentId, caseId, parties])
 
   const handleRemoveStar = useCallback((id) => {
     setStarredSources(prev => {
@@ -808,27 +832,36 @@ const fileInputRef = useRef(null)
 
   const handleGenerateReport = useCallback(async () => {
     if (reportLoading) { reportAbortRef.current?.abort(); return }
-    const filledNotes = notes.filter(n => n.text?.trim())
-    if (!starredSources.length && !filledNotes.length) return
+    const allNotesList = Object.entries(allCaseNotes).flatMap(([docId, noteArr]) => {
+      const p = parties.find(pt => (pt.documents || []).some(d => d.id === docId))
+      const d = p?.documents?.find(doc => doc.id === docId)
+      return noteArr.filter(n => n.text?.trim()).map(n => ({ ...n, docId, docName: d?.name || docId, partyName: p?.name || null }))
+    })
+    if (!starredSources.length && !allNotesList.length) return
     setReportContent('')
     setReportLoading(true)
     const controller = new AbortController()
     reportAbortRef.current = controller
+    const caseLabel = caseName ? `Case: ${caseName}\n\n` : ''
     const evidenceBlock = [
       starredSources.length > 0
-        ? '## Starred Sources\n' + starredSources.map((s, i) =>
-            `[${i + 1}] p.${s.pageNum}${s.question ? ` (context: "${s.question}")` : ''}:\n"${s.chunkText.slice(0, 400)}"`
-          ).join('\n\n')
+        ? '## Starred Sources\n' + starredSources.map((s, i) => {
+            const provenance = [s.partyName, s.docName].filter(Boolean).join(' / ')
+            return `[${i + 1}]${provenance ? ` [${provenance}]` : ''} p.${s.pageNum}${s.question ? ` (context: "${s.question}")` : ''}:\n"${s.chunkText.slice(0, 400)}"`
+          }).join('\n\n')
         : '',
-      filledNotes.length > 0
-        ? '## User Notes\n' + filledNotes.map(n => `p.${n.pageNum}: ${n.text}`).join('\n')
+      allNotesList.length > 0
+        ? '## User Notes\n' + allNotesList.map(n => {
+            const provenance = [n.partyName, n.docName].filter(Boolean).join(' / ')
+            return `${provenance ? `[${provenance}] ` : ''}p.${n.pageNum}: ${n.text}`
+          }).join('\n')
         : '',
     ].filter(Boolean).join('\n\n')
     try {
       await streamOllamaChat({
         messages: [
-          { role: 'system', content: 'You are a professional analyst. Generate a well-structured report from the provided evidence. Use headings, bullet points, and cite page numbers where relevant.' },
-          { role: 'user', content: `${reportFormat.trim() ? `Format instructions: ${reportFormat}\n\n` : ''}Evidence:\n\n${evidenceBlock}\n\nGenerate the report.` },
+          { role: 'system', content: 'You are a professional legal analyst. Generate a well-structured report from the provided evidence across all case documents. Use headings, bullet points, and always cite the source party, document name and page number.' },
+          { role: 'user', content: `${caseLabel}${reportFormat.trim() ? `Format instructions: ${reportFormat}\n\n` : ''}Evidence:\n\n${evidenceBlock}\n\nGenerate the report.` },
         ],
         signal: controller.signal,
         onChunk: text => setReportContent(text),
@@ -838,7 +871,7 @@ const fileInputRef = useRef(null)
     } finally {
       setReportLoading(false)
     }
-  }, [starredSources, notes, reportFormat, reportLoading])
+  }, [starredSources, allCaseNotes, parties, caseName, reportFormat, reportLoading])
 
   const handlePageClick = useCallback((e, pageNum) => {
     if (!noteMode) return
@@ -888,7 +921,8 @@ const fileInputRef = useRef(null)
     // Results are cached per (doc/case + query text) to avoid redundant vector searches.
     let ragContext = ''
     let chunkMap = new Map()
-    if (ragStatus === 'indexed' && activeDocumentId) {
+    // For case-wide search, allow even if active doc isn't indexed (other docs in case may be)
+    if ((ragStatus === 'indexed' || (caseSearchActive && caseId)) && activeDocumentId) {
       const cacheKey = `${caseSearchActive ? `case:${caseId}` : `doc:${activeDocumentId}`}::${text}`
       let rawChunks = ragQueryCacheRef.current.get(cacheKey)
       if (!rawChunks) {
@@ -897,7 +931,13 @@ const fileInputRef = useRef(null)
           : await searchDocChunks(activeDocumentId, text, 3, { caseId })
         if (rawChunks?.length) ragQueryCacheRef.current.set(cacheKey, rawChunks)
       }
-      ;({ ragContext, chunkMap } = buildEvidenceBlock(rawChunks))
+      // Build doc-name labels so the LLM prompt shows human-readable provenance
+      const docLabels = caseSearchActive && caseId
+        ? new Map(parties.flatMap(party =>
+            (party.documents || []).map(doc => [doc.id, `${party.name} / ${doc.name}`])
+          ))
+        : undefined
+      ;({ ragContext, chunkMap } = buildEvidenceBlock(rawChunks, { docLabels }))
     }
 
     // Fallback: when not indexed, include full extracted text (truncated) so the model has document context
@@ -970,7 +1010,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     } finally {
       setChatLoading(false)
     }
-  }, [chatInput, chatLoading, chatMessages, ragStatus, activeDocumentId, caseSearchActive, caseId, addLog])
+  }, [chatInput, chatLoading, chatMessages, ragStatus, activeDocumentId, caseSearchActive, caseId, parties, addLog])
   const handleIndexDocument = useCallback(async ({ forceClear = false } = {}) => {
     if (ragStatus === 'indexing') return
     const cached = lastExtractionPagesRef.current
@@ -1905,7 +1945,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         <div className="pdfapp-right-tabs">
           <button className={`pdfapp-right-tab${rightTab === 'chat' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('chat')}>Chat</button>
           <button className={`pdfapp-right-tab${rightTab === 'evidence' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('evidence')}>
-            Evidence{starredSources.length + notes.filter(n => n.text?.trim()).length > 0 ? ` (${starredSources.length + notes.filter(n => n.text?.trim()).length})` : ''}
+            {(() => { const t = starredSources.length + Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length; return `Evidence${t > 0 ? ` (${t})` : ''}` })()}
           </button>
           <button className={`pdfapp-right-tab${rightTab === 'report' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('report')}>Report</button>
         </div>
@@ -2011,59 +2051,141 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 disabled={chatLoading || !activeDocumentId}
               />
               <button
-                className="pdfapp-chat-send"
-                onClick={handleChatSend}
-                disabled={chatLoading || !chatInput.trim() || !activeDocumentId}
+                className={`pdfapp-chat-send${chatLoading ? ' pdfapp-chat-send--stop' : ''}`}
+                onClick={chatLoading ? () => chatAbortRef.current?.abort() : handleChatSend}
+                disabled={!chatLoading && (!chatInput.trim() || !activeDocumentId)}
+                title={chatLoading ? 'Stop generation' : 'Send'}
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13" />
-                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                </svg>
+                {chatLoading
+                  ? <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+                  : <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                }
               </button>
             </div>
           </div>}
 
         {/* ── Evidence tab ── */}
-        {rightTab === 'evidence' && (
-          <div className="pdfapp-evidence">
-            {starredSources.length === 0 && notes.filter(n => n.text?.trim()).length === 0 && (
-              <div className="pdfapp-evidence-empty">
-                Star sources (★) from chat responses, or add page notes via the pencil tool, to build your evidence collection.
-              </div>
-            )}
-            {starredSources.length > 0 && (
-              <div className="pdfapp-evidence-section">
-                <div className="pdfapp-evidence-section-title">⭐ Starred Sources ({starredSources.length})</div>
-                {starredSources.map(s => (
-                  <div key={s.id} className="pdfapp-evidence-item">
-                    <div className="pdfapp-evidence-item-meta">
-                      <span className="pdfapp-evidence-item-page">p.{s.pageNum}</span>
-                      {s.score != null && <span className="pdfapp-evidence-item-score">{s.score}%</span>}
-                      <button className="pdfapp-evidence-goto" title="Go to page" onClick={() => { scrollPageIntoView(s.pageNum, 'center'); setActiveCitations(new Map([[1, { text: s.chunkText, page_num: s.pageNum, bbox: s.bbox, narrowBbox: s.narrowBbox }]])) }}>→</button>
-                      <button className="pdfapp-evidence-remove" title="Remove" onClick={() => handleRemoveStar(s.id)}>✕</button>
+        {rightTab === 'evidence' && (() => {
+          // Resolve docName/partyName for starred items that predate the enrichment
+          const resolveDoc = (docId) => {
+            const p = parties.find(pt => (pt.documents || []).some(d => d.id === docId))
+            const d = p?.documents?.find(d => d.id === docId)
+            return { partyName: p?.name || null, docName: d?.name || null }
+          }
+
+          // Group starred sources by party
+          const starGroups = parties.map(party => ({
+            party,
+            sources: starredSources
+              .filter(s => (party.documents || []).some(d => d.id === s.docId))
+              .map(s => ({ ...s, docName: s.docName || resolveDoc(s.docId).docName, partyName: s.partyName || party.name })),
+          })).filter(g => g.sources.length > 0)
+          // Unassigned starred (docId not in any party — shouldn't happen but safe)
+          const assignedIds = new Set(starGroups.flatMap(g => g.sources.map(s => s.id)))
+          const unassigned = starredSources.filter(s => !assignedIds.has(s.id))
+
+          // Group all-case notes by party → doc
+          const noteGroups = parties.map(party => ({
+            party,
+            docNotes: (party.documents || [])
+              .map(doc => ({ doc, notes: (allCaseNotes[doc.id] || []).filter(n => n.text?.trim()) }))
+              .filter(dn => dn.notes.length > 0),
+          })).filter(g => g.docNotes.length > 0)
+
+          const totalNotes = Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length
+          const isEmpty = starredSources.length === 0 && totalNotes === 0
+
+          const goToSource = (s) => {
+            const nav = { pageNum: s.pageNum, chunkText: s.chunkText, bbox: s.bbox, narrowBbox: s.narrowBbox }
+            if (s.docId !== activeDocumentId) {
+              pendingNavRef.current = nav
+              setActiveDocumentId(s.docId)
+            } else {
+              scrollPageIntoView(s.pageNum, 'center')
+              setActiveCitations(new Map([[1, { text: s.chunkText, page_num: s.pageNum, bbox: s.bbox, narrowBbox: s.narrowBbox }]]))
+            }
+          }
+          const goToNote = (docId, pageNum) => {
+            if (docId !== activeDocumentId) {
+              pendingNavRef.current = { pageNum, chunkText: '', bbox: null, narrowBbox: null }
+              setActiveDocumentId(docId)
+            } else {
+              scrollPageIntoView(pageNum, 'center')
+            }
+          }
+
+          return (
+            <div className="pdfapp-evidence">
+              {isEmpty && (
+                <div className="pdfapp-evidence-empty">
+                  Star sources (★) from chat responses, or add page notes via the pencil tool, to build your evidence collection.
+                </div>
+              )}
+
+              {/* ── Starred sources grouped by party ── */}
+              {(starGroups.length > 0 || unassigned.length > 0) && (
+                <div className="pdfapp-evidence-section">
+                  <div className="pdfapp-evidence-section-title">⭐ Starred Sources ({starredSources.length})</div>
+                  {starGroups.map(({ party, sources }) => (
+                    <div key={party.id}>
+                      <div className="pdfapp-evidence-party-header">{party.name}</div>
+                      {sources.map(s => (
+                        <div key={s.id} className={`pdfapp-evidence-item${s.docId !== activeDocumentId ? ' pdfapp-evidence-item--other-doc' : ''}`}>
+                          <div className="pdfapp-evidence-item-meta">
+                            <span className="pdfapp-evidence-item-docname" title={s.docName}>{s.docName}</span>
+                            <span className="pdfapp-evidence-item-page">p.{s.pageNum}</span>
+                            {s.score != null && <span className="pdfapp-evidence-item-score">{s.score}%</span>}
+                            <button className="pdfapp-evidence-goto" title={s.docId !== activeDocumentId ? `Switch to ${s.docName}` : 'Go to page'} onClick={() => goToSource(s)}>→</button>
+                            <button className="pdfapp-evidence-remove" title="Remove" onClick={() => handleRemoveStar(s.id)}>✕</button>
+                          </div>
+                          {s.question && <div className="pdfapp-evidence-item-q">"{s.question.slice(0, 100)}{s.question.length > 100 ? '…' : ''}"</div>}
+                          <div className="pdfapp-evidence-item-text">{s.chunkText.slice(0, 220)}{s.chunkText.length > 220 ? '…' : ''}</div>
+                        </div>
+                      ))}
                     </div>
-                    {s.question && <div className="pdfapp-evidence-item-q">"{s.question.slice(0, 100)}{s.question.length > 100 ? '…' : ''}"</div>}
-                    <div className="pdfapp-evidence-item-text">{s.chunkText.slice(0, 220)}{s.chunkText.length > 220 ? '…' : ''}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {notes.filter(n => n.text?.trim()).length > 0 && (
-              <div className="pdfapp-evidence-section">
-                <div className="pdfapp-evidence-section-title">📝 Notes ({notes.filter(n => n.text?.trim()).length})</div>
-                {notes.filter(n => n.text?.trim()).map(n => (
-                  <div key={n.id} className="pdfapp-evidence-item">
-                    <div className="pdfapp-evidence-item-meta">
-                      <span className="pdfapp-evidence-item-page">p.{n.pageNum}</span>
-                      <button className="pdfapp-evidence-goto" title="Go to page" onClick={() => scrollPageIntoView(n.pageNum, 'center')}>→</button>
+                  ))}
+                  {unassigned.map(s => (
+                    <div key={s.id} className="pdfapp-evidence-item">
+                      <div className="pdfapp-evidence-item-meta">
+                        <span className="pdfapp-evidence-item-page">p.{s.pageNum}</span>
+                        {s.score != null && <span className="pdfapp-evidence-item-score">{s.score}%</span>}
+                        <button className="pdfapp-evidence-goto" onClick={() => goToSource(s)}>→</button>
+                        <button className="pdfapp-evidence-remove" onClick={() => handleRemoveStar(s.id)}>✕</button>
+                      </div>
+                      <div className="pdfapp-evidence-item-text">{s.chunkText.slice(0, 220)}{s.chunkText.length > 220 ? '…' : ''}</div>
                     </div>
-                    <div className="pdfapp-evidence-item-text">{n.text}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  ))}
+                </div>
+              )}
+
+              {/* ── Notes grouped by party → doc ── */}
+              {noteGroups.length > 0 && (
+                <div className="pdfapp-evidence-section">
+                  <div className="pdfapp-evidence-section-title">📝 Notes ({totalNotes})</div>
+                  {noteGroups.map(({ party, docNotes }) => (
+                    <div key={party.id}>
+                      <div className="pdfapp-evidence-party-header">{party.name}</div>
+                      {docNotes.map(({ doc, notes: docNoteList }) => (
+                        <div key={doc.id}>
+                          <div className="pdfapp-evidence-doc-header">{doc.name}</div>
+                          {docNoteList.map(n => (
+                            <div key={n.id} className={`pdfapp-evidence-item${doc.id !== activeDocumentId ? ' pdfapp-evidence-item--other-doc' : ''}`}>
+                              <div className="pdfapp-evidence-item-meta">
+                                <span className="pdfapp-evidence-item-page">p.{n.pageNum}</span>
+                                <button className="pdfapp-evidence-goto" title={doc.id !== activeDocumentId ? `Switch to ${doc.name}` : 'Go to page'} onClick={() => goToNote(doc.id, n.pageNum)}>→</button>
+                              </div>
+                              <div className="pdfapp-evidence-item-text">{n.text}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })()}
 
         {/* ── Report tab ── */}
         {rightTab === 'report' && (
@@ -2079,11 +2201,11 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               <button
                 className={`pdfapp-report-btn${reportLoading ? ' pdfapp-report-btn--stop' : ''}`}
                 onClick={handleGenerateReport}
-                disabled={!reportLoading && !starredSources.length && !notes.filter(n => n.text?.trim()).length}
+                disabled={!reportLoading && !starredSources.length && !Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length}
               >
                 {reportLoading
                   ? '■ Stop'
-                  : `Generate Report${starredSources.length + notes.filter(n => n.text?.trim()).length > 0 ? ` (${starredSources.length + notes.filter(n => n.text?.trim()).length} items)` : ''}`}
+                  : (() => { const t = starredSources.length + Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length; return `Generate Report${t > 0 ? ` (${t} items)` : ''}` })()}
               </button>
             </div>
             {!reportContent && !reportLoading && (

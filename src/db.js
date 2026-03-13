@@ -157,6 +157,16 @@ export async function saveNotes(docId, notes, { caseId } = {}) {
     await postJSON(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}`, notes)
 }
 
+// Returns all notes across every document in a case: { [docId]: NoteObject[] }
+export async function loadAllNotes(caseId) {
+    if (!caseId) return {}
+    try {
+        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/all-notes`)
+        if (!res.ok) return {}
+        return res.json()
+    } catch { return {} }
+}
+
 // ── Case Delete ──
 
 export async function deleteCase(caseId) {

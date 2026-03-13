@@ -186,18 +186,35 @@ app.post('/api/cases/:caseId/notes/:docId', (req, res) => {
   res.json({ ok: true })
 })
 
+// Aggregate all notes for every document in a case — { [docId]: NoteObject[] }
+app.get('/api/cases/:caseId/all-notes', (req, res) => {
+  const notesDir = getCaseSubdir(req.params.caseId, 'notes')
+  const files = fs.existsSync(notesDir)
+    ? fs.readdirSync(notesDir).filter(f => f.endsWith('.json'))
+    : []
+  const result = {}
+  for (const f of files) {
+    const docId = f.replace('.json', '')
+    try { result[docId] = JSON.parse(fs.readFileSync(path.join(notesDir, f), 'utf8')) }
+    catch { result[docId] = [] }
+  }
+  res.json(result)
+})
+
 // ── Case Delete (cascade) ──
 
 app.delete('/api/cases/:caseId', (req, res) => {
   const caseDir = path.join(CASES_DIR, safeId(req.params.caseId))
   if (fs.existsSync(caseDir)) fs.rmSync(caseDir, { recursive: true, force: true })
-  // Remove RAG chunks for this case
+  // Close and delete the per-case RAG DB file
   try {
-    if (_ragDb) {
-      const caseChunkIds = _ragDb.prepare('SELECT id FROM doc_chunks WHERE case_id = ?').all(safeId(req.params.caseId))
-      for (const row of caseChunkIds) { _ragDb.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id)) }
-      _ragDb.prepare('DELETE FROM doc_chunks WHERE case_id = ?').run(safeId(req.params.caseId))
+    const key = safeId(req.params.caseId)
+    if (_ragDbs.has(key)) {
+      _ragDbs.get(key).db.close()
+      _ragDbs.delete(key)
     }
+    const ragDbPath = path.join(DATA_DIR, `rag-${key}.db`)
+    if (fs.existsSync(ragDbPath)) fs.unlinkSync(ragDbPath)
   } catch { /* rag db may not exist yet */ }
   res.json({ ok: true })
 })
@@ -208,8 +225,8 @@ const RAG_DB_PATH = path.join(DATA_DIR, 'rag.db')
 const EMBED_MODEL = 'embeddinggemma:latest'
 const EMBED_API  = 'http://localhost:11434/api/embeddings'
 
-let _ragDb  = null
-let _embedDim = null
+const _ragDbs = new Map()   // key → { db, dim }  (one DB per case)
+let _embedDim = null        // shared — same embed model across all DBs
 
 async function embed(text) {
     const res = await fetch(EMBED_API, {
@@ -226,13 +243,21 @@ function toBlob(floats) {
     return Buffer.from(new Float32Array(floats).buffer)
 }
 
-// Lazy-init: detects embedding dimension on first call, creates tables accordingly
-async function getRagDb() {
-    if (_ragDb && _embedDim) return { db: _ragDb, dim: _embedDim }
+// Lazy-init: one SQLite DB per case so KNN is always case-isolated.
+// caseId='default' → rag.db (solo mode + shared format categories)
+// caseId='SomeCase' → rag-somecaseid.db (KNN confined to this case)
+async function getRagDb(caseId = 'default') {
+    const key = caseId === 'default' ? 'default' : safeId(caseId)
+    if (_ragDbs.has(key)) return _ragDbs.get(key)
 
-    const dim = (await embed('init')).length  // detect model output size
+    if (!_embedDim) _embedDim = (await embed('init')).length
+    const dim = _embedDim
 
-    const db = new Database(RAG_DB_PATH)
+    const dbPath = key === 'default'
+        ? RAG_DB_PATH
+        : path.join(DATA_DIR, `rag-${key}.db`)
+
+    const db = new Database(dbPath)
     sqliteVec.load(db)
 
     // Settings table
@@ -300,9 +325,9 @@ async function getRagDb() {
     db.prepare("INSERT OR REPLACE INTO rag_meta VALUES ('dim',   ?)").run(String(dim))
     db.prepare("INSERT OR REPLACE INTO rag_meta VALUES ('model', ?)").run(EMBED_MODEL)
 
-    _ragDb = db
-    _embedDim = dim
-    return { db, dim }
+    const result = { db, dim }
+    _ragDbs.set(key, result)
+    return result
 }
 
 // Embed with cache — skips Ollama call if text hash is already in embed_cache
@@ -319,18 +344,17 @@ async function embedCached(text, db) {
 }
 
 // DELETE /api/rag/clear-doc/:docId  — remove all chunks for a doc (call before re-indexing)
-app.delete('/api/rag/clear-doc/:docId', (req, res) => {
-    if (!_ragDb) return res.json({ ok: true, deleted: 0 })
+app.delete('/api/rag/clear-doc/:docId', async (req, res) => {
     const { caseId = 'default' } = req.query
     const safeDocId = safeId(req.params.docId)
-    const safeCaseId = safeId(caseId)
     try {
-        const rows = _ragDb.prepare('SELECT id FROM doc_chunks WHERE doc_id = ? AND case_id = ?')
-            .all(safeDocId, safeCaseId)
+        const { db } = await getRagDb(caseId)
+        // In a per-case DB every row belongs to this case, so filter by doc_id only
+        const rows = db.prepare('SELECT id FROM doc_chunks WHERE doc_id = ?').all(safeDocId)
         for (const row of rows) {
-            _ragDb.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
+            db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
         }
-        _ragDb.prepare('DELETE FROM doc_chunks WHERE doc_id = ? AND case_id = ?').run(safeDocId, safeCaseId)
+        db.prepare('DELETE FROM doc_chunks WHERE doc_id = ?').run(safeDocId)
         res.json({ ok: true, deleted: rows.length })
     } catch (err) {
         res.status(500).json({ error: err.message })
@@ -345,7 +369,7 @@ app.post('/api/rag/index-doc', async (req, res) => {
         const { docId, chunks, caseId = 'default' } = req.body
         if (!docId || !Array.isArray(chunks)) return res.status(400).json({ error: 'Missing docId or chunks' })
 
-        const { db } = await getRagDb()
+        const { db } = await getRagDb(caseId)
         const safeDocId = safeId(docId)
         const safeCaseId = safeId(caseId)
         let indexed = 0
@@ -392,25 +416,25 @@ app.post('/api/rag/index-doc', async (req, res) => {
 
 // POST /api/rag/prune-doc  — remove chunks that are no longer present (incremental indexing cleanup)
 // body: { docId, caseId, keep: [{pageNum, chunkIdx}] }
-app.post('/api/rag/prune-doc', (req, res) => {
+app.post('/api/rag/prune-doc', async (req, res) => {
     try {
-        if (!_ragDb) return res.json({ ok: true, pruned: 0 })
         const { docId, caseId = 'default', keep } = req.body
         if (!docId || !Array.isArray(keep)) return res.status(400).json({ error: 'Missing docId or keep' })
 
+        const { db } = await getRagDb(caseId)
         const safeDocId = safeId(docId)
-        const safeCaseId = safeId(caseId)
 
-        const existing = _ragDb.prepare(
-            'SELECT id, page_num, chunk_idx FROM doc_chunks WHERE doc_id = ? AND case_id = ?'
-        ).all(safeDocId, safeCaseId)
+        // Per-case DB: filter by doc_id only
+        const existing = db.prepare(
+            'SELECT id, page_num, chunk_idx FROM doc_chunks WHERE doc_id = ?'
+        ).all(safeDocId)
 
         const keepSet = new Set(keep.map(k => `${k.pageNum}:${k.chunkIdx}`))
         const toDelete = existing.filter(r => !keepSet.has(`${r.page_num}:${r.chunk_idx}`))
 
         for (const row of toDelete) {
-            _ragDb.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
-            _ragDb.prepare('DELETE FROM doc_chunks WHERE id = ?').run(row.id)
+            db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
+            db.prepare('DELETE FROM doc_chunks WHERE id = ?').run(row.id)
         }
         res.json({ ok: true, pruned: toDelete.length })
     } catch (err) {
@@ -419,20 +443,14 @@ app.post('/api/rag/prune-doc', (req, res) => {
 })
 
 // GET /api/rag/doc-status/:docId  — how many chunks are indexed for a doc
-app.get('/api/rag/doc-status/:docId', (req, res) => {
+app.get('/api/rag/doc-status/:docId', async (req, res) => {
     try {
-        if (!_ragDb) return res.json({ indexed: false, chunks: 0 })
-        const { caseId } = req.query
-        let row
-        if (caseId) {
-            row = _ragDb.prepare(
-                'SELECT COUNT(*) as n FROM doc_chunks WHERE doc_id = ? AND case_id = ?'
-            ).get(safeId(req.params.docId), safeId(caseId))
-        } else {
-            row = _ragDb.prepare(
-                'SELECT COUNT(*) as n FROM doc_chunks WHERE doc_id = ?'
-            ).get(safeId(req.params.docId))
-        }
+        const { caseId = 'default' } = req.query
+        const { db } = await getRagDb(caseId)
+        // Per-case DB: filter by doc_id only
+        const row = db.prepare(
+            'SELECT COUNT(*) as n FROM doc_chunks WHERE doc_id = ?'
+        ).get(safeId(req.params.docId))
         res.json({ indexed: row.n > 0, chunks: row.n })
     } catch (err) {
         res.json({ indexed: false, chunks: 0 })
@@ -465,11 +483,11 @@ function rerank(chunks, distMap, query, k) {
 // POST /api/rag/search  — semantic search within a document
 app.post('/api/rag/search', async (req, res) => {
     try {
-        const { docId, query, k = 5 } = req.body
-        const { db } = await getRagDb()
+        const { docId, query, k = 5, caseId = 'default' } = req.body
+        const { db } = await getRagDb(caseId)
         const emb = await embed(query)
 
-        // KNN across all chunks, then filter by doc_id
+        // KNN within this case's DB, then filter by doc_id
         const topK = Math.min(k * 20, 200)
         const knnRows = db.prepare(
             'SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ? ORDER BY distance'
@@ -497,11 +515,12 @@ app.post('/api/rag/search', async (req, res) => {
 })
 
 // POST /api/rag/search-case  — semantic search across all docs in a case
+// Uses the per-case DB so KNN is already confined to this case (no case_id filter needed)
 app.post('/api/rag/search-case', async (req, res) => {
     try {
         const { caseId, query, k = 5 } = req.body
         if (!caseId || !query) return res.status(400).json({ error: 'Missing caseId or query' })
-        const { db } = await getRagDb()
+        const { db } = await getRagDb(caseId)
         const emb = await embed(query)
 
         const topK = Math.min(k * 20, 200)
@@ -511,14 +530,14 @@ app.post('/api/rag/search-case', async (req, res) => {
 
         if (!knnRows.length) return res.json([])
 
-        // vec_chunks returns BigInt ids — convert to Number for cross-table lookups
         const distMap = new Map(knnRows.map(r => [Number(r.id), r.distance]))
         const ids = knnRows.map(r => Number(r.id))
         const placeholders = ids.map(() => '?').join(',')
 
+        // All rows in this DB belong to the case — select all matching ids with doc_id for provenance
         const chunks = db.prepare(
-            `SELECT id, doc_id, page_num, chunk_idx, text, bbox FROM doc_chunks WHERE case_id = ? AND id IN (${placeholders})`
-        ).all(safeId(caseId), ...ids)
+            `SELECT id, doc_id, page_num, chunk_idx, text, bbox FROM doc_chunks WHERE id IN (${placeholders})`
+        ).all(...ids)
 
         res.json(rerank(chunks, distMap, query, k).map(c => ({
             ...c,
