@@ -58,7 +58,10 @@ export async function indexDocPages(docId, chunks, { caseId } = {}) {
         headers: JSON_HEADERS,
         body: JSON.stringify({ docId, chunks, caseId }),
     })
-    if (!res.ok) throw new Error(`Index error ${res.status}`)
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(`Index error ${res.status}: ${body.error ?? 'unknown'}`)
+    }
     return res.json()
 }
 

@@ -167,6 +167,20 @@ export async function loadAllNotes(caseId) {
     } catch { return {} }
 }
 
+export async function deleteNotes(docId, { caseId } = {}) {
+    if (!caseId) return
+    await fetch(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}`, { method: 'DELETE' })
+}
+
+export async function deleteCaseBlob(caseId, docId) {
+    await fetch(`/api/cases/${encodeURIComponent(caseId)}/blobs/${encodeURIComponent(docId)}`, { method: 'DELETE' })
+    // Also evict from browser cache
+    if ('caches' in window) {
+        const cache = await caches.open('textbot-pdfs-v1').catch(() => null)
+        if (cache) await cache.delete(`/api/cases/${encodeURIComponent(caseId)}/blobs/${encodeURIComponent(docId)}`).catch(() => {})
+    }
+}
+
 // ── Case Delete ──
 
 export async function deleteCase(caseId) {

@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom'
 import { useTheme } from '../useTheme.js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-import { uploadCaseBlob, loadCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes, loadAllNotes } from '../db.js'
+import { uploadCaseBlob, loadCaseBlob, deleteCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes, loadAllNotes, deleteNotes, deleteSummary } from '../db.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
 import { getDocRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupIntoParagraphs } from '../utils/pdfExtract.js'
@@ -153,7 +153,7 @@ const fileInputRef = useRef(null)
       top = container.scrollTop + elRect.top - cRect.top
     }
     addLogRef.current(`[SCROLL] → page ${pageNum} (${block}) scrollTop: ${Math.round(top)}`, 'info')
-    container.scrollTo({ top, behavior: 'smooth' })
+    container.scrollTo({ top, behavior: 'instant' })
   }, [])
   // ── Auto-fit: scale PDF to fill container width ────────────────────────
   const recalcScale = useCallback(() => {
@@ -214,7 +214,7 @@ const fileInputRef = useRef(null)
 
   // ── PDF Notes ──
   const [notes, setNotes] = useState([])          // [{id, pageNum, x, y, text, createdAt}]
-  const [noteMode, setNoteMode] = useState(false) // true = click-to-place mode
+  const [noteMode, setNoteMode] = useState(false)        // true = click-to-place mode
   const [openNoteId, setOpenNoteId] = useState(null)
 
   const thumbsContainerRef = useRef(null)
@@ -282,8 +282,31 @@ const fileInputRef = useRef(null)
   }
 
   const handleRemoveDocument = (docId) => {
+    const doc = parties.flatMap(p => p.documents).find(d => d.id === docId)
+    const docName = doc?.name || 'this document'
+    if (!window.confirm(`Delete "${docName}"?\n\nThis will permanently remove the PDF, all notes, and all indexed embeddings for this document.`)) return
+
+    // 1. Remove from UI state immediately
     setParties(prev => prev.map(p => ({ ...p, documents: p.documents.filter(d => d.id !== docId) })))
     if (activeDocumentId === docId) setActiveDocumentId(null)
+
+    // 2. Remove from badge count
+    setAllCaseNotes(prev => { const next = { ...prev }; delete next[docId]; return next })
+
+    // 3. Clear per-doc cached state
+    setDocStatuses(prev => { const next = { ...prev }; delete next[docId]; return next })
+    setPageCountsById(prev => { const next = { ...prev }; delete next[docId]; return next })
+    setDocChunkCountsById(prev => { const next = { ...prev }; delete next[docId]; return next })
+
+    // 4. Delete all server-side data (fire-and-forget — non-blocking)
+    if (caseId) {
+      deleteCaseBlob(caseId, docId).catch(() => {})
+      deleteNotes(docId, { caseId }).catch(() => {})
+      deleteSummary(docId, { caseId }).catch(() => {})
+      fetch(`/api/cases/${encodeURIComponent(caseId)}/extractions/${docId}`, { method: 'DELETE' }).catch(() => {})
+      fetch(`/api/cases/${encodeURIComponent(caseId)}/chat/${docId}`, { method: 'DELETE' }).catch(() => {})
+      clearDocChunks(docId, { caseId }).catch(() => {})
+    }
   }
 
   const handleAddParty = () => {
@@ -457,32 +480,29 @@ const fileInputRef = useRef(null)
       addLogRef.current(`[OBSERVER] setupObserver called — watching ${pagesContainerRef.current?.querySelectorAll('.pdfapp-page-canvas').length ?? 0} canvases`, 'info')
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          if (!entry.isIntersecting) return
-          const canvas = entry.target
+          const canvas  = entry.target
           const pageNum = parseInt(canvas.dataset.page, 10)
-          if (canvas.dataset.transferred) {
-            addLogRef.current(`[INTERSECT] page ${pageNum} in view — already transferred (skip)`, 'info')
+          if (!entry.isIntersecting) {
+            // Cancel queued render if page leaves pre-render window before it starts
+            if (!canvas.dataset.rendered) {
+              renderWorkerRef.current?.postMessage({ type: 'cancel', pageNum })
+            }
+            return
+          }
+          if (canvas.dataset.rendered) {
+            addLogRef.current(`[INTERSECT] page ${pageNum} in view — already rendered (skip)`, 'info')
             return
           }
           if (!canvas.isConnected) {
             addLogRef.current(`[INTERSECT] page ${pageNum} in view — not connected (skip)`, 'error')
             return
           }
-          canvas.dataset.transferred = 'true'
-          addLogRef.current(`[INTERSECT] page ${pageNum} in view → transferring to worker`, 'ok')
-          canvas.style.backgroundColor = 'transparent'
-          try {
-            const offscreen = canvas.transferControlToOffscreen()
-            renderWorkerRef.current?.postMessage(
-              { type: 'render', pageNum, canvas: offscreen, dpr: window.devicePixelRatio || 1 },
-              [offscreen]
-            )
-          } catch (err) {
-            addLogRef.current(`[INTERSECT] page ${pageNum} OffscreenCanvas transfer FAILED: ${err.message}`, 'error')
-            console.warn(`[PDF] OffscreenCanvas unavailable for page ${pageNum}:`, err)
-          }
+          addLogRef.current(`[INTERSECT] page ${pageNum} in view → requesting render`, 'ok')
+          renderWorkerRef.current?.postMessage({
+            type: 'render', pageNum, dpr: window.devicePixelRatio || 1,
+          })
         })
-      }, { root: pagesContainerRef.current, rootMargin: '200px 0px 200px 0px' })
+      }, { root: pagesContainerRef.current, rootMargin: '300px 0px 300px 0px' })
 
       observerRef.current = observer
       pagesContainerRef.current
@@ -529,9 +549,23 @@ const fileInputRef = useRef(null)
         pageDimsRef.current = updated
         setPageDims(updated)
       } else if (msg.type === 'rendered') {
-        // Build text layer imperatively after the worker finishes drawing a page
-        const { pageNum } = msg
+        const { pageNum, bitmap } = msg
         addLogRef.current(`[WORKER] rendered page ${pageNum}`, 'info')
+
+        // Draw bitmap onto the main-thread canvas — main thread keeps full control
+        const canvas = pagesContainerRef.current?.querySelector(`[data-page="${pageNum}"]`)
+        if (canvas && bitmap) {
+          canvas.width  = bitmap.width
+          canvas.height = bitmap.height
+          canvas.getContext('2d').drawImage(bitmap, 0, 0)
+          bitmap.close()
+          canvas.dataset.rendered = 'true'
+          canvas.style.backgroundColor = 'transparent'
+        } else {
+          bitmap?.close()
+        }
+
+        // Build text layer after the page is drawn
         if (!pdfDocRef.current) return
         const scale = renderScaleRef.current
         pdfDocRef.current.getPage(pageNum).then(page => {
@@ -681,7 +715,7 @@ const fileInputRef = useRef(null)
   const extractedTextRef = useRef(null)
 
   // ── RAG state ──
-  const [ragStatus, setRagStatus] = useState(null)   // null | 'indexing' | 'indexed'
+  const [ragStatus, setRagStatus] = useState(null)   // null | 'indexing' | 'indexed' | 'failed'
   const [ragProgress, setRagProgress] = useState('')
 
   // ── Chunking strategy (Option D — case-level setting) ──────────────────
@@ -708,11 +742,12 @@ const fileInputRef = useRef(null)
     try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
   })
   const [allCaseNotes, setAllCaseNotes] = useState({}) // { [docId]: NoteObject[] }
-  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'evidence' | 'report'
+  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'report'
   const [reportFormat, setReportFormat] = useState('')
   const [reportContent, setReportContent] = useState('')
   const [reportLoading, setReportLoading] = useState(false)
   const reportAbortRef = useRef(null)
+  const isIndexingRef = useRef(false)   // ref guard — prevents concurrent / loop-triggered indexing
 
   // ── Activity log ──
   const [logs, setLogs] = useState([])
@@ -801,17 +836,22 @@ const fileInputRef = useRef(null)
     }).catch(() => {})
   }, [activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load notes when active doc changes
+  // Load notes when active doc changes — also sync allCaseNotes so the badge is always fresh
   useEffect(() => {
     if (!activeDocumentId || !caseId) { setNotes([]); return }
-    loadNotes(activeDocumentId, { caseId }).then(setNotes).catch(() => setNotes([]))
+    loadNotes(activeDocumentId, { caseId }).then(loaded => {
+      setNotes(loaded)
+      setAllCaseNotes(prev => ({ ...prev, [activeDocumentId]: loaded }))
+    }).catch(() => setNotes([]))
     setOpenNoteId(null)
   }, [activeDocumentId, caseId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const persistNotes = useCallback((next, docId) => {
-    saveNotes(docId, next, { caseId })
-      .then(() => loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {}))
-      .catch(() => {})
+    // A: optimistic update — evidence tab reflects changes instantly
+    if (caseId) {
+      setAllCaseNotes(prev => ({ ...prev, [docId]: next }))
+    }
+    saveNotes(docId, next, { caseId }).catch(() => {})
   }, [caseId])
 
   // Load all notes for the whole case whenever the case changes
@@ -1040,12 +1080,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     }
   }, [chatInput, chatLoading, chatMessages, ragStatus, activeDocumentId, caseSearchActive, caseId, parties, addLog])
   const handleIndexDocument = useCallback(async ({ forceClear = false } = {}) => {
-    if (ragStatus === 'indexing') return
+    if (isIndexingRef.current) return   // ref guard: prevents concurrent/loop starts
     const cached = lastExtractionPagesRef.current
     const hasCachedPages = cached.docId === activeDocumentId && cached.pages
     // Need the main-thread pdf only if we have no cached pages to fall back on
     if (!hasCachedPages && !pdfDocRef.current) return
 
+    isIndexingRef.current = true
     setRagStatus('indexing')
     setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'indexing' }))
     try {
@@ -1105,16 +1146,17 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
     } catch (err) {
       console.error('[RAG] indexing failed:', err)
-      setRagStatus(null)
+      addLog(`Indexing failed: ${err.message}`, 'error')
+      setRagStatus('failed')
       setDocStatuses(prev => {
         const cur = prev[activeDocumentId]
-        // Revert to 'extracted' if we had text, otherwise clear
         return { ...prev, [activeDocumentId]: cur === 'indexing' ? 'extracted' : cur }
       })
     } finally {
+      isIndexingRef.current = false
       setRagProgress('')
     }
-  }, [activeDocumentId, ragStatus, caseId, chunkingStrategy])
+  }, [activeDocumentId, caseId, chunkingStrategy, addLog])
 
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
@@ -1218,7 +1260,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
   useEffect(() => {
     const cached = lastExtractionPagesRef.current
     const hasCachedPages = cached?.docId === activeDocumentId && cached?.pages
-    if (extractedPages && ragStatus === null && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
+    if (extractedPages && (ragStatus === null) && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
       handleIndexDocument()
     }
   }, [extractedPages, ragStatus, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -1547,17 +1589,50 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                         const st = docStatuses[doc.id]
                                         const cc = docChunkCountsById[doc.id]
                                         if (!st) return null
-                                        const MAP = {
-                                          extracting: { label: 'Reading…',   cls: 'loading'   },
-                                          extracted:  { label: 'Text ready',  cls: 'ready'     },
-                                          indexing:   { label: 'Indexing…',   cls: 'loading'   },
-                                          indexed:    { label: cc ? `✓ ${cc}` : '✓ Ready', cls: 'indexed'  },
-                                          error:      { label: '⚠ Error',     cls: 'error'     },
+                                        // icon-only status indicators
+                                        if (st === 'extracting' || st === 'indexing') {
+                                          return (
+                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--loading" title={st === 'extracting' ? 'Reading…' : 'Indexing…'}>
+                                              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                                <circle cx="8" cy="8" r="6" strokeDasharray="28" strokeDashoffset="10" strokeLinecap="round"/>
+                                              </svg>
+                                            </span>
+                                          )
                                         }
-                                        const p = MAP[st]
-                                        return p ? (
-                                          <span className={`pdfapp-doc-pill pdfapp-doc-pill--${p.cls}`}>{p.label}</span>
-                                        ) : null
+                                        if (st === 'indexed') {
+                                          return (
+                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--indexed" title={cc ? `Indexed — ${cc} chunks` : 'Indexed'}>
+                                              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <circle cx="8" cy="8" r="6"/>
+                                                <path d="M5 8 L7 10.5 L11 6" strokeLinecap="round" strokeLinejoin="round"/>
+                                              </svg>
+                                            </span>
+                                          )
+                                        }
+                                        if (st === 'error') {
+                                          return (
+                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--error" title="Indexing error">
+                                              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <circle cx="8" cy="8" r="6"/>
+                                                <path d="M8 5 L8 9" strokeLinecap="round"/>
+                                                <circle cx="8" cy="11.5" r="0.8" fill="currentColor"/>
+                                              </svg>
+                                            </span>
+                                          )
+                                        }
+                                        if (st === 'extracted') {
+                                          return (
+                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--ready" title="Text extracted">
+                                              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                                <rect x="3" y="2" width="10" height="12" rx="1.5"/>
+                                                <line x1="5" y1="6" x2="11" y2="6" strokeLinecap="round"/>
+                                                <line x1="5" y1="9" x2="11" y2="9" strokeLinecap="round"/>
+                                                <line x1="5" y1="12" x2="8" y2="12" strokeLinecap="round"/>
+                                              </svg>
+                                            </span>
+                                          )
+                                        }
+                                        return null
                                       })()}
                                       <button
                                         type="button"
@@ -1742,10 +1817,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     onClick={() => { setNoteMode(m => !m); setOpenNoteId(null) }}
                   >
                     <svg viewBox="0 0 20 20" width="15" height="15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="3" y="1" width="11" height="14" rx="1.5" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.4"/>
-                      <path d="M14 1v4h4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
-                      <rect x="3" y="1" width="11" height="14" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.4" clipPath="none"/>
                       <path d="M3 1 h8 l4 4 v11 a1.5 1.5 0 0 1-1.5 1.5 H4.5 A1.5 1.5 0 0 1 3 16.5 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+                      <path d="M11 1 v3.5 a.5.5 0 0 0 .5.5 H15" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" fill="none"/>
                       <line x1="6" y1="8"  x2="13" y2="8"  stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                       <line x1="6" y1="11" x2="13" y2="11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                       <line x1="6" y1="14" x2="10" y2="14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
@@ -1814,11 +1887,14 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                               className={`pdfapp-note-pin${openNoteId === note.id ? ' pdfapp-note-pin--open' : ''}`}
                               style={{ left: `${note.x * 100}%`, top: `${note.y * 100}%` }}
                               onClick={e => { e.stopPropagation(); setOpenNoteId(id => id === note.id ? null : note.id) }}
-                              title={note.text || 'Click to view note'}
                             >
                               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                                 <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="white" strokeWidth="1.5" fill="none"/>
                               </svg>
+                              {/* D: styled hover preview (replaces browser tooltip) */}
+                              {openNoteId !== note.id && note.text && (
+                                <div className="pdfapp-note-preview">{note.text}</div>
+                              )}
                               {openNoteId === note.id && (
                                 <div className="pdfapp-note-popover" onClick={e => e.stopPropagation()}>
                                   <textarea
@@ -1826,7 +1902,15 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                     defaultValue={note.text}
                                     placeholder="Type your note…"
                                     autoFocus
-                                    onBlur={e => handleNoteTextSave(note.id, e.target.value)}
+                                    onBlur={e => {
+                                      const text = e.target.value.trim()
+                                      if (!text) {
+                                        // B: discard empty notes instead of saving blanks
+                                        handleNoteDelete(note.id)
+                                      } else {
+                                        handleNoteTextSave(note.id, e.target.value)
+                                      }
+                                    }}
                                   />
                                   <div className="pdfapp-note-popover-footer">
                                     <span className="pdfapp-note-date">
@@ -1893,7 +1977,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     ) : ragStatus === 'indexing' ? (
                       <button
                         className="pdfapp-action-btn pdfapp-action-btn--stop"
-                        onClick={() => { setRagStatus(null); setRagProgress('') }}
+                        onClick={() => { setRagStatus('failed'); setRagProgress('') }}
                       >■ Cancel</button>
                     ) : ragStatus === 'indexed' ? (
                       <div className="pdfapp-reprocess-wrap" style={{ position: 'relative' }}>
@@ -2015,8 +2099,12 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         {/* Tab bar */}
         <div className="pdfapp-right-tabs">
           <button className={`pdfapp-right-tab${rightTab === 'chat' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('chat')}>Chat</button>
-          <button className={`pdfapp-right-tab${rightTab === 'evidence' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('evidence')}>
-            {(() => { const t = starredSources.length + Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length; return `Evidence${t > 0 ? ` (${t})` : ''}` })()}
+          <button className={`pdfapp-right-tab${rightTab === 'notes' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('notes')}>
+            {(() => {
+              const merged = { ...allCaseNotes, ...(activeDocumentId ? { [activeDocumentId]: notes } : {}) }
+              const t = Object.values(merged).flat().filter(n => n.text?.trim()).length
+              return `Notes (${t})`
+            })()}
           </button>
           <button className={`pdfapp-right-tab${rightTab === 'report' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('report')}>Report</button>
         </div>
@@ -2135,8 +2223,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
             </div>
           </div>}
 
-        {/* ── Evidence tab ── */}
-        {rightTab === 'evidence' && (() => {
+        {/* ── Notes tab ── */}
+        {rightTab === 'notes' && (() => {
           // Resolve docName/partyName for starred items that predate the enrichment
           const resolveDoc = (docId) => {
             const p = parties.find(pt => (pt.documents || []).some(d => d.id === docId))
@@ -2254,6 +2342,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   ))}
                 </div>
               )}
+
             </div>
           )
         })()}

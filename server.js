@@ -170,6 +170,16 @@ app.put('/api/cases/:caseId/blobs/:docId', express.raw({ type: 'application/octe
   res.json({ ok: true })
 })
 
+app.delete('/api/cases/:caseId/blobs/:docId', (req, res) => {
+  const blobsDir = getCaseSubdir(req.params.caseId, 'blobs')
+  const id = safeId(req.params.docId)
+  const filePath = path.join(blobsDir, id)
+  const metaPath = path.join(blobsDir, `${id}.meta`)
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+  if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath)
+  res.json({ ok: true })
+})
+
 // ── Case-scoped PDF Notes ──
 
 app.get('/api/cases/:caseId/notes/:docId', (req, res) => {
@@ -186,6 +196,12 @@ app.post('/api/cases/:caseId/notes/:docId', (req, res) => {
   res.json({ ok: true })
 })
 
+app.delete('/api/cases/:caseId/notes/:docId', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'notes'), `${safeId(req.params.docId)}.json`)
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+  res.json({ ok: true })
+})
+
 // Aggregate all notes for every document in a case — { [docId]: NoteObject[] }
 app.get('/api/cases/:caseId/all-notes', (req, res) => {
   const notesDir = getCaseSubdir(req.params.caseId, 'notes')
@@ -196,6 +212,43 @@ app.get('/api/cases/:caseId/all-notes', (req, res) => {
   for (const f of files) {
     const docId = f.replace('.json', '')
     try { result[docId] = JSON.parse(fs.readFileSync(path.join(notesDir, f), 'utf8')) }
+    catch { result[docId] = [] }
+  }
+  res.json(result)
+})
+
+// ── Case-scoped Highlights ──
+
+app.get('/api/cases/:caseId/highlights/:docId', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'highlights'), `${safeId(req.params.docId)}.json`)
+  if (!fs.existsSync(filePath)) return res.json([])
+  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+})
+
+app.post('/api/cases/:caseId/highlights/:docId', (req, res) => {
+  fs.writeFileSync(
+    path.join(getCaseSubdir(req.params.caseId, 'highlights'), `${safeId(req.params.docId)}.json`),
+    JSON.stringify(req.body)
+  )
+  res.json({ ok: true })
+})
+
+app.delete('/api/cases/:caseId/highlights/:docId', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'highlights'), `${safeId(req.params.docId)}.json`)
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+  res.json({ ok: true })
+})
+
+// Aggregate all highlights for every document in a case — { [docId]: HighlightObject[] }
+app.get('/api/cases/:caseId/all-highlights', (req, res) => {
+  const highlightsDir = getCaseSubdir(req.params.caseId, 'highlights')
+  const files = fs.existsSync(highlightsDir)
+    ? fs.readdirSync(highlightsDir).filter(f => f.endsWith('.json'))
+    : []
+  const result = {}
+  for (const f of files) {
+    const docId = f.replace('.json', '')
+    try { result[docId] = JSON.parse(fs.readFileSync(path.join(highlightsDir, f), 'utf8')) }
     catch { result[docId] = [] }
   }
   res.json(result)
@@ -222,21 +275,55 @@ app.delete('/api/cases/:caseId', (req, res) => {
 // ── RAG (Local vector search via sqlite-vec) ──────────────────────────────
 
 const RAG_DB_PATH = path.join(DATA_DIR, 'rag.db')
-const EMBED_MODEL = 'embeddinggemma:latest'
-const EMBED_API  = 'http://localhost:11434/api/embeddings'
+
+// ── Embed backend config ──────────────────────────────────────────────────
+// Set EMBED_BACKEND=llamafile in env to use llamafiler instead of Ollama.
+//   Ollama:    http://localhost:11434  model=embeddinggemma:latest
+//   Llamafile: http://localhost:8080   model=all-MiniLM-L6-v2.F16.gguf
+//              (run: ./llamafile/llamafiler -m ./llamafile/all-MiniLM-L6-v2.F16.gguf --embedding)
+const EMBED_BACKEND = (process.env.EMBED_BACKEND || 'ollama').toLowerCase()
+
+const EMBED_CONFIG = {
+    ollama: {
+        api:   'http://localhost:11434/api/embeddings',
+        model: process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest',
+        async call(text) {
+            const res = await fetch(this.api, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: this.model, prompt: text }),
+            })
+            if (!res.ok) throw new Error(`Ollama embed ${res.status}: ${await res.text()}`)
+            const { embedding } = await res.json()
+            return embedding
+        },
+    },
+    llamafile: {
+        api:   `http://localhost:${process.env.LLAMAFILE_PORT || 8080}/v1/embeddings`,
+        model: process.env.LLAMAFILE_EMBED_MODEL || 'all-MiniLM-L6-v2.F16.gguf',
+        async call(text) {
+            const res = await fetch(this.api, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: this.model, input: text }),
+            })
+            if (!res.ok) throw new Error(`Llamafile embed ${res.status}: ${await res.text()}`)
+            const { data } = await res.json()
+            return data[0].embedding
+        },
+    },
+}
+
+const _embedBackend = EMBED_CONFIG[EMBED_BACKEND] ?? EMBED_CONFIG.ollama
+const EMBED_MODEL   = _embedBackend.model
+
+console.log(`[RAG] embed backend: ${EMBED_BACKEND} — model: ${EMBED_MODEL}`)
 
 const _ragDbs = new Map()   // key → { db, dim }  (one DB per case)
 let _embedDim = null        // shared — same embed model across all DBs
 
 async function embed(text) {
-    const res = await fetch(EMBED_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: EMBED_MODEL, prompt: text }),
-    })
-    if (!res.ok) throw new Error(`Ollama embed ${res.status}: ${await res.text()}`)
-    const { embedding } = await res.json()
-    return embedding // float[]
+    return _embedBackend.call(text)
 }
 
 function toBlob(floats) {
