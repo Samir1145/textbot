@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"node server.js\" \"vite\"",
-    "dev:llamafile": "concurrently \"./llamafile/llamafiler -m ./llamafile/all-MiniLM-L6-v2.F16.gguf\" \"./llamafile/llamafiler -m ./llamafile/gemma-3-4b-it-Q4_K_M.gguf -l 0.0.0.0:8081\" \"EMBED_BACKEND=llamafile node server.js\" \"VITE_LLM_BACKEND=llamafile VITE_LLAMAFILE_MODEL=gemma-3-4b-it-Q4_K_M.gguf vite\"",
+    "dev:llamafile": "concurrently \"./llamafile/llamafiler -m ./llamafile/nomic-embed-text-v1.5.Q8_0.gguf --embedding\" \"./llamafile/llamafiler -m ./llamafile/Qwen2.5-7B-Instruct-Q4_K_M.gguf -l 0.0.0.0:8081\" \"EMBED_BACKEND=llamafile LLAMAFILE_EMBED_MODEL=nomic-embed-text-v1.5.Q8_0.gguf node server.js\" \"VITE_LLM_BACKEND=llamafile VITE_LLAMAFILE_MODEL=Qwen2.5-7B-Instruct-Q4_K_M.gguf vite\"",
     "server": "node server.js",
     "server:llamafile": "EMBED_BACKEND=llamafile node server.js",
     "build": "vite build",

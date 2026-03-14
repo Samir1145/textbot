@@ -440,7 +440,7 @@ const fileInputRef = useRef(null)
       pageDimsRef.current = {}
       setExtractedText(null)
       extractedTextRef.current = null
-      setExtractedPages(null)
+      setExtractedPages(extractionByDocRef.current[activeDocumentId] ?? null)
       setExtractionSource(null)
       setExtractionError(null)
       setExtractionStatus('')
@@ -525,11 +525,13 @@ const fileInputRef = useRef(null)
         // pixel dimensions (2× on retina) before CSS sizes are applied.
         flushSync(() => {
           setPageDims(dims)
-          if (isDocChange) {
-            setPageCount(numPages)
-            setPageCountsById(prev => ({ ...prev, [activeDocumentId]: numPages }))
-            setPdfLoading(false)
-          }
+          // Always set pageCount + loading — safe no-op on zoom (same value).
+          // Also fixes React StrictMode double-invoke: second run has isDocChange=false
+          // because prevActiveDocUrlRef was already updated in the first run, so
+          // guarding on isDocChange would leave pageCount=null permanently.
+          setPageCount(numPages)
+          setPageCountsById(prev => ({ ...prev, [activeDocumentId]: numPages }))
+          setPdfLoading(false)
         })
         // DOM is already updated — single rAF to let the browser paint before observing
         requestAnimationFrame(() => {
@@ -647,10 +649,24 @@ const fileInputRef = useRef(null)
     worker.onmessage = ({ data: msg }) => {
       if (cancelled) return
 
-      // Worker sends back a JPEG buffer for thumbnails — persist to IDB for next session.
-      if (msg.type === 'rendered' && msg.thumbBuffer && activeDocumentId) {
-        const blob = new Blob([msg.thumbBuffer], { type: 'image/jpeg' })
-        setCachedThumb(activeDocumentId, msg.pageNum, blob)
+      // Worker sends back an ImageBitmap — draw onto the thumbnail canvas and cache.
+      if (msg.type === 'rendered' && msg.bitmap) {
+        const canvas = thumbsContainerRef.current?.querySelector(`.pdfapp-thumb-canvas[data-page="${msg.pageNum}"]`)
+        if (canvas?.isConnected) {
+          const ctx = canvas.getContext('2d')
+          canvas.width  = msg.bitmap.width
+          canvas.height = msg.bitmap.height
+          ctx?.drawImage(msg.bitmap, 0, 0)
+          // Cache as JPEG blob for next session
+          if (activeDocumentId) {
+            const tmp = new OffscreenCanvas(msg.bitmap.width, msg.bitmap.height)
+            tmp.getContext('2d').drawImage(msg.bitmap, 0, 0)
+            tmp.convertToBlob({ type: 'image/jpeg', quality: 0.7 })
+              .then(blob => setCachedThumb(activeDocumentId, msg.pageNum, blob))
+              .catch(() => {})
+          }
+        }
+        msg.bitmap.close()
       }
 
       if (msg.type !== 'ready') return
@@ -679,15 +695,9 @@ const fileInputRef = useRef(null)
               } catch { /* fall through to worker if IDB blob is corrupt */ }
             }
 
-            // Not cached — transfer canvas to worker for rendering
+            // Not cached — request render from worker (ImageBitmap protocol)
             if (!canvas.isConnected) return
-            try {
-              const offscreen = canvas.transferControlToOffscreen()
-              thumbWorkerRef.current?.postMessage(
-                { type: 'render', pageNum, canvas: offscreen, dpr: 1 },
-                [offscreen]
-              )
-            } catch { /* OffscreenCanvas not supported */ }
+            thumbWorkerRef.current?.postMessage({ type: 'render', pageNum, dpr: 1 })
           })
         }, { root: thumbsContainerRef.current, rootMargin: '600px' })
         thumbObserverRef.current = observer
@@ -742,11 +752,16 @@ const fileInputRef = useRef(null)
     try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
   })
   const [allCaseNotes, setAllCaseNotes] = useState({}) // { [docId]: NoteObject[] }
-  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'report'
-  const [reportFormat, setReportFormat] = useState('')
-  const [reportContent, setReportContent] = useState('')
-  const [reportLoading, setReportLoading] = useState(false)
-  const reportAbortRef = useRef(null)
+  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'agent'
+  // ── Agent state ──
+  const [agentTask,   setAgentTask]   = useState('')
+  const [agentIntent, setAgentIntent] = useState('')
+  const [agentRole,   setAgentRole]   = useState('')
+  const [agentJobId,  setAgentJobId]  = useState(null)
+  const [agentSteps,  setAgentSteps]  = useState([])
+  const [agentStatus, setAgentStatus] = useState('idle') // 'idle'|'running'|'done'|'error'|'cancelled'
+  const [agentResult, setAgentResult] = useState(null)
+  const agentEsRef = useRef(null)
   const isIndexingRef = useRef(false)   // ref guard — prevents concurrent / loop-triggered indexing
 
   // ── Activity log ──
@@ -784,6 +799,14 @@ const fileInputRef = useRef(null)
   const [chatLoading, setChatLoading] = useState(false)
   const [activeCitations, setActiveCitations] = useState(new Map()) // n → chunk
 
+  // Stable display citations — falls back to last LLM response's citations when activeCitations
+  // is empty (covers: doc-switch clear, race between indexing state churn and citation set)
+  const displayCitations = useMemo(() => {
+    if (activeCitations.size > 0) return activeCitations
+    const lastCited = [...chatMessages].reverse().find(m => m.role === 'assistant' && m.citations?.size)
+    return lastCited?.citations ?? new Map()
+  }, [activeCitations, chatMessages])
+
   // Scroll to the first cited page whenever activeCitations changes
   useEffect(() => {
     if (!activeCitations.size) return
@@ -801,6 +824,10 @@ const fileInputRef = useRef(null)
   }, [activeCitations])
   const chatAbortRef = useRef(null)
   const chatMessagesRef = useRef(null)
+  // Session-level per-doc caches — state restores instantly on doc switch (no async blank flash)
+  const chatByDocRef       = useRef({}) // docId → Message[]
+  const extractionByDocRef = useRef({}) // docId → extractedPages
+  const ragStatusByDocRef  = useRef({}) // docId → 'indexed' | 'failed'
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -811,24 +838,33 @@ const fileInputRef = useRef(null)
 
   // Reset chat + RAG state when document changes; load persisted chat history
   useEffect(() => {
-    setChatMessages([])
+    // Restore immediately from in-session cache — no async round-trip, no blank flash
+    const sessionMsgs = chatByDocRef.current[activeDocumentId] || []
+    const sessionLastCited = [...sessionMsgs].reverse().find(m => m.role === 'assistant' && m.citations?.size)
+    setChatMessages(sessionMsgs)
+    setActiveCitations(sessionLastCited?.citations ?? new Map())
     setChatInput('')
-    setRagStatus(null)
+    setRagStatus(ragStatusByDocRef.current[activeDocumentId] ?? null)
     setRagProgress('')
-    setActiveCitations(new Map())
     ragQueryCacheRef.current.clear() // invalidate cached search results for previous doc
 
     if (!activeDocumentId) return
 
-    // Load saved chat history (case mode only)
-    if (caseId) {
+    // Load from server only on first visit this session (cross-session persistence)
+    if (caseId && !sessionMsgs.length) {
       loadChatHistory(activeDocumentId, { caseId }).then(msgs => {
-        if (msgs.length) setChatMessages(msgs)
+        if (msgs.length) {
+          chatByDocRef.current[activeDocumentId] = msgs
+          setChatMessages(msgs)
+          const lastCited = [...msgs].reverse().find(m => m.role === 'assistant' && m.citations?.size)
+          if (lastCited) setActiveCitations(lastCited.citations)
+        }
       }).catch(() => {})
     }
 
     getDocRagStatus(activeDocumentId, { caseId }).then(({ indexed, chunks }) => {
       if (indexed) {
+        ragStatusByDocRef.current[activeDocumentId] = 'indexed'
         setRagStatus('indexed')
         setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'indexed' }))
         if (chunks) setDocChunkCountsById(prev => ({ ...prev, [activeDocumentId]: chunks }))
@@ -898,48 +934,52 @@ const fileInputRef = useRef(null)
     })
   }, [caseId])
 
-  const handleGenerateReport = useCallback(async () => {
-    if (reportLoading) { reportAbortRef.current?.abort(); return }
-    const allNotesList = Object.entries(allCaseNotes).flatMap(([docId, noteArr]) => {
-      const p = parties.find(pt => (pt.documents || []).some(d => d.id === docId))
-      const d = p?.documents?.find(doc => doc.id === docId)
-      return noteArr.filter(n => n.text?.trim()).map(n => ({ ...n, docId, docName: d?.name || docId, partyName: p?.name || null }))
+  const handleAgentStart = useCallback(async () => {
+    if (!agentTask.trim() || !caseId) return
+    // Close any existing SSE stream
+    agentEsRef.current?.close()
+    setAgentSteps([])
+    setAgentResult(null)
+    setAgentStatus('running')
+
+    const res = await fetch('/api/agent/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task: agentTask, intent: agentIntent, role: agentRole, caseId }),
     })
-    if (!starredSources.length && !allNotesList.length) return
-    setReportContent('')
-    setReportLoading(true)
-    const controller = new AbortController()
-    reportAbortRef.current = controller
-    const caseLabel = caseName ? `Case: ${caseName}\n\n` : ''
-    const evidenceBlock = [
-      starredSources.length > 0
-        ? '## Starred Sources\n' + starredSources.map((s, i) => {
-            const provenance = [s.partyName, s.docName].filter(Boolean).join(' / ')
-            return `[${i + 1}]${provenance ? ` [${provenance}]` : ''} p.${s.pageNum}${s.question ? ` (context: "${s.question}")` : ''}:\n"${s.chunkText.slice(0, 400)}"`
-          }).join('\n\n')
-        : '',
-      allNotesList.length > 0
-        ? '## User Notes\n' + allNotesList.map(n => {
-            const provenance = [n.partyName, n.docName].filter(Boolean).join(' / ')
-            return `${provenance ? `[${provenance}] ` : ''}p.${n.pageNum}: ${n.text}`
-          }).join('\n')
-        : '',
-    ].filter(Boolean).join('\n\n')
-    try {
-      await streamOllamaChat({
-        messages: [
-          { role: 'system', content: 'You are a professional legal analyst. Generate a well-structured report from the provided evidence across all case documents. Use headings, bullet points, and always cite the source party, document name and page number.' },
-          { role: 'user', content: `${caseLabel}${reportFormat.trim() ? `Format instructions: ${reportFormat}\n\n` : ''}Evidence:\n\n${evidenceBlock}\n\nGenerate the report.` },
-        ],
-        signal: controller.signal,
-        onChunk: text => setReportContent(text),
-      })
-    } catch (err) {
-      if (err.name !== 'AbortError') setReportContent(prev => prev + `\n\n[Error: ${err.message}]`)
-    } finally {
-      setReportLoading(false)
+    const { jobId, error } = await res.json()
+    if (error) { setAgentStatus('error'); return }
+    setAgentJobId(jobId)
+
+    const es = new EventSource(`/api/agent/${jobId}/stream`)
+    agentEsRef.current = es
+
+    es.onmessage = (e) => {
+      const step = JSON.parse(e.data)
+      if (step.type === 'status') {
+        setAgentStatus(step.status)
+        if (step.result) setAgentResult(step.result)
+        if (step.status !== 'running') { es.close(); agentEsRef.current = null }
+        // If agent saved notes, reload them
+        return
+      }
+      setAgentSteps(prev => [...prev, step])
+      // Reload notes when agent adds one
+      if (step.type === 'tool_result' && step.tool === 'add_note' && step.result?.ok) {
+        loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {})
+      }
     }
-  }, [starredSources, allCaseNotes, parties, caseName, reportFormat, reportLoading])
+    es.onerror = () => { setAgentStatus('error'); es.close(); agentEsRef.current = null }
+  }, [agentTask, agentIntent, agentRole, caseId, setAllCaseNotes])
+
+  const handleAgentStop = useCallback(async () => {
+    agentEsRef.current?.close()
+    agentEsRef.current = null
+    if (agentJobId) {
+      await fetch(`/api/agent/${agentJobId}`, { method: 'DELETE' }).catch(() => {})
+    }
+    setAgentStatus('cancelled')
+  }, [agentJobId])
 
   const handlePageClick = useCallback((e, pageNum) => {
     if (!noteMode) return
@@ -1096,9 +1136,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         await clearDocChunks(activeDocumentId, { caseId })
       }
 
-      // Step 2 — index format categories (skips already-done ones)
-      setRagProgress('Setting up categories (first time only)…')
-      await initFormatCategories(FORMAT_CATEGORIES)
+      // Step 2 — index format categories (non-fatal — skips if embed model not ready yet)
+      try {
+        setRagProgress('Setting up categories (first time only)…')
+        await initFormatCategories(FORMAT_CATEGORIES)
+      } catch (err) {
+        addLog(`Format categories skipped (will retry next index): ${err.message}`, 'warn')
+      }
 
       // Step 3 — get bbox-aware paragraph chunks
       // Prefer cached pages from extraction (has OCR bboxes too); fallback to native re-extract
@@ -1168,6 +1212,18 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
   const [extractionError, setExtractionError] = useState(null)
   const [extractionSource, setExtractionSource] = useState(null) // 'text' | 'ocr' | null
   const extractionAbortRef = useRef(null)
+
+  // Keep session caches in sync so doc-switch restores are instant
+  // NOTE: placed here — after extractedPages declaration — to avoid TDZ in dep array
+  useEffect(() => {
+    if (activeDocumentId && chatMessages.length) chatByDocRef.current[activeDocumentId] = chatMessages
+  }, [chatMessages, activeDocumentId])
+  useEffect(() => {
+    if (activeDocumentId && extractedPages) extractionByDocRef.current[activeDocumentId] = extractedPages
+  }, [extractedPages, activeDocumentId])
+  useEffect(() => {
+    if (activeDocumentId && ragStatus && ragStatus !== 'indexing') ragStatusByDocRef.current[activeDocumentId] = ragStatus
+  }, [ragStatus, activeDocumentId])
 
   // Watch key status strings and mirror them into the log automatically
   useEffect(() => { if (extractionStatus) addLog(extractionStatus) }, [extractionStatus, addLog])
@@ -1255,8 +1311,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
   }, [activeDocumentId, caseId])
 
   // Auto-index for RAG after extraction completes.
-  // Also re-indexes when full extraction arrives after a partial index (ragStatus resets to null via
-  // the doc-change effect, so the check here naturally catches both first and full runs).
+  // Fires only when ragStatus===null (new doc or first extraction this session).
+  // Returning to an already-indexed doc sets ragStatus from ragStatusByDocRef, so this won't re-trigger.
   useEffect(() => {
     const cached = lastExtractionPagesRef.current
     const hasCachedPages = cached?.docId === activeDocumentId && cached?.pages
@@ -1372,7 +1428,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
             return (
               <button
                 key={i}
-                className={`pdfapp-citation-chip${activeCitations.has(token) ? ' pdfapp-citation-chip--active' : ''}`}
+                className={`pdfapp-citation-chip${displayCitations.has(token) ? ' pdfapp-citation-chip--active' : ''}`}
                 title={`Page ${chunk.page_num} — ${chunk.text.slice(0, 120)}${chunk.text.length > 120 ? '…' : ''}`}
                 onClick={() => {
                   addLog(`[CLICK] citation chip [${token}] → page ${chunk.page_num}`, 'info')
@@ -1842,7 +1898,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     {pageCount != null && Array.from({ length: pageCount }, (_, index) => {
                       const pageNum = index + 1
                       const dim = pageDims[pageNum]
-                      const pageHighlights = [...activeCitations.values()].filter(c => c.page_num === pageNum && c.bbox)
+                      const pageHighlights = [...displayCitations.values()].filter(c => c.page_num === pageNum && c.bbox)
                       const pageNotes = notes.filter(n => n.pageNum === pageNum)
                       return (
                         <div
@@ -2106,7 +2162,9 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               return `Notes (${t})`
             })()}
           </button>
-          <button className={`pdfapp-right-tab${rightTab === 'report' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('report')}>Report</button>
+          <button className={`pdfapp-right-tab${rightTab === 'agent' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('agent')}>
+            Agent{agentStatus === 'running' ? ' ⟳' : agentStatus === 'done' ? ' ✓' : ''}
+          </button>
         </div>
 
         {/* ── Chat tab ── */}
@@ -2140,7 +2198,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                           return (
                             <div key={n} className="pdfapp-source-row">
                               <button
-                                className={`pdfapp-source-item${activeCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
+                                className={`pdfapp-source-item${displayCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
                                 onClick={() => {
                                   addLog(`[CLICK] source [${n}] → page ${chunk.page_num}`, 'info')
                                   setActiveCitations(new Map([[n, chunk]]))
@@ -2347,39 +2405,133 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           )
         })()}
 
-        {/* ── Report tab ── */}
-        {rightTab === 'report' && (
-          <div className="pdfapp-report-panel">
-            <div className="pdfapp-report-format">
-              <textarea
-                className="pdfapp-report-format-input"
-                placeholder="Describe the report format… e.g. 'Executive summary with: Background, Key Findings, Risk Assessment, Recommendations'"
-                value={reportFormat}
-                rows={3}
-                onChange={e => setReportFormat(e.target.value)}
-              />
-              <button
-                className={`pdfapp-report-btn${reportLoading ? ' pdfapp-report-btn--stop' : ''}`}
-                onClick={handleGenerateReport}
-                disabled={!reportLoading && !starredSources.length && !Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length}
-              >
-                {reportLoading
-                  ? '■ Stop'
-                  : (() => { const t = starredSources.length + Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length; return `Generate Report${t > 0 ? ` (${t} items)` : ''}` })()}
-              </button>
+        {/* ── Agent tab ── */}
+        {rightTab === 'agent' && (
+          <div className="pdfapp-agent-panel">
+
+            {/* Intent + Task form — always visible */}
+            <div className="pdfapp-agent-form">
+              <div className="pdfapp-agent-form-field">
+                <label className="pdfapp-agent-label">Task</label>
+                <textarea
+                  className="pdfapp-agent-textarea"
+                  placeholder="What should the agent do? e.g. 'Find all liability clauses across all contracts and flag any conflicts'"
+                  value={agentTask}
+                  rows={2}
+                  onChange={e => setAgentTask(e.target.value)}
+                  disabled={agentStatus === 'running'}
+                />
+              </div>
+              <div className="pdfapp-agent-form-field">
+                <label className="pdfapp-agent-label">Your goal <span className="pdfapp-agent-label-hint">(helps the agent focus)</span></label>
+                <textarea
+                  className="pdfapp-agent-textarea"
+                  placeholder="e.g. 'Acting for the buyer. Flag anything that exposes the client to unlimited liability.'"
+                  value={agentIntent}
+                  rows={2}
+                  onChange={e => setAgentIntent(e.target.value)}
+                  disabled={agentStatus === 'running'}
+                />
+              </div>
+              <div className="pdfapp-agent-form-row">
+                <select
+                  className="pdfapp-agent-select"
+                  value={agentRole}
+                  onChange={e => setAgentRole(e.target.value)}
+                  disabled={agentStatus === 'running'}
+                >
+                  <option value="">— Perspective —</option>
+                  <option value="Acting for buyer">Acting for buyer</option>
+                  <option value="Acting for seller">Acting for seller</option>
+                  <option value="Acting for contractor">Acting for contractor</option>
+                  <option value="Acting for client">Acting for client</option>
+                  <option value="Neutral due diligence">Neutral due diligence</option>
+                  <option value="Litigation — claimant">Litigation — claimant</option>
+                  <option value="Litigation — defendant">Litigation — defendant</option>
+                </select>
+                {agentStatus === 'running'
+                  ? <button className="pdfapp-agent-run-btn pdfapp-agent-run-btn--stop" onClick={handleAgentStop}>■ Stop</button>
+                  : <button
+                      className="pdfapp-agent-run-btn"
+                      onClick={handleAgentStart}
+                      disabled={!agentTask.trim() || !caseId}
+                    >
+                      {agentStatus === 'idle' ? 'Run Agent →' : 'Run Again →'}
+                    </button>
+                }
+              </div>
+              {!caseId && <div className="pdfapp-agent-no-case">Open a case to use the agent.</div>}
             </div>
-            {!reportContent && !reportLoading && (
+
+            {/* Step audit trail */}
+            {agentSteps.length === 0 && agentStatus === 'idle' && (
               <div className="pdfapp-evidence-empty">
-                Add starred sources and notes in the Evidence tab, then generate your report here.
+                Describe your task and goal above, then run the agent. It will search your documents step-by-step and save findings to Notes.
               </div>
             )}
-            {reportContent && (
-              <div className="pdfapp-report-output-wrap">
-                <div className="pdfapp-report-output-actions">
-                  <button className="pdfapp-report-copy" onClick={() => navigator.clipboard.writeText(reportContent).catch(() => {})}>Copy</button>
-                  <button className="pdfapp-report-clear" onClick={() => setReportContent('')}>Clear</button>
-                </div>
-                <div className="pdfapp-report-output">{reportContent}</div>
+
+            {(agentSteps.length > 0 || agentStatus === 'running') && (
+              <div className="pdfapp-agent-trail">
+                {agentStatus === 'running' && (
+                  <div className="pdfapp-agent-thinking">
+                    <span className="pdfapp-agent-thinking-dot" />
+                    <span className="pdfapp-agent-thinking-dot" />
+                    <span className="pdfapp-agent-thinking-dot" />
+                    <span className="pdfapp-agent-thinking-label">Thinking…</span>
+                  </div>
+                )}
+                {agentSteps.map((step, i) => (
+                  <div key={i} className={`pdfapp-agent-step pdfapp-agent-step--${step.type}`}>
+                    {step.type === 'tool_call' && (
+                      <>
+                        <span className="pdfapp-agent-step-icon">⚙</span>
+                        <div className="pdfapp-agent-step-body">
+                          <span className="pdfapp-agent-step-tool">{step.tool}</span>
+                          {step.tool === 'search_case' && <span className="pdfapp-agent-step-args">"{step.args?.query}"</span>}
+                          {step.tool === 'search_doc'  && <span className="pdfapp-agent-step-args">"{step.args?.query}" in {step.args?.docId?.slice(0,8)}…</span>}
+                          {step.tool === 'add_note'    && <span className="pdfapp-agent-step-args">saving note…</span>}
+                        </div>
+                      </>
+                    )}
+                    {step.type === 'tool_result' && (
+                      <>
+                        <span className="pdfapp-agent-step-icon">↩</span>
+                        <div className="pdfapp-agent-step-body">
+                          {step.tool === 'add_note' && step.result?.ok
+                            ? <span className="pdfapp-agent-step-note-saved">Note saved to Notes tab</span>
+                            : Array.isArray(step.result)
+                              ? <span className="pdfapp-agent-step-result-count">{step.result.length} result{step.result.length !== 1 ? 's' : ''} found</span>
+                              : <span className="pdfapp-agent-step-result-count">{step.result?.error || 'done'}</span>
+                          }
+                        </div>
+                      </>
+                    )}
+                    {step.type === 'error' && (
+                      <>
+                        <span className="pdfapp-agent-step-icon">✕</span>
+                        <div className="pdfapp-agent-step-body pdfapp-agent-step-body--error">{step.content}</div>
+                      </>
+                    )}
+                  </div>
+                ))}
+
+                {/* Final answer */}
+                {agentResult && (
+                  <div className="pdfapp-agent-answer">
+                    <div className="pdfapp-agent-answer-header">
+                      <span>Agent finding</span>
+                      <button className="pdfapp-agent-answer-copy" onClick={() => navigator.clipboard.writeText(agentResult).catch(() => {})}>Copy</button>
+                    </div>
+                    <div className="pdfapp-agent-answer-body">{agentResult}</div>
+                  </div>
+                )}
+
+                {agentStatus === 'cancelled' && (
+                  <div className="pdfapp-agent-step pdfapp-agent-step--cancelled">
+                    <span className="pdfapp-agent-step-icon">⏹</span>
+                    <div className="pdfapp-agent-step-body">Stopped by user</div>
+                  </div>
+                )}
               </div>
             )}
           </div>

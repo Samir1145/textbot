@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequire } from 'module'
-import { createHash } from 'crypto'
+import { createHash, randomUUID } from 'crypto'
 
 const require = createRequire(import.meta.url)
 const Database = require('better-sqlite3')
@@ -278,7 +278,7 @@ const RAG_DB_PATH = path.join(DATA_DIR, 'rag.db')
 
 // ── Embed backend config ──────────────────────────────────────────────────
 // Set EMBED_BACKEND=llamafile in env to use llamafiler instead of Ollama.
-//   Ollama:    http://localhost:11434  model=embeddinggemma:latest
+//   Ollama:    http://localhost:11434  model=nomic-embed-text (768-dim, 8192 ctx)
 //   Llamafile: http://localhost:8080   model=all-MiniLM-L6-v2.F16.gguf
 //              (run: ./llamafile/llamafiler -m ./llamafile/all-MiniLM-L6-v2.F16.gguf --embedding)
 const EMBED_BACKEND = (process.env.EMBED_BACKEND || 'ollama').toLowerCase()
@@ -286,7 +286,7 @@ const EMBED_BACKEND = (process.env.EMBED_BACKEND || 'ollama').toLowerCase()
 const EMBED_CONFIG = {
     ollama: {
         api:   'http://localhost:11434/api/embeddings',
-        model: process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest',
+        model: process.env.OLLAMA_EMBED_MODEL || 'nomic-embed-text',
         async call(text) {
             const res = await fetch(this.api, {
                 method: 'POST',
@@ -660,13 +660,17 @@ app.post('/api/rag/init-categories', async (req, res) => {
             const existing = db.prepare('SELECT id FROM format_cats WHERE name = ?').get(name)
             if (existing) continue
 
-            const emb = await embed(`${name}: ${description}`)
-            const { lastInsertRowid: catId } = db.prepare(
-                'INSERT OR IGNORE INTO format_cats (name, description) VALUES (?, ?)'
-            ).run(name, description)
-            if (catId) {
-                db.prepare('INSERT INTO vec_cats (id, embedding) VALUES (?, ?)').run(BigInt(catId), toBlob(emb))
-                indexed++
+            try {
+                const emb = await embed(`${name}: ${description}`)
+                const { lastInsertRowid: catId } = db.prepare(
+                    'INSERT OR IGNORE INTO format_cats (name, description) VALUES (?, ?)'
+                ).run(name, description)
+                if (catId) {
+                    db.prepare('INSERT INTO vec_cats (id, embedding) VALUES (?, ?)').run(BigInt(catId), toBlob(emb))
+                    indexed++
+                }
+            } catch (err) {
+                console.warn('[RAG] skipping category embed:', name, err.message)
             }
         }
 
@@ -709,6 +713,266 @@ app.post('/api/rag/suggest-formats', async (req, res) => {
         console.error('[RAG] suggest-formats error:', err.message)
         res.status(500).json({ error: err.message })
     }
+})
+
+// ── Agent (ReAct loop) ────────────────────────────────────────────────────
+
+const agentJobs = new Map()   // jobId → { status, steps, clients, result, error, cancelled }
+
+function agentBroadcast(clients, data) {
+    const msg = `data: ${JSON.stringify(data)}\n\n`
+    for (const res of clients) { try { res.write(msg) } catch {} }
+}
+
+const AGENT_TOOLS = [
+    {
+        type: 'function',
+        function: {
+            name: 'search_case',
+            description: 'Search all documents in the case for relevant text. Use this for broad queries across all documents.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    query: { type: 'string', description: 'Search query' },
+                    k:     { type: 'number', description: 'Number of results (default 5)' },
+                },
+                required: ['query'],
+            },
+        },
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'search_doc',
+            description: 'Search a specific document by ID for relevant text.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    query: { type: 'string', description: 'Search query' },
+                    docId: { type: 'string', description: 'The document ID to search' },
+                    k:     { type: 'number', description: 'Number of results (default 5)' },
+                },
+                required: ['query', 'docId'],
+            },
+        },
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'add_note',
+            description: 'Save an important finding as a note. Use this to record key discoveries so the lawyer can review them.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    docId:   { type: 'string', description: 'Document ID this note relates to' },
+                    pageNum: { type: 'number', description: 'Page number (use 1 if unknown)' },
+                    text:    { type: 'string', description: 'The note text to save' },
+                },
+                required: ['docId', 'text'],
+            },
+        },
+    },
+]
+
+async function agentExecuteTool(name, args, caseId) {
+    if (name === 'search_case') {
+        const { query, k = 5 } = args
+        const { db } = await getRagDb(caseId)
+        const emb = await embed(query)
+        const topK = Math.min(k * 20, 200)
+        const knnRows = db.prepare(
+            'SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ? ORDER BY distance'
+        ).all(toBlob(emb), topK)
+        if (!knnRows.length) return []
+        const distMap = new Map(knnRows.map(r => [Number(r.id), r.distance]))
+        const ids = knnRows.map(r => Number(r.id))
+        const placeholders = ids.map(() => '?').join(',')
+        const chunks = db.prepare(
+            `SELECT id, doc_id, page_num, chunk_idx, text FROM doc_chunks WHERE id IN (${placeholders})`
+        ).all(...ids)
+        return rerank(chunks, distMap, query, k).map(c => ({
+            docId: c.doc_id, pageNum: c.page_num, text: c.text.slice(0, 400),
+        }))
+    }
+
+    if (name === 'search_doc') {
+        const { query, docId, k = 5 } = args
+        const { db } = await getRagDb(caseId)
+        const emb = await embed(query)
+        const topK = Math.min(k * 20, 200)
+        const knnRows = db.prepare(
+            'SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ? ORDER BY distance'
+        ).all(toBlob(emb), topK)
+        if (!knnRows.length) return []
+        const distMap = new Map(knnRows.map(r => [Number(r.id), r.distance]))
+        const ids = knnRows.map(r => Number(r.id))
+        const placeholders = ids.map(() => '?').join(',')
+        const chunks = db.prepare(
+            `SELECT id, page_num, chunk_idx, text FROM doc_chunks WHERE doc_id = ? AND id IN (${placeholders})`
+        ).all(safeId(docId), ...ids)
+        return rerank(chunks, distMap, query, k).map(c => ({
+            docId, pageNum: c.page_num, text: c.text.slice(0, 400),
+        }))
+    }
+
+    if (name === 'add_note') {
+        const { docId, pageNum = 1, text } = args
+        const notesDir = getCaseSubdir(caseId, 'notes')
+        const filePath = path.join(notesDir, `${safeId(docId)}.json`)
+        const existing = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : []
+        const note = { id: `agent-${Date.now()}`, pageNum, text, createdAt: new Date().toISOString(), source: 'agent' }
+        existing.push(note)
+        fs.writeFileSync(filePath, JSON.stringify(existing))
+        return { ok: true, noteId: note.id }
+    }
+
+    return { error: `Unknown tool: ${name}` }
+}
+
+async function runAgentLoop({ jobId, task, intent, role, caseId }) {
+    const job = agentJobs.get(jobId)
+
+    const systemPrompt = [
+        'You are a legal research assistant with access to tools that search case documents.',
+        intent ? `\nLawyer\'s goal: ${intent}` : '',
+        role   ? `\nActing as: ${role}` : '',
+        '\nInstructions:',
+        '- Use search_case to search broadly, search_doc to search a specific document.',
+        '- Use add_note to save important findings as you discover them.',
+        '- Only cite text you have directly retrieved via tools.',
+        '- When search results are weak, rephrase and search again.',
+        '- After gathering evidence, give a clear final answer with citations (doc ID and page number).',
+        '- Stop after 15 tool calls maximum.',
+    ].filter(Boolean).join('\n')
+
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user',   content: task },
+    ]
+
+    let stepCount = 0
+    const MAX_STEPS = 15
+
+    while (stepCount < MAX_STEPS) {
+        if (job.cancelled) return
+
+        let response
+        try {
+            const res = await fetch('http://localhost:11434/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: 'qwen2.5:7b', messages, tools: AGENT_TOOLS, stream: false }),
+            })
+            if (!res.ok) throw new Error(`Ollama ${res.status}`)
+            response = await res.json()
+        } catch (err) {
+            const step = { type: 'error', content: `LLM error: ${err.message}` }
+            job.steps.push(step)
+            agentBroadcast(job.clients, step)
+            job.status = 'error'; job.error = err.message
+            agentBroadcast(job.clients, { type: 'status', status: 'error' })
+            return
+        }
+
+        const msg = response.message
+
+        // No tool calls → LLM is done
+        if (!msg.tool_calls?.length) {
+            const step = { type: 'done', content: msg.content }
+            job.steps.push(step)
+            agentBroadcast(job.clients, step)
+            job.result = msg.content
+            job.status = 'done'
+            agentBroadcast(job.clients, { type: 'status', status: 'done', result: msg.content })
+            return
+        }
+
+        // Add assistant turn to message history
+        messages.push({ role: 'assistant', content: msg.content || '', tool_calls: msg.tool_calls })
+
+        // Execute each tool call
+        for (const call of msg.tool_calls) {
+            if (job.cancelled) return
+
+            const toolName = call.function.name
+            const toolArgs = typeof call.function.arguments === 'string'
+                ? JSON.parse(call.function.arguments)
+                : call.function.arguments
+
+            const callStep = { type: 'tool_call', tool: toolName, args: toolArgs }
+            job.steps.push(callStep)
+            agentBroadcast(job.clients, callStep)
+
+            const result = await agentExecuteTool(toolName, toolArgs, caseId)
+
+            const resultStep = { type: 'tool_result', tool: toolName, result }
+            job.steps.push(resultStep)
+            agentBroadcast(job.clients, resultStep)
+
+            messages.push({ role: 'tool', content: JSON.stringify(result) })
+        }
+
+        stepCount++
+    }
+
+    // Max steps reached
+    const step = { type: 'done', content: 'Maximum steps reached. Review the findings above.' }
+    job.steps.push(step)
+    agentBroadcast(job.clients, step)
+    job.status = 'done'
+    agentBroadcast(job.clients, { type: 'status', status: 'done' })
+}
+
+// POST /api/agent/start
+app.post('/api/agent/start', express.json(), async (req, res) => {
+    const { task, intent, role, caseId } = req.body
+    if (!task?.trim()) return res.status(400).json({ error: 'task is required' })
+    if (!caseId)       return res.status(400).json({ error: 'caseId is required' })
+
+    const jobId = randomUUID()
+    agentJobs.set(jobId, { status: 'running', steps: [], clients: new Set(), result: null, error: null, cancelled: false })
+
+    runAgentLoop({ jobId, task, intent, role, caseId }).catch(err => {
+        const job = agentJobs.get(jobId)
+        if (job) { job.status = 'error'; job.error = err.message; agentBroadcast(job.clients, { type: 'error', content: err.message }) }
+    })
+
+    // Auto-cleanup after 30 minutes
+    setTimeout(() => agentJobs.delete(jobId), 30 * 60 * 1000)
+
+    res.json({ jobId })
+})
+
+// GET /api/agent/:jobId/stream  — SSE live step feed
+app.get('/api/agent/:jobId/stream', (req, res) => {
+    const job = agentJobs.get(req.params.jobId)
+    if (!job) return res.status(404).json({ error: 'Job not found' })
+
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Connection', 'keep-alive')
+    res.flushHeaders()
+
+    // Replay existing steps for reconnects
+    for (const step of job.steps) res.write(`data: ${JSON.stringify(step)}\n\n`)
+
+    if (job.status !== 'running') {
+        res.write(`data: ${JSON.stringify({ type: 'status', status: job.status, result: job.result })}\n\n`)
+        return res.end()
+    }
+
+    job.clients.add(res)
+    req.on('close', () => job.clients.delete(res))
+})
+
+// DELETE /api/agent/:jobId  — cancel
+app.delete('/api/agent/:jobId', (req, res) => {
+    const job = agentJobs.get(req.params.jobId)
+    if (!job) return res.status(404).json({ error: 'Not found' })
+    job.cancelled = true
+    job.status = 'cancelled'
+    agentBroadcast(job.clients, { type: 'status', status: 'cancelled' })
+    res.json({ ok: true })
 })
 
 // Global error handler — converts multer/express errors to JSON responses
