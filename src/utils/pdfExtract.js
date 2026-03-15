@@ -68,21 +68,32 @@ function _makePara(words) {
   return { text, bbox, sourceWords: sorted }
 }
 
-/** Extract word bboxes from PDF.js getTextContent() items + viewport. */
+/** Extract word bboxes from PDF.js getTextContent() items + viewport.
+ *
+ * Stage 2 fixes:
+ *  - item.width is already in page-space (PDF.js 5.x); no CTM multiplication needed.
+ *  - item.width === 0 edge case: estimate from char count × font-size × 0.55 em/char.
+ *  - y2 was the text baseline, missing descenders. Now extends by 25% of font height.
+ *  - Explicitly destructures the full CTM [a,b,c,d,tx,ty] for clarity.
+ */
 function extractNativeWords(items, viewport) {
   return items
     .filter(item => item.str?.trim())
     .map(item => {
-      const tx = item.transform[4]
-      const ty = item.transform[5]
-      const w = item.width || 0
-      const h = item.height || Math.abs(item.transform[3]) || 0
+      const [a, b, c, d, tx, ty] = item.transform
+      // Font size in page units (magnitude of the x-column of the 2×2 CTM part)
+      const fontPx = Math.sqrt(a * a + b * b) || Math.abs(d) || 0
+      // item.width is in page-space for PDF.js 5.x; fall back to char-count estimate
+      const w = item.width > 0 ? item.width : item.str.length * fontPx * 0.55
+      // item.height is the ascent (above baseline); add ~25% descent below baseline
+      const ascent  = item.height > 0 ? item.height : fontPx
+      const descent = ascent * 0.25
       return {
         text: item.str,
         x1_pct: clamp01(tx / viewport.width),
-        y1_pct: clamp01((viewport.height - ty - h) / viewport.height),
+        y1_pct: clamp01((viewport.height - ty - ascent) / viewport.height),
         x2_pct: clamp01((tx + w) / viewport.width),
-        y2_pct: clamp01((viewport.height - ty) / viewport.height),
+        y2_pct: clamp01((viewport.height - ty + descent) / viewport.height),
       }
     })
 }
@@ -238,14 +249,15 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
     throw new Error('No text could be extracted from this PDF.')
   }
 
-  // Persist text + bbox pages (sourceWords stripped to reduce payload size)
+  // Persist text + bbox pages — sourceWords now included (Stage 3)
+  // rawWords kept for re-chunking and as Stage 1 fallback for old docs without sourceWords
   const saveUrl = caseId
     ? `/api/cases/${encodeURIComponent(caseId)}/extractions/${docId}`
     : `/api/extractions/${docId}`
   const pagesForCache = pages.map(p => ({
     pageNum:  p.pageNum,
-    chunks:   p.chunks.map(({ text, bbox }) => ({ text, bbox })),
-    rawWords: p.rawWords || [],   // persisted so re-chunking never requires re-OCR/re-extraction
+    chunks:   p.chunks.map(({ text, bbox, sourceWords }) => ({ text, bbox, sourceWords })),
+    rawWords: p.rawWords || [],
   }))
   await fetch(saveUrl, {
     method: 'POST',

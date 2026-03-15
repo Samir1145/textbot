@@ -75,22 +75,53 @@ function _contextAround(responseText, n) {
 }
 
 /**
+ * Stage 1 fix: when sourceWords were stripped at persist time, rebuild a
+ * usable word list from the page's rawWords by filtering to tokens that
+ * appear in the chunk text.  rawWords is always persisted.
+ */
+function _rebuildSourceWords(chunk, page) {
+  if (!page?.rawWords?.length) return null
+  const chunkTokens = _tokenSet(chunk.text)
+  if (chunkTokens.size === 0) return null
+  // A rawWord item may be a single word (ideal) or an entire line (PDF.js Tj operator).
+  // Match if ANY token within the item's text appears in the chunk token set.
+  const words = page.rawWords.filter(w => {
+    for (const t of _tokenSet(w.text)) if (chunkTokens.has(t)) return true
+    return false
+  })
+  return words.length >= 1 ? words : null
+}
+
+/**
  * Try to narrow a paragraph-level bbox to the sentence most relevant to the
- * LLM's usage context.  Requires sourceWords on the matched extraction chunk.
- * Returns a tight [x1,y1,x2,y2] or null if narrowing isn't possible.
+ * LLM's usage context.
+ * Returns { bbox: [x1,y1,x2,y2], source: string } or null if not possible.
+ *
+ * source values:
+ *   'sourcewords' — exact word list from the extraction chunk (best)
+ *   'rawwords'    — rebuilt from page rawWords via token matching (Stage 1)
  */
 function _computeNarrowBbox(chunk, contextText, extractionPages) {
   if (!chunk.bbox || !extractionPages) return null
   const page = extractionPages.find(p => p.pageNum === chunk.page_num)
   if (!page) return null
 
-  // Match by chunk_idx first, fall back to text prefix
+  // Match chunk in extraction cache by index, fall back to text prefix
   const ec = page.chunks[chunk.chunk_idx]
     ?? page.chunks.find(c => c.text.slice(0, 60) === chunk.text.slice(0, 60))
-  if (!ec?.sourceWords?.length || ec.sourceWords.length < 4) return null
+
+  // Prefer persisted sourceWords; fall back to rawWords rebuild (fixes reload bug)
+  // >= 2 handles both word-level items (real PDFs) and line-level items (some PDFs/OCR)
+  const sourceWords = ec?.sourceWords?.length >= 2
+    ? ec.sourceWords
+    : _rebuildSourceWords(chunk, page)
+  if (!sourceWords) return null
+
+  const source = ec?.sourceWords?.length >= 2 ? 'sourcewords' : 'rawwords'
+  const chunkText = ec?.text ?? chunk.text
 
   // Split into sentences (punctuation-based)
-  const sentences = ec.text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10)
+  const sentences = chunkText.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10)
   if (sentences.length <= 1) return null
 
   const ctxTokens = _tokenSet(contextText)
@@ -104,29 +135,32 @@ function _computeNarrowBbox(chunk, contextText, extractionPages) {
   if (bestIdx < 0 || bestScore < 0.04) return null
 
   const sentTokens = _tokenSet(sentences[bestIdx])
-  const matching = ec.sourceWords.filter(w => sentTokens.has(w.text.toLowerCase().replace(/\W/g, '')))
+  const matching = sourceWords.filter(w => sentTokens.has(w.text.toLowerCase().replace(/\W/g, '')))
   if (matching.length < 2) return null
 
-  return [
-    Math.min(...matching.map(w => w.x1_pct)),
-    Math.min(...matching.map(w => w.y1_pct)),
-    Math.max(...matching.map(w => w.x2_pct)),
-    Math.max(...matching.map(w => w.y2_pct)),
-  ]
+  return {
+    bbox: [
+      Math.min(...matching.map(w => w.x1_pct)),
+      Math.min(...matching.map(w => w.y1_pct)),
+      Math.max(...matching.map(w => w.x2_pct)),
+      Math.max(...matching.map(w => w.y2_pct)),
+    ],
+    source,
+  }
 }
 
 /**
  * Enrich a citations Map with narrowBbox where sentence-level matching succeeds.
  * extractionPages comes from lastExtractionPagesRef.current.pages.
- * Returns a new Map<n, chunk> with narrowBbox added where possible.
+ * Returns a new Map<n, chunk> with narrowBbox + narrowBboxSource added where possible.
  */
 export function narrowCitations(citations, responseText, extractionPages) {
   if (!extractionPages || !citations.size) return citations
   const out = new Map()
   for (const [n, chunk] of citations) {
     const context = _contextAround(responseText, n)
-    const narrowBbox = _computeNarrowBbox(chunk, context, extractionPages)
-    out.set(n, narrowBbox ? { ...chunk, narrowBbox } : chunk)
+    const result = _computeNarrowBbox(chunk, context, extractionPages)
+    out.set(n, result ? { ...chunk, narrowBbox: result.bbox, narrowBboxSource: result.source } : chunk)
   }
   return out
 }

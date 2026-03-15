@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react'
-import { flushSync } from 'react-dom'
+import { flushSync, createPortal } from 'react-dom'
 import { useTheme } from '../useTheme.js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
@@ -9,6 +9,7 @@ import { getDocRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchD
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupIntoParagraphs } from '../utils/pdfExtract.js'
 import { getCachedThumb, setCachedThumb } from '../utils/thumbnailCache.js'
 import { buildEvidenceBlock, parseCitations, tokeniseMessage, narrowCitations, distanceToScore } from '../utils/parseCitations.js'
+import { findTextInTextLayer } from '../utils/textLayerSearch.js'
 import { streamOllamaChat, callOllama } from '../utils/ollamaStream.js'
 import './PDFApp.css'
 
@@ -119,6 +120,7 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     const first = (folder?.children || []).find(c => c.type === 'file')
     return first ? String(first.id) : null
   })
+  const activeDoc = useMemo(() => documents.find(d => d.id === activeDocumentId), [documents, activeDocumentId])
   const [activeDocUrl, setActiveDocUrl] = useState(null)
   const [pageCount, setPageCount] = useState(null)
   const [pageCountsById, setPageCountsById] = useState(() => {
@@ -567,20 +569,28 @@ const fileInputRef = useRef(null)
           bitmap?.close()
         }
 
-        // Build text layer after the page is drawn
-        if (!pdfDocRef.current) return
-        const scale = renderScaleRef.current
-        pdfDocRef.current.getPage(pageNum).then(page => {
+        // Build text layer after the page is drawn.
+        // pdfDocRef may still be loading (main-thread load is async; worker can finish first).
+        // Retry up to 15 × 200ms while waiting for pdfDocRef to become available.
+        ;(function buildTextLayer(attempt) {
           if (cancelled) return
-          const vp = page.getViewport({ scale })
-          return page.getTextContent().then(tc => {
+          if (!pdfDocRef.current) {
+            if (attempt < 15) setTimeout(() => buildTextLayer(attempt + 1), 200)
+            return
+          }
+          const scale = renderScaleRef.current
+          pdfDocRef.current.getPage(pageNum).then(page => {
             if (cancelled) return
-            const container = pagesContainerRef.current?.querySelector(`[data-textlayer="${pageNum}"]`)
-            if (!container) return
-            container.innerHTML = ''
-            new pdfjsLib.TextLayer({ textContentSource: tc, container, viewport: vp }).render()
-          })
-        }).catch(() => {})
+            const vp = page.getViewport({ scale })
+            return page.getTextContent().then(tc => {
+              if (cancelled) return
+              const container = pagesContainerRef.current?.querySelector(`[data-textlayer="${pageNum}"]`)
+              if (!container) return
+              container.innerHTML = ''
+              new pdfjsLib.TextLayer({ textContentSource: tc, container, viewport: vp }).render()
+            })
+          }).catch(() => {})
+        })(0)
       } else if (msg.type === 'error') {
         if (!cancelled) { setPdfError(msg.error || 'PDF render error'); if (isDocChange) setPdfLoading(false) }
       }
@@ -591,6 +601,19 @@ const fileInputRef = useRef(null)
       // Zoom: re-init with cached buffer (zero new network requests)
       const renderBuffer = pdfBufferRef.current.slice(0)
       worker.postMessage({ type: 'init', pdfData: renderBuffer, scale: renderScale }, [renderBuffer])
+      // Rebuild main pdfDoc from cached buffer if it was destroyed (e.g. React strict mode
+      // double-invoke: Effect 1 sets pdfDocRef then cleanup destroys it; Effect 2 lands here)
+      if (!pdfDocRef.current) {
+        pdfjsLib.getDocument({
+          data: pdfBufferRef.current.slice(0),
+          standardFontDataUrl: '/standard_fonts/',
+          cMapUrl: '/cmaps/',
+          cMapPacked: true,
+        }).promise.then(pdf => {
+          if (cancelled) { pdf.destroy(); return }
+          pdfDocRef.current = pdf
+        }).catch(() => {})
+      }
     } else {
       // Doc change: fetch once, split into two copies
       fetch(activeDocUrl)
@@ -737,8 +760,7 @@ const fileInputRef = useRef(null)
   const [chunkingStrategy, setChunkingStrategy] = useState(() =>
     (caseId && localStorage.getItem(`chunking-${caseId}`)) || 'balanced'
   )
-  const [caseSettingsOpen, setCaseSettingsOpen] = useState(false)
-  const [reprocessMenuOpen, setReprocessMenuOpen] = useState(false)
+  const [chunkGuideOpen, setChunkGuideOpen] = useState(false)
   // Persistence effects for chunking + chunk counts — must be after their declarations (TDZ)
   useEffect(() => {
     if (caseId) localStorage.setItem(`chunking-${caseId}`, chunkingStrategy)
@@ -817,11 +839,57 @@ const fileInputRef = useRef(null)
     const bboxArea = bbox ? ((bbox[2] - bbox[0]) * (bbox[3] - bbox[1])).toFixed(3) : 'n/a'
     const isLarge = bbox && (bbox[2] - bbox[0]) > 0.8 && (bbox[3] - bbox[1]) > 0.5
     addLog(
-      `[CITATION] page=${firstChunk.page_num} bbox=${bboxStr} area=${bboxArea}${isLarge ? ' ⚠ LARGE BBOX (covers most of page)' : ''} narrowBbox=${narrowBbox ? `[${narrowBbox.map(v => v.toFixed(3)).join(', ')}]` : 'none'}`,
+      `[CITATION] page=${firstChunk.page_num} bbox=${bboxStr} area=${bboxArea}${isLarge ? ' ⚠ LARGE BBOX (covers most of page)' : ''} narrowBbox=${narrowBbox ? `[${narrowBbox.map(v => v.toFixed(3)).join(', ')}] source=${firstChunk.narrowBboxSource ?? 'unknown'}` : 'none'}`,
       isLarge ? 'error' : 'ok'
     )
     scrollPageIntoView(firstChunk.page_num, 'center')
   }, [activeCitations])
+
+  // Stage 4: upgrade active citations with DOM-based bbox after text layer renders.
+  // Retries up to 10 × 200ms while waiting for PDF.js to populate the text layer spans.
+  useEffect(() => {
+    if (!activeCitations.size || !pagesContainerRef.current) return
+
+    const toUpgrade = [...activeCitations.entries()].filter(
+      ([, chunk]) => chunk.bbox && chunk.narrowBboxSource !== 'textlayer'
+    )
+    if (!toUpgrade.length) return
+
+    let cancelled = false
+    let attempts = 0
+
+    function tryUpgrade() {
+      if (cancelled) return
+      attempts++
+      const upgrades = []
+
+      for (const [n, chunk] of toUpgrade) {
+        const textLayerDiv = pagesContainerRef.current?.querySelector(`[data-textlayer="${chunk.page_num}"]`)
+        if (!textLayerDiv) continue
+        if (!textLayerDiv.querySelectorAll('span').length) continue // not yet rendered
+
+        const pageWrapper = textLayerDiv.parentElement
+        const domBbox = findTextInTextLayer(pageWrapper, chunk.text)
+        if (domBbox) upgrades.push([n, { ...chunk, narrowBbox: domBbox, narrowBboxSource: 'textlayer' }])
+      }
+
+      if (upgrades.length) {
+        if (!cancelled) {
+          setActiveCitations(prev => {
+            const next = new Map(prev)
+            for (const [n, upgraded] of upgrades) next.set(n, upgraded)
+            return next
+          })
+        }
+      } else if (attempts < 10) {
+        setTimeout(tryUpgrade, 200)
+      }
+    }
+
+    const t = setTimeout(tryUpgrade, 150)
+    return () => { cancelled = true; clearTimeout(t) }
+  }, [activeCitations]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const chatAbortRef = useRef(null)
   const chatMessagesRef = useRef(null)
   // Session-level per-doc caches — state restores instantly on doc switch (no async blank flash)
@@ -1719,38 +1787,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               )}
             </div>
 
-            {/* ── Case Settings (Option D — chunking strategy) ── */}
-            {caseId && (
-              <div className="pdfapp-case-settings">
-                <button
-                  type="button"
-                  className="pdfapp-case-settings-header"
-                  onClick={() => setCaseSettingsOpen(o => !o)}
-                >
-                  <span>⚙ Search Precision</span>
-                  <span className="pdfapp-log-chevron">{caseSettingsOpen ? '▾' : '▸'}</span>
-                </button>
-                {caseSettingsOpen && (
-                  <div className="pdfapp-case-settings-body">
-                    <div className="pdfapp-strategy-hint">Chunk size — affects all future indexing</div>
-                    <div className="pdfapp-strategy-btns">
-                      {Object.entries(CHUNKING_STRATEGIES).map(([key, { label }]) => (
-                        <button
-                          key={key}
-                          className={`pdfapp-strategy-btn${chunkingStrategy === key ? ' pdfapp-strategy-btn--active' : ''}`}
-                          onClick={() => setChunkingStrategy(key)}
-                        >{label}</button>
-                      ))}
-                    </div>
-                    <div className="pdfapp-strategy-desc">
-                      {chunkingStrategy === 'fine'     && 'Fine (~50 words) — best for precise quotes'}
-                      {chunkingStrategy === 'balanced' && 'Balanced (~100 words) — best for Q&A'}
-                      {chunkingStrategy === 'broad'    && 'Broad (~200 words) — best for summaries'}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* ── Activity Log ── */}
             <div className="pdfapp-log-panel">
@@ -1924,7 +1960,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                 return (
                                 <div
                                   key={i}
-                                  className={`pdfapp-highlight-rect${chunk.narrowBbox ? ' pdfapp-highlight-rect--narrow' : ''}`}
+                                  className={`pdfapp-highlight-rect${chunk.narrowBbox ? ` pdfapp-highlight-rect--narrow pdfapp-highlight-rect--${chunk.narrowBboxSource ?? 'unknown'}` : ''}`}
                                   style={{
                                     left:   `${b[0] * 100}%`,
                                     top:    `${b[1] * 100}%`,
@@ -2035,36 +2071,23 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                         className="pdfapp-action-btn pdfapp-action-btn--stop"
                         onClick={() => { setRagStatus('failed'); setRagProgress('') }}
                       >■ Cancel</button>
-                    ) : ragStatus === 'indexed' ? (
-                      <div className="pdfapp-reprocess-wrap" style={{ position: 'relative' }}>
-                        <button
-                          className="pdfapp-action-btn pdfapp-action-btn--menu"
-                          title="Re-process options"
-                          onClick={() => setReprocessMenuOpen(v => !v)}
-                        >···</button>
-                        {reprocessMenuOpen && (
-                          <div className="pdfapp-reprocess-dropdown" onMouseLeave={() => setReprocessMenuOpen(false)}>
-                            <button onClick={() => { setReprocessMenuOpen(false); activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file) }}>
-                              Re-extract text
-                            </button>
-                            <button onClick={() => { setReprocessMenuOpen(false); handleIndexDocument({ forceClear: true }) }}>
-                              Re-index
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ) : extractedPages ? (
+                    ) : extractedPages && ragStatus !== 'indexed' ? (
                       <button
                         className="pdfapp-action-btn pdfapp-action-btn--index"
                         onClick={handleIndexDocument}
                       >Index for search →</button>
-                    ) : (
+                    ) : ragStatus !== 'indexed' ? (
                       <button
                         className="pdfapp-action-btn pdfapp-action-btn--extract"
                         disabled={!activeDoc?.file || pdfLoading}
                         onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
                       >{extractionSource === 'ocr' ? 'Re-scan pages' : activeDoc?.file ? 'Prepare for search' : 'No file loaded'}</button>
-                    )}
+                    ) : null}
+                    <button
+                      className="pdfapp-action-btn pdfapp-action-btn--menu"
+                      title="Text processing guide & settings"
+                      onClick={() => setChunkGuideOpen(true)}
+                    >···</button>
                   </div>
 
                   <span
@@ -2538,6 +2561,109 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         )}
 
       </div>
+
+      {/* ── Text Processing Guide Modal ── */}
+      {chunkGuideOpen && createPortal(
+        <div className="pdfapp-guide-overlay" onClick={() => setChunkGuideOpen(false)}>
+          <div className="pdfapp-guide-modal" onClick={e => e.stopPropagation()}>
+            <div className="pdfapp-guide-header">
+              <span className="pdfapp-guide-title">Text Processing Guide</span>
+              <button className="pdfapp-guide-close" onClick={() => setChunkGuideOpen(false)}>✕</button>
+            </div>
+
+            <div className="pdfapp-guide-body">
+
+              {/* Extraction */}
+              <div className="pdfapp-guide-section">
+                <div className="pdfapp-guide-section-title">
+                  <span className="pdfapp-guide-icon">📄</span> Extraction
+                </div>
+                <p className="pdfapp-guide-text">
+                  The app reads your PDF's built-in text layer (fast, accurate). If the document has no text layer — e.g. a scanned page image — it falls back to <strong>OCR</strong> (optical character recognition), which reads text from the visual pixels. The extraction badge in the header shows <code>Text</code> or <code>OCR</code> to tell you which was used.
+                </p>
+                <p className="pdfapp-guide-text">
+                  Re-extract if the document text looks garbled, or if you replaced a scanned PDF with a text version.
+                </p>
+              </div>
+
+              {/* Chunking */}
+              <div className="pdfapp-guide-section">
+                <div className="pdfapp-guide-section-title">
+                  <span className="pdfapp-guide-icon">✂️</span> Chunking
+                </div>
+                <p className="pdfapp-guide-text">
+                  Extracted text is split into overlapping segments called <strong>chunks</strong>. Each chunk is a short passage (50–200 words). Smaller chunks return more precise matches; larger chunks give the AI more surrounding context per result.
+                </p>
+                <p className="pdfapp-guide-text">
+                  The chunk count shown in the header reflects the current index. Changing chunk size (below) only takes effect after re-indexing.
+                </p>
+              </div>
+
+              {/* Embedding & Indexing */}
+              <div className="pdfapp-guide-section">
+                <div className="pdfapp-guide-section-title">
+                  <span className="pdfapp-guide-icon">🔢</span> Embedding &amp; Indexing
+                </div>
+                <p className="pdfapp-guide-text">
+                  Each chunk is converted into a numeric vector by an embedding model (<code>nomic-embed-text</code>). These vectors are stored locally in SQLite. When you search or chat, the app finds the chunks whose vectors are closest to your query — this is semantic search, not just keyword matching.
+                </p>
+                <p className="pdfapp-guide-text">
+                  Re-index after changing the chunk size, or if search results seem off.
+                </p>
+              </div>
+
+              {/* OCR */}
+              <div className="pdfapp-guide-section">
+                <div className="pdfapp-guide-section-title">
+                  <span className="pdfapp-guide-icon">🔍</span> OCR
+                </div>
+                <p className="pdfapp-guide-text">
+                  OCR is triggered automatically for scanned pages. It runs in-browser via Tesseract.js — no data leaves your machine. OCR is slower than text extraction and may produce minor errors in complex layouts (tables, footnotes, multi-column text). For best results, use a PDF with an embedded text layer where possible.
+                </p>
+              </div>
+
+              {/* Search Precision */}
+              <div className="pdfapp-guide-section pdfapp-guide-section--settings">
+                <div className="pdfapp-guide-section-title">
+                  <span className="pdfapp-guide-icon">🎯</span> Search Precision
+                </div>
+                <p className="pdfapp-guide-text">Controls chunk size for future indexing runs.</p>
+                <div className="pdfapp-strategy-btns" style={{ margin: '8px 0 6px' }}>
+                  {Object.entries(CHUNKING_STRATEGIES).map(([key, { label }]) => (
+                    <button
+                      key={key}
+                      className={`pdfapp-strategy-btn${chunkingStrategy === key ? ' pdfapp-strategy-btn--active' : ''}`}
+                      onClick={() => setChunkingStrategy(key)}
+                    >{label}</button>
+                  ))}
+                </div>
+                <div className="pdfapp-strategy-desc">
+                  {chunkingStrategy === 'fine'     && 'Fine (~50 words) — best for precise quotes and clause-level search'}
+                  {chunkingStrategy === 'balanced' && 'Balanced (~100 words) — best for Q&A and general search'}
+                  {chunkingStrategy === 'broad'    && 'Broad (~200 words) — best for summaries and topic-level search'}
+                </div>
+              </div>
+
+              {/* Actions */}
+              {activeDoc?.file && (
+                <div className="pdfapp-guide-actions">
+                  <button
+                    className="pdfapp-guide-action-btn"
+                    onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
+                  >Re-extract text</button>
+                  {ragStatus === 'indexed' && (
+                    <button
+                      className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
+                      onClick={() => { setChunkGuideOpen(false); handleIndexDocument({ forceClear: true }) }}
+                    >Re-index</button>
+                  )}
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      , document.body)}
 
     </div>
   )

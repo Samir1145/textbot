@@ -941,25 +941,79 @@
 }
 .pdfapp-action-btn--menu:hover { background: var(--bg-hover); color: var(--text); }
 
-.pdfapp-reprocess-dropdown {
-  position: absolute;
-  right: 0; top: calc(100% + 4px);
+/* ── Text Processing Guide Modal ─────────────────────────────────────── */
+.pdfapp-guide-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+}
+.pdfapp-guide-modal {
   background: var(--bg-2);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  z-index: 100;
-  min-width: 140px;
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  width: 480px; max-width: calc(100vw - 32px);
+  max-height: 80vh;
+  display: flex; flex-direction: column;
   overflow: hidden;
 }
-.pdfapp-reprocess-dropdown button {
-  display: block; width: 100%;
-  padding: 7px 12px;
-  text-align: left;
-  background: none; border: none; color: var(--text);
-  font-size: 11px; cursor: pointer;
+.pdfapp-guide-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.pdfapp-reprocess-dropdown button:hover { background: var(--bg-hover); }
+.pdfapp-guide-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+}
+.pdfapp-guide-close {
+  background: none; border: none; color: var(--text-muted);
+  font-size: 14px; cursor: pointer; padding: 2px 4px; line-height: 1;
+  border-radius: 4px;
+}
+.pdfapp-guide-close:hover { background: var(--bg-hover); color: var(--text); }
+.pdfapp-guide-body {
+  overflow-y: auto; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 16px;
+}
+.pdfapp-guide-section {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pdfapp-guide-section--settings {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.pdfapp-guide-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  display: flex; align-items: center; gap: 6px;
+}
+.pdfapp-guide-icon { font-size: 13px; }
+.pdfapp-guide-text {
+  font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin: 0;
+}
+.pdfapp-guide-text strong { color: var(--text); font-weight: 600; }
+.pdfapp-guide-text code {
+  font-size: 10.5px; background: var(--bg-3); padding: 1px 5px;
+  border-radius: 3px; color: #60a5fa; font-family: monospace;
+}
+.pdfapp-guide-actions {
+  display: flex; gap: 8px;
+  padding-top: 4px; border-top: 1px solid var(--border);
+}
+.pdfapp-guide-action-btn {
+  padding: 5px 12px; border-radius: 5px; font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border);
+  background: var(--bg-3); color: var(--text-muted);
+  transition: background 0.15s;
+}
+.pdfapp-guide-action-btn:hover { background: var(--bg-hover); color: var(--text); }
+.pdfapp-guide-action-btn--index {
+  background: #1a4a2e; color: #4ade80; border-color: #2d6b42;
+}
+.pdfapp-guide-action-btn--index:hover { background: #225e39; }
 
 /* ── Case Settings — Search Precision (Option D) ─────────────────────── */
 .pdfapp-case-settings {
@@ -1966,6 +2020,13 @@
   background: rgba(234, 179, 8, 0.22);
   border-color: rgba(234, 179, 8, 0.85);
   box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.2);
+}
+
+/* Stage 4: DOM text-layer lookup — tightest possible highlight */
+.pdfapp-highlight-rect--textlayer {
+  background: rgba(74, 222, 128, 0.22);
+  border-color: rgba(34, 197, 94, 0.85);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
 }
 
 /* ── Source chip confidence score ──────────────────────────────────────── */
