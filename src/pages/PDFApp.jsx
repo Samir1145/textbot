@@ -892,6 +892,8 @@ const fileInputRef = useRef(null)
 
   const chatAbortRef = useRef(null)
   const chatMessagesRef = useRef(null)
+  const chunksPanelRef = useRef(null)
+  const [activeChunkKey, setActiveChunkKey] = useState(null)
   // Session-level per-doc caches — state restores instantly on doc switch (no async blank flash)
   const chatByDocRef       = useRef({}) // docId → Message[]
   const extractionByDocRef = useRef({}) // docId → extractedPages
@@ -904,6 +906,13 @@ const fileInputRef = useRef(null)
     }
   }, [chatMessages])
 
+  // Scroll chunk panel to the active card when activeChunkKey changes
+  useEffect(() => {
+    if (!activeChunkKey || !chunksPanelRef.current) return
+    const card = chunksPanelRef.current.querySelector(`[data-chunk-key="${activeChunkKey}"]`)
+    if (card) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, [activeChunkKey])
+
   // Reset chat + RAG state when document changes; load persisted chat history
   useEffect(() => {
     // Restore immediately from in-session cache — no async round-trip, no blank flash
@@ -911,6 +920,7 @@ const fileInputRef = useRef(null)
     const sessionLastCited = [...sessionMsgs].reverse().find(m => m.role === 'assistant' && m.citations?.size)
     setChatMessages(sessionMsgs)
     setActiveCitations(sessionLastCited?.citations ?? new Map())
+    setActiveChunkKey(null)
     setChatInput('')
     setRagStatus(ragStatusByDocRef.current[activeDocumentId] ?? null)
     setRagProgress('')
@@ -1967,6 +1977,18 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                     width:  `${(b[2] - b[0]) * 100}%`,
                                     height: `${(b[3] - b[1]) * 100}%`,
                                   }}
+                                  onClick={() => {
+                                    // Reverse: clicking highlight scrolls chunk panel to matching card
+                                    if (!extractedPages) return
+                                    const pg = extractedPages.find(p => p.pageNum === chunk.page_num)
+                                    if (!pg) return
+                                    const idx = chunk.chunk_idx ?? pg.chunks.findIndex(c =>
+                                      c.bbox && chunk.bbox &&
+                                      Math.abs(c.bbox[0] - chunk.bbox[0]) < 0.005 &&
+                                      Math.abs(c.bbox[1] - chunk.bbox[1]) < 0.005
+                                    )
+                                    if (idx >= 0) setActiveChunkKey(`${chunk.page_num}-${idx}`)
+                                  }}
                                 />
                                 )
                               })}
@@ -2101,10 +2123,26 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
                 {extractedTextOpen && (
                   extractedPages ? (
-                    <div className="pdfapp-chunks-body">
+                    <div className="pdfapp-chunks-body" ref={chunksPanelRef}>
                       {extractedPages.map(page =>
-                        page.chunks.map((chunk, idx) => (
-                          <div key={`${page.pageNum}-${idx}`} className="pdfapp-chunk-card">
+                        page.chunks.map((chunk, idx) => {
+                          const chunkKey = `${page.pageNum}-${idx}`
+                          return (
+                          <div
+                            key={chunkKey}
+                            data-chunk-key={chunkKey}
+                            className={`pdfapp-chunk-card${activeChunkKey === chunkKey ? ' pdfapp-chunk-card--active' : ''}`}
+                            onClick={() => {
+                              setActiveChunkKey(chunkKey)
+                              setActiveCitations(new Map([[1, {
+                                text: chunk.text,
+                                page_num: page.pageNum,
+                                bbox: chunk.bbox,
+                                narrowBbox: chunk.narrowBbox ?? null,
+                                chunk_idx: idx,
+                              }]]))
+                            }}
+                          >
                             <div className="pdfapp-chunk-meta">
                               <span className="pdfapp-chunk-tag pdfapp-chunk-tag--page">P{page.pageNum}</span>
                               <span className="pdfapp-chunk-tag pdfapp-chunk-tag--idx">#{idx}</span>
@@ -2116,7 +2154,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                             </div>
                             <p className="pdfapp-chunk-text">{chunk.text}</p>
                           </div>
-                        ))
+                          )
+                        })
                       )}
                       {extractingText && (
                         <div className="pdfapp-extracted-prompt" style={{ paddingTop: 8 }}>

@@ -845,6 +845,8 @@
   background: rgba(59, 130, 246, 0.18);
   border: 2px solid rgba(59, 130, 246, 0.75);
   border-radius: 3px;
+  pointer-events: auto; /* allow click-to-scroll-chunk; parent overlay is none */
+  cursor: pointer;
   box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15);
   animation: highlight-pop 0.35s ease-out forwards;
 }
@@ -1206,17 +1208,26 @@
 /* ── Individual chunk card ─────────────────────────────────────────── */
 .pdfapp-chunk-card {
   border: 1px solid var(--border-subtle);
+  border-left: 3px solid transparent;
   border-radius: 6px;
   padding: 7px 10px 8px;
   background: var(--bg-2);
   display: flex;
   flex-direction: column;
   gap: 5px;
-  transition: border-color 120ms;
+  cursor: pointer;
+  transition: border-color 120ms, background 120ms;
 }
 
 .pdfapp-chunk-card:hover {
   border-color: var(--border);
+  background: var(--bg-3, var(--bg-2));
+}
+
+.pdfapp-chunk-card--active {
+  border-left-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.07);
+  border-color: rgba(59, 130, 246, 0.35);
 }
 
 .pdfapp-chunk-meta {
