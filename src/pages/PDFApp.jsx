@@ -259,7 +259,7 @@ const fileInputRef = useRef(null)
     if (caseId) {
       // Case mode: add files directly to parties without going through the parent
       const newDocs = pdfFiles.map(f => ({
-        id: String(Date.now() + Math.random()),
+        id: crypto.randomUUID(),
         name: f.name,
         file: f,
       }))
@@ -302,12 +302,13 @@ const fileInputRef = useRef(null)
 
     // 4. Delete all server-side data (fire-and-forget — non-blocking)
     if (caseId) {
-      deleteCaseBlob(caseId, docId).catch(() => {})
-      deleteNotes(docId, { caseId }).catch(() => {})
-      deleteSummary(docId, { caseId }).catch(() => {})
-      fetch(`/api/cases/${encodeURIComponent(caseId)}/extractions/${docId}`, { method: 'DELETE' }).catch(() => {})
-      fetch(`/api/cases/${encodeURIComponent(caseId)}/chat/${docId}`, { method: 'DELETE' }).catch(() => {})
-      clearDocChunks(docId, { caseId }).catch(() => {})
+      const onDeleteError = (label) => (err) => addLog(`Delete failed (${label}): ${err?.message || err}`, 'error')
+      deleteCaseBlob(caseId, docId).catch(onDeleteError('blob'))
+      deleteNotes(docId, { caseId }).catch(onDeleteError('notes'))
+      deleteSummary(docId, { caseId }).catch(onDeleteError('summary'))
+      fetch(`/api/cases/${encodeURIComponent(caseId)}/extractions/${docId}`, { method: 'DELETE' }).catch(onDeleteError('extractions'))
+      fetch(`/api/cases/${encodeURIComponent(caseId)}/chat/${docId}`, { method: 'DELETE' }).catch(onDeleteError('chat'))
+      clearDocChunks(docId, { caseId }).catch(onDeleteError('chunks'))
     }
   }
 

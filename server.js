@@ -38,7 +38,8 @@ app.get('/api/storage/:store', (req, res) => {
     if (!ALLOWED_STORES.has(store)) return res.status(400).json({ error: 'Invalid store' })
     const filePath = path.join(DATA_DIR, `${store}.json`)
     if (!fs.existsSync(filePath)) return res.json([])
-    res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+    try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+    catch { res.json([]) }
 })
 
 app.post('/api/storage/:store', (req, res) => {
@@ -53,7 +54,8 @@ app.post('/api/storage/:store', (req, res) => {
 app.get('/api/cases/:caseId/summaries/:docId', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'summaries'), `${safeId(req.params.docId)}.json`)
   if (!fs.existsSync(filePath)) return res.json(null)
-  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.json(null) }
 })
 
 app.post('/api/cases/:caseId/summaries/:docId', (req, res) => {
@@ -75,7 +77,8 @@ app.delete('/api/cases/:caseId/summaries/:docId', (req, res) => {
 app.get('/api/cases/:caseId/extractions/:docId', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'extractions'), `${safeId(req.params.docId)}.json`)
   if (!fs.existsSync(filePath)) return res.json(null)
-  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.json(null) }
 })
 
 app.post('/api/cases/:caseId/extractions/:docId', (req, res) => {
@@ -103,7 +106,8 @@ app.delete('/api/extractions/:docId', (req, res) => {
 app.get('/api/cases/:caseId/chat/:docId', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'chat'), `${safeId(req.params.docId)}.json`)
   if (!fs.existsSync(filePath)) return res.json([])
-  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.json([]) }
 })
 
 app.post('/api/cases/:caseId/chat/:docId', (req, res) => {
@@ -134,7 +138,8 @@ app.get('/api/cases/:caseId/skill-results/:docId', (req, res) => {
 app.get('/api/cases/:caseId/skill-results/:docId/:skillId', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'skill-results'), safeId(req.params.docId), `${safeId(req.params.skillId)}.json`)
   if (!fs.existsSync(filePath)) return res.status(404).json(null)
-  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.status(500).json({ error: 'Corrupted skill result file' }) }
 })
 
 app.post('/api/cases/:caseId/skill-results/:docId/:skillId', (req, res) => {
@@ -152,9 +157,10 @@ app.get('/api/cases/:caseId/blobs/:docId', (req, res) => {
   const filePath = path.join(blobsDir, id)
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' })
   const metaPath = path.join(blobsDir, `${id}.meta`)
-  const name = fs.existsSync(metaPath)
-    ? JSON.parse(fs.readFileSync(metaPath, 'utf8')).name
-    : id
+  let name = id
+  if (fs.existsSync(metaPath)) {
+    try { name = JSON.parse(fs.readFileSync(metaPath, 'utf8')).name || id } catch { /* use id */ }
+  }
   res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(name)}`)
   res.setHeader('Content-Type', 'application/pdf')
   res.sendFile(filePath)
@@ -165,7 +171,9 @@ app.put('/api/cases/:caseId/blobs/:docId', express.raw({ type: 'application/octe
   const id = safeId(req.params.docId)
   fs.writeFileSync(path.join(blobsDir, id), req.body)
   if (req.query.name) {
-    fs.writeFileSync(path.join(blobsDir, `${id}.meta`), JSON.stringify({ name: req.query.name }))
+    // Strip control characters and path separators before storing in Content-Disposition
+    const safeName = String(req.query.name).replace(/[\x00-\x1f\x7f/\\]/g, '_').slice(0, 255)
+    fs.writeFileSync(path.join(blobsDir, `${id}.meta`), JSON.stringify({ name: safeName }))
   }
   res.json({ ok: true })
 })
@@ -185,7 +193,8 @@ app.delete('/api/cases/:caseId/blobs/:docId', (req, res) => {
 app.get('/api/cases/:caseId/notes/:docId', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'notes'), `${safeId(req.params.docId)}.json`)
   if (!fs.existsSync(filePath)) return res.json([])
-  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.json([]) }
 })
 
 app.post('/api/cases/:caseId/notes/:docId', (req, res) => {
@@ -222,7 +231,8 @@ app.get('/api/cases/:caseId/all-notes', (req, res) => {
 app.get('/api/cases/:caseId/highlights/:docId', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'highlights'), `${safeId(req.params.docId)}.json`)
   if (!fs.existsSync(filePath)) return res.json([])
-  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.json([]) }
 })
 
 app.post('/api/cases/:caseId/highlights/:docId', (req, res) => {
@@ -256,14 +266,16 @@ app.get('/api/cases/:caseId/all-highlights', (req, res) => {
 
 // ── Aide Soul & Diary ────────────────────────────────────────────────────
 
+const SOUL_DEFAULT = { soul: { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }, savedAt: null }
 app.get('/api/cases/:caseId/aide/soul', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'soul.json')
-  if (!fs.existsSync(filePath)) return res.json({ soul: { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }, savedAt: null })
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-  // Support both old format (flat) and new format ({ soul, savedAt })
-  if (data.soul) return res.json(data)
-  const { savedAt, ...soul } = data
-  res.json({ soul, savedAt: savedAt || null })
+  if (!fs.existsSync(filePath)) return res.json(SOUL_DEFAULT)
+  try {
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+    if (data.soul) return res.json(data)
+    const { savedAt, ...soul } = data
+    res.json({ soul, savedAt: savedAt || null })
+  } catch { res.json(SOUL_DEFAULT) }
 })
 
 app.post('/api/cases/:caseId/aide/soul', express.json(), (req, res) => {
@@ -278,7 +290,8 @@ app.post('/api/cases/:caseId/aide/soul', express.json(), (req, res) => {
 app.get('/api/cases/:caseId/aide/diary', (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'diary.json')
   if (!fs.existsSync(filePath)) return res.json([])
-  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.json([]) }
 })
 
 app.post('/api/cases/:caseId/aide/diary/entry', express.json(), (req, res) => {
@@ -881,11 +894,13 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
             : '',
         recentDiary.length
             ? `\n## What You Learned in Previous Sessions\n${recentDiary.map((e, i) => {
-                const parts = [`### Session ${recentDiary.length - i} (${e.date ? new Date(e.date).toLocaleDateString() : 'recent'})`]
-                if (e.task)       parts.push(`Task: ${e.task}`)
-                if (e.reflection) parts.push(`Reflection: ${e.reflection}`)
+                const dateStr = e.createdAt || e.date
+                const label = dateStr ? new Date(dateStr).toLocaleDateString() : 'recent'
+                const parts = [`### Session ${recentDiary.length - i} (${label})`]
+                if (e.task?.trim())       parts.push(`Task: ${e.task.trim()}`)
+                if (e.reflection?.trim()) parts.push(`Reflection: ${e.reflection.trim()}`)
                 return parts.join('\n')
-              }).join('\n\n')}`
+              }).filter(Boolean).join('\n\n')}`
             : '',
         intent ? `\n## Your Goal for This Task\n${intent}` : '',
         role   ? `\nActing as: ${role}` : '',
@@ -994,15 +1009,28 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
             if (job.cancelled) return
 
             const toolName = call.function.name
-            const toolArgs = typeof call.function.arguments === 'string'
-                ? JSON.parse(call.function.arguments)
-                : call.function.arguments
+            let toolArgs
+            try {
+                toolArgs = typeof call.function.arguments === 'string'
+                    ? JSON.parse(call.function.arguments)
+                    : call.function.arguments
+            } catch {
+                toolArgs = {}
+            }
 
             const callStep = { type: 'tool_call', tool: toolName, args: toolArgs }
             job.steps.push(callStep)
             agentBroadcast(job.clients, callStep)
 
-            const result = await agentExecuteTool(toolName, toolArgs, caseId)
+            let result
+            try {
+                result = await agentExecuteTool(toolName, toolArgs, caseId)
+            } catch (toolErr) {
+                result = { error: toolErr.message }
+                const errStep = { type: 'error', content: `Tool "${toolName}" failed: ${toolErr.message}` }
+                job.steps.push(errStep)
+                agentBroadcast(job.clients, errStep)
+            }
 
             const resultStep = { type: 'tool_result', tool: toolName, result }
             job.steps.push(resultStep)
