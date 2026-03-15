@@ -312,6 +312,16 @@
   gap: 5px;
 }
 
+/* B: hide delete button until row is hovered or active */
+.pdfapp-doc-remove {
+  opacity: 0;
+  transition: opacity 100ms;
+}
+.pdfapp-doc-card:hover .pdfapp-doc-remove,
+.pdfapp-doc-card--active .pdfapp-doc-remove {
+  opacity: 1;
+}
+
 /* ── Doc status icon (replaces text pill) ────────────────────────────── */
 .pdfapp-doc-status-icon {
   display: flex;
@@ -520,20 +530,13 @@
 
 .pdfapp-party-chevron {
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  padding: 0;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
-  color: var(--border-2);
-  cursor: pointer;
-}
-
-.pdfapp-party-chevron:hover {
-  color: var(--text-muted);
+  color: var(--text-dim);
+  pointer-events: none;
 }
 
 .pdfapp-party-name {
@@ -545,6 +548,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* D: doc-count badge shown when folder is collapsed */
+.pdfapp-party-count {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  margin-right: 2px;
 }
 
 .pdfapp-party-rename-input {
@@ -596,10 +608,22 @@
 }
 
 .pdfapp-party-docs {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 4px 0 6px;
+  gap: 2px;
+  padding: 2px 0 4px 20px;
+}
+
+/* Vertical connecting line */
+.pdfapp-party-docs::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 10px;
+  width: 1px;
+  background: var(--border);
 }
 
 .pdfapp-doc-item--indented {
@@ -1282,6 +1306,201 @@
 
 .pdfapp-chunk-card--legacy {
   background: var(--bg);
+}
+
+/* ── Chunk search bar ──────────────────────────────────────────────── */
+.pdfapp-chunk-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+
+.pdfapp-chunk-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  outline: none;
+}
+
+.pdfapp-chunk-search-input:focus {
+  border-color: #3b82f6;
+}
+
+.pdfapp-chunk-search-clear {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.pdfapp-chunk-search-clear:hover {
+  background: var(--bg-3, var(--bg-hover));
+  color: var(--text);
+}
+
+/* ── Chunk match highlight ─────────────────────────────────────────── */
+.pdfapp-chunk-match {
+  background: rgba(250, 204, 21, 0.4);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ── Semantic score tag ────────────────────────────────────────────── */
+.pdfapp-chunk-tag--score {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 3px;
+  font-size: 0.69rem;
+  padding: 0 4px;
+  font-weight: 600;
+}
+
+/* ── Note button on chunk card ─────────────────────────────────────── */
+.pdfapp-chunk-note-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 120ms, background 120ms;
+  flex-shrink: 0;
+}
+
+.pdfapp-chunk-card:hover .pdfapp-chunk-note-btn,
+.pdfapp-chunk-card--active .pdfapp-chunk-note-btn {
+  opacity: 1;
+}
+
+.pdfapp-chunk-note-btn:hover {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+/* ── Inline note editor ────────────────────────────────────────────── */
+.pdfapp-chunk-note-area {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdfapp-chunk-note-input {
+  width: 100%;
+  min-height: 64px;
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.pdfapp-chunk-note-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.pdfapp-chunk-note-save {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pdfapp-chunk-note-save:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pdfapp-chunk-note-save:not(:disabled):hover {
+  background: #2563eb;
+}
+
+.pdfapp-chunk-note-cancel {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pdfapp-chunk-note-cancel:hover {
+  background: var(--bg-3, var(--bg-hover));
+  color: var(--text);
+}
+
+/* Note count badge on pencil button */
+.pdfapp-chunk-note-btn--has-notes {
+  opacity: 1 !important;
+  color: #3b82f6;
+}
+.pdfapp-chunk-note-count {
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0 4px;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+/* Existing notes shown above new-note textarea */
+.pdfapp-chunk-note-existing {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.pdfapp-chunk-note-existing-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pdfapp-chunk-note-existing-date {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+}
+.pdfapp-chunk-note-existing-text {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text);
+  line-height: 1.4;
+  white-space: pre-wrap;
 }
 
 .pdfapp-extracted-placeholder {
@@ -2541,6 +2760,226 @@
   flex-direction: column;
   gap: 14px;
 }
+
+/* ══════════════════════════════════════════════
+   Notes Tab Tree (nt-*)
+   ══════════════════════════════════════════════ */
+.nt-root {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Section (Starred / Notes) ── */
+.nt-section {
+  display: flex;
+  flex-direction: column;
+}
+.nt-section-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.nt-section-row:hover { background: var(--surface-hover); }
+.nt-section-title { flex: 1; }
+
+/* ── Party row ── */
+.nt-party-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.71rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.nt-party-row:hover { background: var(--surface-hover); }
+
+/* ── Doc row ── */
+.nt-doc-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.69rem;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+.nt-doc-row:hover { background: var(--surface-hover); }
+
+/* ── Children container with connecting line ── */
+.nt-children {
+  position: relative;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.nt-children::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 2px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--border);
+}
+
+/* ── Shared row elements ── */
+.nt-row-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nt-doc-label {
+  font-size: 0.67rem;
+  color: var(--text-dim);
+}
+.nt-count {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  color: var(--text-faint);
+  margin-left: auto;
+}
+.nt-page-badge {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  padding: 1px 4px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-radius: 3px;
+}
+.nt-date {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  color: var(--text-faint);
+}
+.nt-score {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  color: #22c55e;
+}
+
+/* ── Hover action buttons ── */
+.nt-row-actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 100ms;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.nt-note-row:hover .nt-row-actions,
+.nt-star-row:hover .nt-row-actions {
+  opacity: 1;
+}
+.nt-action-btn {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.nt-action-btn:hover { background: var(--bg-2); color: var(--text); }
+.nt-action-btn--danger:hover { background: rgba(239, 68, 68, 0.12); color: #f87171; }
+
+/* ── Chunk group header ── */
+.nt-chunk-header {
+  font-size: 0.63rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 2px 6px;
+  margin: 2px 0;
+  border-radius: 3px;
+  background: var(--bg-2, rgba(0,0,0,0.04));
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nt-chunk-header:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+/* ── Note row ── */
+.nt-note-row {
+  padding: 3px 4px;
+  border-radius: 4px;
+}
+.nt-note-row:hover { background: var(--bg-2, rgba(0,0,0,0.03)); }
+.nt-note-row--other { opacity: 0.7; }
+.nt-note-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+.nt-note-text {
+  font-size: 0.72rem;
+  color: var(--text-2);
+  line-height: 1.45;
+  cursor: pointer;
+  padding: 1px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.nt-note-text:hover { color: var(--text); }
+.nt-note-edit-input {
+  width: 100%;
+  font-size: 0.72rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  padding: 4px 6px;
+  resize: vertical;
+  outline: none;
+  min-height: 52px;
+  box-sizing: border-box;
+}
+
+/* ── Starred source row ── */
+.nt-star-row {
+  padding: 3px 4px;
+  border-radius: 4px;
+}
+.nt-star-row:hover { background: var(--bg-2, rgba(0,0,0,0.03)); }
+.nt-star-text {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .pdfapp-evidence-empty {
   padding: 32px 16px;
   text-align: center;
@@ -2622,7 +3061,7 @@
 .pdfapp-evidence-remove:hover { color: #ef4444; opacity: 1; }
 
 /* ── Agent panel ─────────────────────────────────────────────────────────── */
-.pdfapp-agent-panel {
+.pdfapp-aide-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -2630,7 +3069,7 @@
   padding: 12px;
   gap: 10px;
 }
-.pdfapp-agent-form {
+.pdfapp-aide-form {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2638,16 +3077,16 @@
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border-subtle);
 }
-.pdfapp-agent-form-field { display: flex; flex-direction: column; gap: 4px; }
-.pdfapp-agent-label {
+.pdfapp-aide-form-field { display: flex; flex-direction: column; gap: 4px; }
+.pdfapp-aide-label {
   font-size: 0.68rem;
   font-weight: 600;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.pdfapp-agent-label-hint { font-weight: 400; text-transform: none; letter-spacing: 0; }
-.pdfapp-agent-textarea {
+.pdfapp-aide-label-hint { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.pdfapp-aide-textarea {
   resize: none;
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
@@ -2659,14 +3098,14 @@
   line-height: 1.5;
   transition: border-color 120ms;
 }
-.pdfapp-agent-textarea:focus { outline: none; border-color: rgba(96,165,250,0.6); }
-.pdfapp-agent-textarea:disabled { opacity: 0.5; }
-.pdfapp-agent-form-row {
+.pdfapp-aide-textarea:focus { outline: none; border-color: rgba(96,165,250,0.6); }
+.pdfapp-aide-textarea:disabled { opacity: 0.5; }
+.pdfapp-aide-form-row {
   display: flex;
   gap: 8px;
   align-items: center;
 }
-.pdfapp-agent-select {
+.pdfapp-aide-select {
   flex: 1;
   padding: 6px 8px;
   border-radius: 6px;
@@ -2676,8 +3115,8 @@
   font-size: 0.75rem;
   cursor: pointer;
 }
-.pdfapp-agent-select:disabled { opacity: 0.5; }
-.pdfapp-agent-run-btn {
+.pdfapp-aide-select:disabled { opacity: 0.5; }
+.pdfapp-aide-run-btn {
   padding: 7px 14px;
   border-radius: 6px;
   font-size: 0.78rem;
@@ -2690,10 +3129,10 @@
   transition: background 120ms;
   flex-shrink: 0;
 }
-.pdfapp-agent-run-btn:hover:not(:disabled) { background: #1f4572; }
-.pdfapp-agent-run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.pdfapp-agent-run-btn--stop { background: rgba(239,68,68,0.12); color: #ef4444; }
-.pdfapp-agent-no-case {
+.pdfapp-aide-run-btn:hover:not(:disabled) { background: #1f4572; }
+.pdfapp-aide-run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pdfapp-aide-run-btn--stop { background: rgba(239,68,68,0.12); color: #ef4444; }
+.pdfapp-aide-no-case {
   font-size: 0.72rem;
   color: var(--text-dim);
   text-align: center;
@@ -2701,34 +3140,34 @@
 }
 
 /* Trail */
-.pdfapp-agent-trail {
+.pdfapp-aide-trail {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.pdfapp-agent-thinking {
+.pdfapp-aide-thinking {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 6px 4px;
 }
-.pdfapp-agent-thinking-dot {
+.pdfapp-aide-thinking-dot {
   width: 5px; height: 5px;
   border-radius: 50%;
   background: #60a5fa;
-  animation: agentDotPulse 1.2s ease-in-out infinite;
+  animation: aideDotPulse 1.2s ease-in-out infinite;
 }
-.pdfapp-agent-thinking-dot:nth-child(2) { animation-delay: 0.2s; }
-.pdfapp-agent-thinking-dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes agentDotPulse {
+.pdfapp-aide-thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.pdfapp-aide-thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes aideDotPulse {
   0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
   40%            { opacity: 1;   transform: scale(1); }
 }
-.pdfapp-agent-thinking-label { font-size: 0.7rem; color: #60a5fa; margin-left: 4px; }
+.pdfapp-aide-thinking-label { font-size: 0.7rem; color: #60a5fa; margin-left: 4px; }
 
-.pdfapp-agent-step {
+.pdfapp-aide-step {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -2737,14 +3176,14 @@
   font-size: 0.75rem;
   line-height: 1.5;
 }
-.pdfapp-agent-step--tool_call  { background: rgba(96,165,250,0.06); }
-.pdfapp-agent-step--tool_result { background: rgba(255,255,255,0.03); }
-.pdfapp-agent-step--error       { background: rgba(239,68,68,0.08); }
-.pdfapp-agent-step--cancelled   { background: rgba(255,255,255,0.03); color: var(--text-dim); }
-.pdfapp-agent-step-icon { font-size: 0.8rem; color: var(--text-dim); flex-shrink: 0; margin-top: 1px; }
-.pdfapp-agent-step-body { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--text-dim); }
-.pdfapp-agent-step-body--error { color: #ef4444; }
-.pdfapp-agent-step-tool {
+.pdfapp-aide-step--tool_call  { background: rgba(96,165,250,0.06); }
+.pdfapp-aide-step--tool_result { background: rgba(255,255,255,0.03); }
+.pdfapp-aide-step--error       { background: rgba(239,68,68,0.08); }
+.pdfapp-aide-step--cancelled   { background: rgba(255,255,255,0.03); color: var(--text-dim); }
+.pdfapp-aide-step-icon { font-size: 0.8rem; color: var(--text-dim); flex-shrink: 0; margin-top: 1px; }
+.pdfapp-aide-step-body { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--text-dim); }
+.pdfapp-aide-step-body--error { color: #ef4444; }
+.pdfapp-aide-step-tool {
   font-size: 0.68rem;
   font-weight: 600;
   color: #60a5fa;
@@ -2752,19 +3191,19 @@
   padding: 1px 6px;
   border-radius: 3px;
 }
-.pdfapp-agent-step-args { color: var(--text); font-style: italic; font-size: 0.73rem; }
-.pdfapp-agent-step-result-count { font-size: 0.72rem; }
-.pdfapp-agent-step-note-saved { font-size: 0.72rem; color: #4ade80; }
+.pdfapp-aide-step-args { color: var(--text); font-style: italic; font-size: 0.73rem; }
+.pdfapp-aide-step-result-count { font-size: 0.72rem; }
+.pdfapp-aide-step-note-saved { font-size: 0.72rem; color: #4ade80; }
 
 /* Final answer */
-.pdfapp-agent-answer {
+.pdfapp-aide-answer {
   margin-top: 8px;
   border: 1px solid rgba(96,165,250,0.25);
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
 }
-.pdfapp-agent-answer-header {
+.pdfapp-aide-answer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2776,7 +3215,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.pdfapp-agent-answer-copy {
+.pdfapp-aide-answer-copy {
   font-size: 0.68rem;
   padding: 2px 8px;
   border-radius: 4px;
@@ -2787,8 +3226,8 @@
   text-transform: none;
   letter-spacing: 0;
 }
-.pdfapp-agent-answer-copy:hover { background: rgba(96,165,250,0.1); }
-.pdfapp-agent-answer-body {
+.pdfapp-aide-answer-copy:hover { background: rgba(96,165,250,0.1); }
+.pdfapp-aide-answer-body {
   padding: 10px 12px;
   font-size: 0.78rem;
   line-height: 1.75;
@@ -2797,6 +3236,361 @@
   word-break: break-word;
   max-height: 300px;
   overflow-y: auto;
+}
+
+/* ── Aide sub-tabs ─────────────────────────────────────────────────────── */
+.pdfapp-aide-subtabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+.pdfapp-aide-subtab {
+  padding: 5px 14px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  border-radius: 3px 3px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.15s;
+}
+.pdfapp-aide-subtab:hover { color: var(--text); }
+.pdfapp-aide-subtab--active {
+  color: var(--accent, #60a5fa);
+  border-bottom-color: var(--accent, #60a5fa);
+}
+.pdfapp-aide-subtab-badge {
+  background: var(--accent, #60a5fa);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 99px;
+  line-height: 1.4;
+}
+
+/* ── Soul panel ────────────────────────────────────────────────────────── */
+.pdfapp-aide-soul-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pdfapp-aide-soul-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pdfapp-aide-soul-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.pdfapp-aide-soul-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pdfapp-aide-soul-saved {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+}
+.pdfapp-aide-soul-save-btn {
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-dim);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pdfapp-aide-soul-save-btn--dirty {
+  border-color: var(--accent, #60a5fa);
+  color: var(--accent, #60a5fa);
+}
+.pdfapp-aide-soul-save-btn--dirty:hover {
+  background: rgba(96,165,250,0.1);
+}
+.pdfapp-aide-soul-save-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pdfapp-aide-soul-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pdfapp-aide-soul-section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.pdfapp-aide-soul-section-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pdfapp-aide-soul-hint {
+  font-weight: 400;
+  color: var(--text-dim);
+  font-size: 0.67rem;
+}
+.pdfapp-aide-soul-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-secondary, rgba(0,0,0,0.15));
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 0.73rem;
+  line-height: 1.6;
+  padding: 7px 9px;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.pdfapp-aide-soul-textarea:focus {
+  outline: none;
+  border-color: var(--accent, #60a5fa);
+}
+.pdfapp-aide-soul-empty {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+.pdfapp-aide-soul-add-btn {
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-dim);
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.pdfapp-aide-soul-add-btn:hover { color: var(--text); border-color: var(--text-dim); }
+
+/* Skill file drop */
+.pdfapp-aide-skill-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1.5px dashed var(--border-subtle);
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-align: center;
+  transition: border-color 0.15s, color 0.15s;
+}
+.pdfapp-aide-skill-drop:hover { border-color: var(--accent, #60a5fa); color: var(--text); }
+.pdfapp-aide-skill-drop-icon { font-size: 1.3rem; line-height: 1; }
+.pdfapp-aide-skill-loaded {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-secondary, rgba(0,0,0,0.15));
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.pdfapp-aide-skill-filename {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent, #60a5fa);
+}
+.pdfapp-aide-skill-preview {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.pdfapp-aide-skill-remove {
+  align-self: flex-start;
+  font-size: 0.68rem;
+  background: none;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Style samples */
+.pdfapp-aide-sample-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.pdfapp-aide-sample-textarea { flex: 1; }
+.pdfapp-aide-sample-remove {
+  background: none;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 6px 4px 0;
+  flex-shrink: 0;
+}
+
+/* Corrections */
+.pdfapp-aide-correction-input-row {
+  display: flex;
+  gap: 6px;
+}
+.pdfapp-aide-correction-input {
+  flex: 1;
+  background: var(--bg-secondary, rgba(0,0,0,0.15));
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 0.73rem;
+  padding: 5px 8px;
+  font-family: inherit;
+}
+.pdfapp-aide-correction-input:focus { outline: none; border-color: var(--accent, #60a5fa); }
+.pdfapp-aide-correction-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 5px 8px;
+  background: var(--bg-secondary, rgba(0,0,0,0.15));
+  border-radius: 5px;
+  border: 1px solid var(--border-subtle);
+}
+.pdfapp-aide-correction-text {
+  flex: 1;
+  font-size: 0.71rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ── Memory panel ──────────────────────────────────────────────────────── */
+.pdfapp-aide-memory-panel {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.pdfapp-aide-audit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary, rgba(0,0,0,0.1));
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+.pdfapp-aide-audit-label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.pdfapp-aide-audit-tokens {
+  font-size: 0.68rem;
+  color: var(--text);
+  font-weight: 700;
+}
+.pdfapp-aide-audit-tokens--warn { color: #f87171; }
+.pdfapp-aide-audit-warn {
+  font-size: 0.66rem;
+  color: #f87171;
+}
+.pdfapp-aide-memory-header {
+  padding: 10px 12px 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Diary entries */
+.pdfapp-aide-diary-entry {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.pdfapp-aide-diary-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.pdfapp-aide-diary-row:hover { background: var(--hover-bg, rgba(255,255,255,0.04)); }
+.pdfapp-aide-diary-chevron {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.pdfapp-aide-diary-chevron.open { transform: rotate(90deg); }
+.pdfapp-aide-diary-task {
+  flex: 1;
+  font-size: 0.72rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pdfapp-aide-diary-date {
+  font-size: 0.67rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.pdfapp-aide-diary-body {
+  padding: 4px 12px 10px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pdfapp-aide-diary-reflection {
+  font-size: 0.72rem;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.pdfapp-aide-diary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pdfapp-aide-diary-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pdfapp-aide-diary-section > div {
+  font-size: 0.72rem;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
 
 /* ── Evidence panel — party / doc grouping ──────────────────────────────── */
@@ -2818,6 +3612,31 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.pdfapp-evidence-chunk-group {
+  margin-bottom: 8px;
+}
+.pdfapp-evidence-chunk-header {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 3px 6px;
+  margin-bottom: 2px;
+  background: var(--bg-2, rgba(0,0,0,0.04));
+  border-radius: 3px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.pdfapp-evidence-chunk-header--link {
+  cursor: pointer;
+}
+.pdfapp-evidence-chunk-header--link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .pdfapp-evidence-item-docname {
   font-size: 0.62rem;

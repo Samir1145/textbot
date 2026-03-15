@@ -99,7 +99,7 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
       .filter(c => c.type === 'file')
       .map(c => ({ id: String(c.id), name: c.name, file: c.file }))
     if (initialDocs.length === 0) return []
-    return [{ id: crypto.randomUUID(), name: 'Party 1', documents: initialDocs }]
+    return [{ id: crypto.randomUUID(), name: 'Folder 1', documents: initialDocs }]
   })
   const [activePartyId, setActivePartyId] = useState(null)
   const [collapsedParties, setCollapsedParties] = useState({})
@@ -230,7 +230,7 @@ const fileInputRef = useRef(null)
   // DEV: ref so pre-addLog callbacks can log into the activity panel
   const addLogRef = useRef(() => {})
   // Cross-doc navigation: set before switching activeDocumentId; consumed when new PDF is ready
-  const pendingNavRef = useRef(null) // { pageNum, chunkText, bbox, narrowBbox }
+  const pendingNavRef = useRef(null) // { pageNum, chunkText, bbox, narrowBbox, chunkIdx? }
   const pdfBufferRef = useRef(null)      // cached PDF bytes for zoom re-renders
   const prevActiveDocUrlRef = useRef(null)
   const prevActiveDocIdRef = useRef(null)
@@ -267,7 +267,7 @@ const fileInputRef = useRef(null)
       pendingAddPartyRef.current = null
       setParties(prev => {
         if (!targetId || !prev.some(p => p.id === targetId)) {
-          if (prev.length === 0) return [{ id: crypto.randomUUID(), name: 'Party 1', documents: newDocs }]
+          if (prev.length === 0) return [{ id: crypto.randomUUID(), name: 'Folder 1', documents: newDocs }]
           return [{ ...prev[0], documents: [...prev[0].documents, ...newDocs] }, ...prev.slice(1)]
         }
         return prev.map(p => p.id === targetId ? { ...p, documents: [...p.documents, ...newDocs] } : p)
@@ -313,7 +313,7 @@ const fileInputRef = useRef(null)
 
   const handleAddParty = () => {
     const newId = crypto.randomUUID()
-    setParties(prev => [...prev, { id: newId, name: `Party ${prev.length + 1}`, documents: [] }])
+    setParties(prev => [...prev, { id: newId, name: `Folder ${prev.length + 1}`, documents: [] }])
     setActivePartyId(newId)
   }
 
@@ -383,7 +383,7 @@ const fileInputRef = useRef(null)
       pendingAddPartyRef.current = null
 
       if (!targetId || !prev.some(p => p.id === targetId)) {
-        if (prev.length === 0) return [{ id: crypto.randomUUID(), name: 'Party 1', documents: newDocs }]
+        if (prev.length === 0) return [{ id: crypto.randomUUID(), name: 'Folder 1', documents: newDocs }]
         return [{ ...prev[0], documents: [...prev[0].documents, ...newDocs] }, ...prev.slice(1)]
       }
       return prev.map(p => p.id === targetId ? { ...p, documents: [...p.documents, ...newDocs] } : p)
@@ -540,10 +540,14 @@ const fileInputRef = useRef(null)
           setupObserver()
           // Consume any pending cross-doc navigation (set before switching activeDocumentId)
           if (pendingNavRef.current) {
-            const { pageNum, chunkText, bbox, narrowBbox } = pendingNavRef.current
+            const { pageNum, chunkText, bbox, narrowBbox, chunkIdx } = pendingNavRef.current
             pendingNavRef.current = null
             scrollPageIntoView(pageNum, 'center')
             setActiveCitations(new Map([[1, { text: chunkText, page_num: pageNum, bbox, narrowBbox }]]))
+            if (chunkIdx != null) {
+              setActiveChunkKey(`${pageNum}-${chunkIdx}`)
+              setExtractedTextOpen(true)
+            }
           }
         })
       } else if (msg.type === 'dims-update') {
@@ -774,16 +778,30 @@ const fileInputRef = useRef(null)
     try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
   })
   const [allCaseNotes, setAllCaseNotes] = useState({}) // { [docId]: NoteObject[] }
-  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'agent'
-  // ── Agent state ──
-  const [agentTask,   setAgentTask]   = useState('')
-  const [agentIntent, setAgentIntent] = useState('')
-  const [agentRole,   setAgentRole]   = useState('')
-  const [agentJobId,  setAgentJobId]  = useState(null)
-  const [agentSteps,  setAgentSteps]  = useState([])
-  const [agentStatus, setAgentStatus] = useState('idle') // 'idle'|'running'|'done'|'error'|'cancelled'
-  const [agentResult, setAgentResult] = useState(null)
-  const agentEsRef = useRef(null)
+  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'aide'
+  const [notesCollapsed, setNotesCollapsed] = useState({}) // { 'section:starred'|'party:id'|'doc:id'|'note-exp:id': bool }
+  const [editingNoteId, setEditingNoteId] = useState(null)
+  const [editingNoteDraft, setEditingNoteDraft] = useState('')
+  // ── Aide state ──
+  const [aideTask,   setAideTask]   = useState('')
+  const [aideIntent, setAideIntent] = useState('')
+  const [aideRole,   setAideRole]   = useState('')
+  const [aideJobId,  setAideJobId]  = useState(null)
+  const [aideSteps,  setAideSteps]  = useState([])
+  const [aideStatus, setAideStatus] = useState('idle') // 'idle'|'running'|'done'|'error'|'cancelled'
+  const [aideResult, setAideResult] = useState(null)
+  const aideEsRef = useRef(null)
+
+  // ── Aide Soul / Memory ────────────────────────────────────────────────────
+  const [aideSoulTab,    setAideSoulTab]    = useState('run') // 'run' | 'soul' | 'memory'
+  const [aideSoul,       setAideSoul]       = useState({ skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] })
+  const [aideDiary,      setAideDiary]      = useState([])
+  const [aideSoulDirty,  setAideSoulDirty]  = useState(false)
+  const [aideSoulSaving, setAideSoulSaving] = useState(false)
+  const [aideSoulSavedAt,setAideSoulSavedAt]= useState(null)
+  const [aideNewCorrection, setAideNewCorrection] = useState('')
+  const [aideDiaryOpen,  setAideDiaryOpen]  = useState(new Set())
+  const [aideSkillFileName, setAideSkillFileName] = useState('')
   const isIndexingRef = useRef(false)   // ref guard — prevents concurrent / loop-triggered indexing
 
   // ── Activity log ──
@@ -894,6 +912,12 @@ const fileInputRef = useRef(null)
   const chatMessagesRef = useRef(null)
   const chunksPanelRef = useRef(null)
   const [activeChunkKey, setActiveChunkKey] = useState(null)
+  const [chunkQuery, setChunkQuery] = useState('')
+  const [chunkSearchMode, setChunkSearchMode] = useState('idle') // 'idle' | 'filter' | 'semantic'
+  const [chunkSemanticResults, setChunkSemanticResults] = useState(null) // null | array of {page_num, chunk_idx}
+  const [chunkSemanticLoading, setChunkSemanticLoading] = useState(false)
+  const [editingNoteChunkKey, setEditingNoteChunkKey] = useState(null)
+  const [noteChunkDraft, setNoteChunkDraft] = useState('')
   // Session-level per-doc caches — state restores instantly on doc switch (no async blank flash)
   const chatByDocRef       = useRef({}) // docId → Message[]
   const extractionByDocRef = useRef({}) // docId → extractedPages
@@ -921,6 +945,11 @@ const fileInputRef = useRef(null)
     setChatMessages(sessionMsgs)
     setActiveCitations(sessionLastCited?.citations ?? new Map())
     setActiveChunkKey(null)
+    setChunkQuery('')
+    setChunkSearchMode('idle')
+    setChunkSemanticResults(null)
+    setEditingNoteChunkKey(null)
+    setNoteChunkDraft('')
     setChatInput('')
     setRagStatus(ragStatusByDocRef.current[activeDocumentId] ?? null)
     setRagProgress('')
@@ -968,11 +997,80 @@ const fileInputRef = useRef(null)
     saveNotes(docId, next, { caseId }).catch(() => {})
   }, [caseId])
 
+  const deleteNoteFromTab = useCallback((docId, noteId) => {
+    const current = allCaseNotes[docId] || []
+    const next = current.filter(n => n.id !== noteId)
+    if (docId === activeDocumentId) setNotes(next)
+    persistNotes(next, docId)
+  }, [allCaseNotes, activeDocumentId, persistNotes])
+
+  const saveNoteEditFromTab = useCallback((docId, noteId, text) => {
+    const trimmed = text.trim()
+    if (!trimmed) { deleteNoteFromTab(docId, noteId); return }
+    const current = allCaseNotes[docId] || []
+    const next = current.map(n => n.id === noteId ? { ...n, text: trimmed } : n)
+    if (docId === activeDocumentId) setNotes(next)
+    persistNotes(next, docId)
+  }, [allCaseNotes, activeDocumentId, deleteNoteFromTab, persistNotes])
+
   // Load all notes for the whole case whenever the case changes
   useEffect(() => {
     if (!caseId) return
     loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {})
   }, [caseId])
+
+  // ── Chunk search handlers ──
+  const handleChunkQueryChange = useCallback((val) => {
+    setChunkQuery(val)
+    if (val.trim()) {
+      setChunkSearchMode('filter')
+      setChunkSemanticResults(null)
+    } else {
+      setChunkSearchMode('idle')
+      setChunkSemanticResults(null)
+    }
+  }, [])
+
+  const handleChunkSemanticSearch = useCallback(async () => {
+    const q = chunkQuery.trim()
+    if (!q || !activeDocumentId) return
+    setChunkSemanticLoading(true)
+    setChunkSemanticResults(null)
+    try {
+      const results = await searchDocChunks(activeDocumentId, q, 10, { caseId })
+      setChunkSemanticResults(results)
+      setChunkSearchMode('semantic')
+    } catch {
+      setChunkSemanticResults([])
+    } finally {
+      setChunkSemanticLoading(false)
+    }
+  }, [chunkQuery, activeDocumentId, caseId])
+
+  const saveNoteFromChunk = useCallback((chunk, pageNum, chunkIdx) => {
+    const text = noteChunkDraft.trim()
+    if (!text || !activeDocumentId) return
+    const bbox = chunk.bbox ?? null
+    // Derive x/y from bbox center (normalised 0–1) or fall back to (0.5, 0.5)
+    const x = bbox ? (bbox[0] + bbox[2]) / 2 : 0.5
+    const y = bbox ? (bbox[1] + bbox[3]) / 2 : 0.5
+    const note = {
+      id: crypto.randomUUID(),
+      pageNum,
+      x,
+      y,
+      text,
+      createdAt: new Date().toISOString(),
+      chunkText: chunk.text,
+      chunkBbox: bbox,
+      chunkIdx,
+    }
+    const next = [...notes, note]
+    setNotes(next)
+    persistNotes(next, activeDocumentId)
+    setEditingNoteChunkKey(null)
+    setNoteChunkDraft('')
+  }, [noteChunkDraft, activeDocumentId, notes, persistNotes])
 
   // ── Starred source handlers ──
   const _starKey = (chunk) => `${chunk.page_num}::${chunk.text.slice(0, 60)}`
@@ -1012,52 +1110,123 @@ const fileInputRef = useRef(null)
     })
   }, [caseId])
 
-  const handleAgentStart = useCallback(async () => {
-    if (!agentTask.trim() || !caseId) return
+  const handleAideStart = useCallback(async () => {
+    if (!aideTask.trim() || !caseId) return
     // Close any existing SSE stream
-    agentEsRef.current?.close()
-    setAgentSteps([])
-    setAgentResult(null)
-    setAgentStatus('running')
+    aideEsRef.current?.close()
+    setAideSteps([])
+    setAideResult(null)
+    setAideStatus('running')
 
     const res = await fetch('/api/agent/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task: agentTask, intent: agentIntent, role: agentRole, caseId }),
+      body: JSON.stringify({ task: aideTask, intent: aideIntent, role: aideRole, caseId }),
     })
     const { jobId, error } = await res.json()
-    if (error) { setAgentStatus('error'); return }
-    setAgentJobId(jobId)
+    if (error) { setAideStatus('error'); return }
+    setAideJobId(jobId)
 
     const es = new EventSource(`/api/agent/${jobId}/stream`)
-    agentEsRef.current = es
+    aideEsRef.current = es
 
     es.onmessage = (e) => {
       const step = JSON.parse(e.data)
       if (step.type === 'status') {
-        setAgentStatus(step.status)
-        if (step.result) setAgentResult(step.result)
-        if (step.status !== 'running') { es.close(); agentEsRef.current = null }
-        // If agent saved notes, reload them
+        setAideStatus(step.status)
+        if (step.result) setAideResult(step.result)
+        if (step.status !== 'running') { es.close(); aideEsRef.current = null }
         return
       }
-      setAgentSteps(prev => [...prev, step])
-      // Reload notes when agent adds one
+      if (step.type === 'diary_entry') {
+        setAideDiary(prev => [step.entry, ...prev])
+        return
+      }
+      setAideSteps(prev => [...prev, step])
       if (step.type === 'tool_result' && step.tool === 'add_note' && step.result?.ok) {
         loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {})
       }
     }
-    es.onerror = () => { setAgentStatus('error'); es.close(); agentEsRef.current = null }
-  }, [agentTask, agentIntent, agentRole, caseId, setAllCaseNotes])
+    es.onerror = () => { setAideStatus('error'); es.close(); aideEsRef.current = null }
+  }, [aideTask, aideIntent, aideRole, caseId, setAllCaseNotes])
 
-  const handleAgentStop = useCallback(async () => {
-    agentEsRef.current?.close()
-    agentEsRef.current = null
-    if (agentJobId) {
-      await fetch(`/api/agent/${agentJobId}`, { method: 'DELETE' }).catch(() => {})
+  const handleAideStop = useCallback(async () => {
+    aideEsRef.current?.close()
+    aideEsRef.current = null
+    if (aideJobId) {
+      await fetch(`/api/agent/${aideJobId}`, { method: 'DELETE' }).catch(() => {})
     }
-    setAgentStatus('cancelled')
-  }, [agentJobId])
+    setAideStatus('cancelled')
+  }, [aideJobId])
+
+  // Load soul + diary whenever the case changes
+  useEffect(() => {
+    if (!caseId) return
+    fetch(`/api/cases/${caseId}/aide/soul`).then(r => r.json()).then(d => {
+      setAideSoul(d.soul || { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] })
+      setAideSoulDirty(false)
+      setAideSoulSavedAt(d.savedAt || null)
+    }).catch(() => {})
+    fetch(`/api/cases/${caseId}/aide/diary`).then(r => r.json()).then(d => {
+      setAideDiary(Array.isArray(d) ? d : [])
+    }).catch(() => {})
+  }, [caseId])
+
+  const handleAideSoulSave = useCallback(async () => {
+    if (!caseId || aideSoulSaving) return
+    setAideSoulSaving(true)
+    try {
+      const res = await fetch(`/api/cases/${caseId}/aide/soul`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ soul: aideSoul }),
+      })
+      const data = await res.json()
+      setAideSoulSavedAt(data.savedAt || new Date().toISOString())
+      setAideSoulDirty(false)
+    } finally {
+      setAideSoulSaving(false)
+    }
+  }, [caseId, aideSoul, aideSoulSaving])
+
+  const patchSoul = useCallback((key, value) => {
+    setAideSoul(prev => ({ ...prev, [key]: value }))
+    setAideSoulDirty(true)
+  }, [])
+
+  const addCorrection = useCallback(() => {
+    const text = aideNewCorrection.trim()
+    if (!text) return
+    setAideSoul(prev => ({ ...prev, corrections: [...(prev.corrections || []), { id: crypto.randomUUID(), text, createdAt: new Date().toISOString() }] }))
+    setAideSoulDirty(true)
+    setAideNewCorrection('')
+  }, [aideNewCorrection])
+
+  const removeCorrection = useCallback((id) => {
+    setAideSoul(prev => ({ ...prev, corrections: (prev.corrections || []).filter(c => c.id !== id) }))
+    setAideSoulDirty(true)
+  }, [])
+
+  const addStyleSample = useCallback(() => {
+    setAideSoul(prev => ({ ...prev, styleSamples: [...(prev.styleSamples || []), { id: crypto.randomUUID(), text: '', createdAt: new Date().toISOString() }] }))
+    setAideSoulDirty(true)
+  }, [])
+
+  const updateStyleSample = useCallback((id, text) => {
+    setAideSoul(prev => ({ ...prev, styleSamples: (prev.styleSamples || []).map(s => s.id === id ? { ...s, text } : s) }))
+    setAideSoulDirty(true)
+  }, [])
+
+  const removeStyleSample = useCallback((id) => {
+    setAideSoul(prev => ({ ...prev, styleSamples: (prev.styleSamples || []).filter(s => s.id !== id) }))
+    setAideSoulDirty(true)
+  }, [])
+
+  const aideSoulTokenEstimate = useMemo(() => {
+    const s = aideSoul
+    const texts = [s.skillMd, s.redFlags, s.styleGuide, ...(s.corrections || []).map(c => c.text), ...(s.styleSamples || []).map(x => x.text)]
+    return Math.round(texts.reduce((sum, t) => sum + (t?.length || 0), 0) / 4)
+  }, [aideSoul])
 
   const handlePageClick = useCallback((e, pageNum) => {
     if (!noteMode) return
@@ -1573,7 +1742,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                 </span>
 
                 <button type="button" className="pdfapp-sb-litigants-btn" onClick={handleAddParty}>
-                  + Litigants
+                  + Folder
                 </button>
                 <button
                   type="button"
@@ -1593,9 +1762,9 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
             <div className="pdfapp-party-list">
               {parties.length === 0 ? (
                 <div className="pdfapp-sb-empty-state">
-                  <p>No parties yet.</p>
+                  <p>No folders yet.</p>
                   <button type="button" className="pdfapp-sb-litigants-btn" onClick={handleAddParty}>
-                    + Add Litigant
+                    + Add Folder
                   </button>
                 </div>
               ) : (
@@ -1604,17 +1773,16 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   const isRenaming = renamingPartyId === party.id
                   return (
                     <div key={party.id} className="pdfapp-party-group">
-                      {/* Party header card */}
+                      {/* Folder header row — click anywhere to expand/collapse */}
                       <div
                         className={`pdfapp-party-header${activePartyId === party.id ? ' pdfapp-party-header--active' : ''}`}
-                        onClick={() => setActivePartyId(party.id)}
+                        onClick={() => {
+                          setCollapsedParties(prev => ({ ...prev, [party.id]: !isCollapsed }))
+                          setActivePartyId(party.id)
+                        }}
                       >
-                        <button
-                          type="button"
-                          className="pdfapp-party-chevron"
-                          onClick={e => { e.stopPropagation(); setCollapsedParties(prev => ({ ...prev, [party.id]: !isCollapsed })) }}
-                          aria-label={isCollapsed ? 'Expand party' : 'Collapse party'}
-                        >
+                        {/* Chevron — visual only, not a button */}
+                        <span className="pdfapp-party-chevron">
                           <svg
                             viewBox="0 0 24 24" width="11" height="11"
                             fill="none" stroke="currentColor" strokeWidth="2.5"
@@ -1622,7 +1790,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                           >
                             <polyline points="6 9 12 15 18 9" />
                           </svg>
-                        </button>
+                        </span>
 
                         {isRenaming ? (
                           <input
@@ -1637,20 +1805,39 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                             }}
                           />
                         ) : (
-                          <span
-                            className="pdfapp-party-name"
-                            title={party.name}
-                            onDoubleClick={e => { e.stopPropagation(); setRenamingPartyId(party.id) }}
-                          >
+                          <span className="pdfapp-party-name" title={party.name}>
                             {party.name}
                           </span>
                         )}
 
+                        {/* D: doc-count + status badge when collapsed */}
+                        {isCollapsed && party.documents.length > 0 && (() => {
+                          const allIndexed = party.documents.every(d => docStatuses[d.id] === 'indexed')
+                          const anyProcessing = party.documents.some(d => ['extracting', 'indexing'].includes(docStatuses[d.id]))
+                          return (
+                            <span className="pdfapp-party-count">
+                              {party.documents.length}{allIndexed ? ' ✓' : anyProcessing ? ' ⟳' : ''}
+                            </span>
+                          )
+                        })()}
+
+                        {/* Hover actions */}
                         <div className="pdfapp-party-actions">
                           <button
                             type="button"
                             className="pdfapp-party-action-btn"
-                            title="Add document to this party"
+                            title="Rename folder"
+                            onClick={e => { e.stopPropagation(); setRenamingPartyId(party.id) }}
+                          >
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            className="pdfapp-party-action-btn"
+                            title="Add document"
                             onClick={e => { e.stopPropagation(); handleAddDocToParty(party.id) }}
                           >
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1663,7 +1850,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                           <button
                             type="button"
                             className="pdfapp-party-action-btn pdfapp-party-action-btn--danger"
-                            title="Remove party"
+                            title="Delete folder"
                             onClick={e => { e.stopPropagation(); handleRemoveParty(party.id) }}
                           >
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1911,21 +2098,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   {activeDoc.name.length > 50 ? activeDoc.name.slice(0, 50) + '…' : activeDoc.name}
                 </span>
                 <div className="pdfapp-toolbar-right">
-                  {/* Note tool */}
-                  <button
-                    className={`pdfapp-toolbar-btn pdfapp-toolbar-btn--annot${noteMode ? ' pdfapp-toolbar-btn--active' : ''}`}
-                    title={noteMode ? 'Note mode on — click anywhere on the PDF to place a note' : 'Add note'}
-                    disabled={!pageCount}
-                    onClick={() => { setNoteMode(m => !m); setOpenNoteId(null) }}
-                  >
-                    <svg viewBox="0 0 20 20" width="15" height="15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M3 1 h8 l4 4 v11 a1.5 1.5 0 0 1-1.5 1.5 H4.5 A1.5 1.5 0 0 1 3 16.5 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
-                      <path d="M11 1 v3.5 a.5.5 0 0 0 .5.5 H15" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" fill="none"/>
-                      <line x1="6" y1="8"  x2="13" y2="8"  stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                      <line x1="6" y1="11" x2="13" y2="11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                      <line x1="6" y1="14" x2="10" y2="14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                    </svg>
-                  </button>
                 </div>
               </div>
               <div className="pdfapp-center-body" ref={pagesContainerRef}>
@@ -2081,30 +2253,20 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     )}
                   </div>
 
-                  {/* ── Contextual single action (Option C) ── */}
+                  {/* ── Controls: cancel in-progress ops + settings menu ── */}
                   <div className="pdfapp-extract-controls" onClick={e => e.stopPropagation()}>
-                    {extractingText ? (
+                    {extractingText && (
                       <button
                         className="pdfapp-action-btn pdfapp-action-btn--stop"
                         onClick={() => { extractionAbortRef.current?.abort(); setExtractingText(false); setExtractionStatus('') }}
                       >■ Cancel</button>
-                    ) : ragStatus === 'indexing' ? (
+                    )}
+                    {ragStatus === 'indexing' && (
                       <button
                         className="pdfapp-action-btn pdfapp-action-btn--stop"
                         onClick={() => { setRagStatus('failed'); setRagProgress('') }}
                       >■ Cancel</button>
-                    ) : extractedPages && ragStatus !== 'indexed' ? (
-                      <button
-                        className="pdfapp-action-btn pdfapp-action-btn--index"
-                        onClick={handleIndexDocument}
-                      >Index for search →</button>
-                    ) : ragStatus !== 'indexed' ? (
-                      <button
-                        className="pdfapp-action-btn pdfapp-action-btn--extract"
-                        disabled={!activeDoc?.file || pdfLoading}
-                        onClick={() => activeDoc?.file && runExtraction(activeDocumentId, activeDoc.file)}
-                      >{extractionSource === 'ocr' ? 'Re-scan pages' : activeDoc?.file ? 'Prepare for search' : 'No file loaded'}</button>
-                    ) : null}
+                    )}
                     <button
                       className="pdfapp-action-btn pdfapp-action-btn--menu"
                       title="Text processing guide & settings"
@@ -2123,40 +2285,188 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
                 {extractedTextOpen && (
                   extractedPages ? (
+                    <>
+                    {/* ── Chunk search bar ── */}
+                    <div className="pdfapp-chunk-search-bar">
+                      <input
+                        className="pdfapp-chunk-search-input"
+                        type="text"
+                        placeholder="Filter chunks… (Enter for semantic search)"
+                        value={chunkQuery}
+                        onChange={e => handleChunkQueryChange(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') { e.preventDefault(); handleChunkSemanticSearch() }
+                          if (e.key === 'Escape') { handleChunkQueryChange(''); e.target.blur() }
+                        }}
+                      />
+                      {chunkQuery && (
+                        <button className="pdfapp-chunk-search-clear" onClick={() => handleChunkQueryChange('')} title="Clear">✕</button>
+                      )}
+                      {chunkSemanticLoading && <div className="pdfapp-spinner pdfapp-spinner--small" style={{ flexShrink: 0 }} />}
+                    </div>
                     <div className="pdfapp-chunks-body" ref={chunksPanelRef}>
-                      {extractedPages.map(page =>
-                        page.chunks.map((chunk, idx) => {
-                          const chunkKey = `${page.pageNum}-${idx}`
+                      {(() => {
+                        // Build display list based on search mode
+                        let displayChunks // [{page, chunk, idx, matchHighlight}]
+                        const queryNorm = chunkQuery.trim().toLowerCase()
+
+                        if (chunkSearchMode === 'semantic' && chunkSemanticResults) {
+                          // Show semantic results in ranked order
+                          displayChunks = chunkSemanticResults.map(r => {
+                            const page = extractedPages.find(p => p.pageNum === r.page_num)
+                            const chunk = page?.chunks[r.chunk_idx]
+                            if (!page || !chunk) return null
+                            return { page, chunk, idx: r.chunk_idx, score: r.distance != null ? distanceToScore(r.distance) : null }
+                          }).filter(Boolean)
+                        } else if (chunkSearchMode === 'filter' && queryNorm) {
+                          // Text filter across all chunks
+                          displayChunks = []
+                          for (const page of extractedPages) {
+                            page.chunks.forEach((chunk, idx) => {
+                              if (chunk.text?.toLowerCase().includes(queryNorm)) {
+                                displayChunks.push({ page, chunk, idx })
+                              }
+                            })
+                          }
+                        } else {
+                          // All chunks
+                          displayChunks = []
+                          for (const page of extractedPages) {
+                            page.chunks.forEach((chunk, idx) => {
+                              displayChunks.push({ page, chunk, idx })
+                            })
+                          }
+                        }
+
+                        if (displayChunks.length === 0) {
                           return (
-                          <div
-                            key={chunkKey}
-                            data-chunk-key={chunkKey}
-                            className={`pdfapp-chunk-card${activeChunkKey === chunkKey ? ' pdfapp-chunk-card--active' : ''}`}
-                            onClick={() => {
-                              setActiveChunkKey(chunkKey)
-                              setActiveCitations(new Map([[1, {
-                                text: chunk.text,
-                                page_num: page.pageNum,
-                                bbox: chunk.bbox,
-                                narrowBbox: chunk.narrowBbox ?? null,
-                                chunk_idx: idx,
-                              }]]))
-                            }}
-                          >
-                            <div className="pdfapp-chunk-meta">
-                              <span className="pdfapp-chunk-tag pdfapp-chunk-tag--page">P{page.pageNum}</span>
-                              <span className="pdfapp-chunk-tag pdfapp-chunk-tag--idx">#{idx}</span>
-                              {chunk.bbox && (
-                                <span className="pdfapp-chunk-bbox">
-                                  [{chunk.bbox.map(v => (v * 100).toFixed(1) + '%').join(', ')}]
-                                </span>
+                            <div className="pdfapp-extracted-prompt">
+                              <span className="pdfapp-extracted-placeholder">
+                                {chunkQuery.trim()
+                                  ? chunkSearchMode === 'semantic'
+                                    ? 'No matching chunks found.'
+                                    : <>No chunks match. Press <kbd>Enter</kbd> for semantic search.</>
+                                  : 'No text chunks extracted. Try re-running extraction.'}
+                              </span>
+                            </div>
+                          )
+                        }
+
+                        return displayChunks.map(({ page, chunk, idx, score }) => {
+                          const chunkKey = `${page.pageNum}-${idx}`
+                          const isEditing = editingNoteChunkKey === chunkKey
+                          const chunkNotes = notes.filter(n => n.chunkIdx === idx && n.pageNum === page.pageNum)
+
+                          // Highlight matching text in filter mode
+                          let textContent
+                          if (chunkSearchMode === 'filter' && queryNorm && chunk.text) {
+                            const parts = []
+                            let remaining = chunk.text
+                            let searchFrom = 0
+                            const lower = chunk.text.toLowerCase()
+                            let found
+                            while ((found = lower.indexOf(queryNorm, searchFrom)) !== -1) {
+                              if (found > searchFrom) parts.push(<span key={`b${found}`}>{chunk.text.slice(searchFrom, found)}</span>)
+                              parts.push(<mark key={`m${found}`} className="pdfapp-chunk-match">{chunk.text.slice(found, found + queryNorm.length)}</mark>)
+                              searchFrom = found + queryNorm.length
+                            }
+                            if (searchFrom < chunk.text.length) parts.push(<span key="tail">{chunk.text.slice(searchFrom)}</span>)
+                            textContent = parts
+                          } else {
+                            textContent = chunk.text
+                          }
+
+                          return (
+                            <div
+                              key={chunkKey}
+                              data-chunk-key={chunkKey}
+                              className={`pdfapp-chunk-card${activeChunkKey === chunkKey ? ' pdfapp-chunk-card--active' : ''}`}
+                              onClick={e => {
+                                // Don't trigger PDF scroll when clicking note button/textarea
+                                if (e.target.closest('.pdfapp-chunk-note-btn') || e.target.closest('.pdfapp-chunk-note-area')) return
+                                setActiveChunkKey(chunkKey)
+                                setActiveCitations(new Map([[1, {
+                                  text: chunk.text,
+                                  page_num: page.pageNum,
+                                  bbox: chunk.bbox,
+                                  narrowBbox: chunk.narrowBbox ?? null,
+                                  chunk_idx: idx,
+                                }]]))
+                              }}
+                            >
+                              <div className="pdfapp-chunk-meta">
+                                <span className="pdfapp-chunk-tag pdfapp-chunk-tag--page">P{page.pageNum}</span>
+                                <span className="pdfapp-chunk-tag pdfapp-chunk-tag--idx">#{idx}</span>
+                                {score != null && (
+                                  <span className="pdfapp-chunk-tag pdfapp-chunk-tag--score">{Math.round(score * 100)}%</span>
+                                )}
+                                {chunk.bbox && !score && (
+                                  <span className="pdfapp-chunk-bbox">
+                                    [{chunk.bbox.map(v => (v * 100).toFixed(1) + '%').join(', ')}]
+                                  </span>
+                                )}
+                                <button
+                                  className={`pdfapp-chunk-note-btn${chunkNotes.length > 0 ? ' pdfapp-chunk-note-btn--has-notes' : ''}`}
+                                  title={chunkNotes.length > 0 ? `${chunkNotes.length} note${chunkNotes.length > 1 ? 's' : ''} — click to add another` : 'Add note from this chunk'}
+                                  onClick={e => {
+                                    e.stopPropagation()
+                                    if (isEditing) {
+                                      setEditingNoteChunkKey(null)
+                                      setNoteChunkDraft('')
+                                    } else {
+                                      setEditingNoteChunkKey(chunkKey)
+                                      setNoteChunkDraft('')
+                                    }
+                                  }}
+                                >✏{chunkNotes.length > 0 && <span className="pdfapp-chunk-note-count">{chunkNotes.length}</span>}</button>
+                              </div>
+                              <p className="pdfapp-chunk-text">{textContent}</p>
+                              {isEditing && (
+                                <div className="pdfapp-chunk-note-area" onClick={e => e.stopPropagation()}>
+                                  {chunkNotes.length > 0 && (
+                                    <div className="pdfapp-chunk-note-existing">
+                                      {chunkNotes.map(n => (
+                                        <div key={n.id} className="pdfapp-chunk-note-existing-item">
+                                          <span className="pdfapp-chunk-note-existing-date">{new Date(n.createdAt).toLocaleDateString()}</span>
+                                          <p className="pdfapp-chunk-note-existing-text">{n.text}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  <textarea
+                                    className="pdfapp-chunk-note-input"
+                                    placeholder="Add a note… (Ctrl+Enter to save, Esc to cancel)"
+                                    value={noteChunkDraft}
+                                    autoFocus
+                                    onChange={e => setNoteChunkDraft(e.target.value)}
+                                    onKeyDown={e => {
+                                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                        e.preventDefault()
+                                        saveNoteFromChunk(chunk, page.pageNum, idx)
+                                      }
+                                      if (e.key === 'Escape') {
+                                        setEditingNoteChunkKey(null)
+                                        setNoteChunkDraft('')
+                                      }
+                                    }}
+                                  />
+                                  <div className="pdfapp-chunk-note-actions">
+                                    <button
+                                      className="pdfapp-chunk-note-save"
+                                      disabled={!noteChunkDraft.trim()}
+                                      onClick={() => saveNoteFromChunk(chunk, page.pageNum, idx)}
+                                    >Save note</button>
+                                    <button
+                                      className="pdfapp-chunk-note-cancel"
+                                      onClick={() => { setEditingNoteChunkKey(null); setNoteChunkDraft('') }}
+                                    >Cancel</button>
+                                  </div>
+                                </div>
                               )}
                             </div>
-                            <p className="pdfapp-chunk-text">{chunk.text}</p>
-                          </div>
                           )
                         })
-                      )}
+                      })()}
                       {extractingText && (
                         <div className="pdfapp-extracted-prompt" style={{ paddingTop: 8 }}>
                           <div className="pdfapp-spinner pdfapp-spinner--small" />
@@ -2164,6 +2474,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                         </div>
                       )}
                     </div>
+                    </>
                   ) : extractingText ? (
                     <div className="pdfapp-extracted-prompt">
                       <span className="pdfapp-extracted-status">{extractionStatus || 'Extracting…'}</span>
@@ -2224,8 +2535,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               return `Notes (${t})`
             })()}
           </button>
-          <button className={`pdfapp-right-tab${rightTab === 'agent' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('agent')}>
-            Agent{agentStatus === 'running' ? ' ⟳' : agentStatus === 'done' ? ' ✓' : ''}
+          <button className={`pdfapp-right-tab${rightTab === 'aide' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('aide')}>
+            Aide{aideStatus === 'running' ? ' ⟳' : aideStatus === 'done' ? ' ✓' : ''}
           </button>
         </div>
 
@@ -2345,25 +2656,21 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
         {/* ── Notes tab ── */}
         {rightTab === 'notes' && (() => {
-          // Resolve docName/partyName for starred items that predate the enrichment
           const resolveDoc = (docId) => {
             const p = parties.find(pt => (pt.documents || []).some(d => d.id === docId))
             const d = p?.documents?.find(d => d.id === docId)
             return { partyName: p?.name || null, docName: d?.name || null }
           }
 
-          // Group starred sources by party
           const starGroups = parties.map(party => ({
             party,
             sources: starredSources
               .filter(s => (party.documents || []).some(d => d.id === s.docId))
               .map(s => ({ ...s, docName: s.docName || resolveDoc(s.docId).docName, partyName: s.partyName || party.name })),
           })).filter(g => g.sources.length > 0)
-          // Unassigned starred (docId not in any party — shouldn't happen but safe)
           const assignedIds = new Set(starGroups.flatMap(g => g.sources.map(s => s.id)))
           const unassigned = starredSources.filter(s => !assignedIds.has(s.id))
 
-          // Group all-case notes by party → doc
           const noteGroups = parties.map(party => ({
             party,
             docNotes: (party.documents || [])
@@ -2374,10 +2681,12 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           const totalNotes = Object.values(allCaseNotes).flat().filter(n => n.text?.trim()).length
           const isEmpty = starredSources.length === 0 && totalNotes === 0
 
+          const toggle = (key) => setNotesCollapsed(prev => ({ ...prev, [key]: !prev[key] }))
+          const isCol = (key) => !!notesCollapsed[key]
+
           const goToSource = (s) => {
-            const nav = { pageNum: s.pageNum, chunkText: s.chunkText, bbox: s.bbox, narrowBbox: s.narrowBbox }
             if (s.docId !== activeDocumentId) {
-              pendingNavRef.current = nav
+              pendingNavRef.current = { pageNum: s.pageNum, chunkText: s.chunkText, bbox: s.bbox, narrowBbox: s.narrowBbox }
               setActiveDocumentId(s.docId)
             } else {
               scrollPageIntoView(s.pageNum, 'center')
@@ -2392,210 +2701,527 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               scrollPageIntoView(pageNum, 'center')
             }
           }
+          const goToChunk = (docId, n) => {
+            const nav = { pageNum: n.pageNum, chunkText: n.chunkText || '', bbox: n.chunkBbox || null, narrowBbox: null, chunkIdx: n.chunkIdx }
+            if (docId !== activeDocumentId) {
+              pendingNavRef.current = nav
+              setActiveDocumentId(docId)
+            } else {
+              scrollPageIntoView(n.pageNum, 'center')
+              setActiveCitations(new Map([[1, { text: n.chunkText || '', page_num: n.pageNum, bbox: n.chunkBbox || null, narrowBbox: null }]]))
+              setActiveChunkKey(`${n.pageNum}-${n.chunkIdx}`)
+              setExtractedTextOpen(true)
+            }
+          }
+
+          // ── Note row renderer ──
+          const renderNoteRow = (n, doc) => {
+            const isEditing = editingNoteId === n.id
+            const isExpanded = !!notesCollapsed[`note-exp:${n.id}`]
+            const dateStr = n.createdAt ? new Date(n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''
+            const navigate = () => n.chunkIdx != null ? goToChunk(doc.id, n) : goToNote(doc.id, n.pageNum)
+            return (
+              <div key={n.id} className={`nt-note-row${doc.id !== activeDocumentId ? ' nt-note-row--other' : ''}`}>
+                <div className="nt-note-meta">
+                  <span className="nt-page-badge">p.{n.pageNum}</span>
+                  {dateStr && <span className="nt-date">{dateStr}</span>}
+                  <div className="nt-row-actions">
+                    <button className="nt-action-btn" title="Navigate" onClick={navigate}>→</button>
+                    <button className="nt-action-btn" title="Edit note" onClick={e => { e.stopPropagation(); setEditingNoteId(n.id); setEditingNoteDraft(n.text) }}>✏</button>
+                    <button className="nt-action-btn nt-action-btn--danger" title="Delete note" onClick={e => { e.stopPropagation(); deleteNoteFromTab(doc.id, n.id) }}>✕</button>
+                  </div>
+                </div>
+                {isEditing ? (
+                  <textarea
+                    className="nt-note-edit-input"
+                    value={editingNoteDraft}
+                    autoFocus
+                    onChange={e => setEditingNoteDraft(e.target.value)}
+                    onBlur={() => { saveNoteEditFromTab(doc.id, n.id, editingNoteDraft); setEditingNoteId(null) }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { saveNoteEditFromTab(doc.id, n.id, editingNoteDraft); setEditingNoteId(null) }
+                      if (e.key === 'Escape') setEditingNoteId(null)
+                    }}
+                  />
+                ) : (
+                  <div className="nt-note-text" onClick={() => toggle(`note-exp:${n.id}`)}>
+                    {isExpanded || n.text.length <= 80 ? n.text : n.text.slice(0, 80) + '…'}
+                  </div>
+                )}
+              </div>
+            )
+          }
+
+          const ChevronSvg = ({ collapsed }) => (
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5"
+              style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 150ms ease', flexShrink: 0 }}>
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          )
 
           return (
-            <div className="pdfapp-evidence">
+            <div className="nt-root">
               {isEmpty && (
                 <div className="pdfapp-evidence-empty">
-                  Star sources (★) from chat responses, or add page notes via the pencil tool, to build your evidence collection.
+                  Star sources (★) from chat responses, or add notes from text chunks (✏), to build your evidence collection.
                 </div>
               )}
 
-              {/* ── Starred sources grouped by party ── */}
+              {/* ── Starred Sources ── */}
               {(starGroups.length > 0 || unassigned.length > 0) && (
-                <div className="pdfapp-evidence-section">
-                  <div className="pdfapp-evidence-section-title">⭐ Starred Sources ({starredSources.length})</div>
-                  {starGroups.map(({ party, sources }) => (
-                    <div key={party.id}>
-                      <div className="pdfapp-evidence-party-header">{party.name}</div>
-                      {sources.map(s => (
-                        <div key={s.id} className={`pdfapp-evidence-item${s.docId !== activeDocumentId ? ' pdfapp-evidence-item--other-doc' : ''}`}>
-                          <div className="pdfapp-evidence-item-meta">
-                            <span className="pdfapp-evidence-item-docname" title={s.docName}>{s.docName}</span>
-                            <span className="pdfapp-evidence-item-page">p.{s.pageNum}</span>
-                            {s.score != null && <span className="pdfapp-evidence-item-score">{s.score}%</span>}
-                            <button className="pdfapp-evidence-goto" title={s.docId !== activeDocumentId ? `Switch to ${s.docName}` : 'Go to page'} onClick={() => goToSource(s)}>→</button>
-                            <button className="pdfapp-evidence-remove" title="Remove" onClick={() => handleRemoveStar(s.id)}>✕</button>
-                          </div>
-                          {s.question && <div className="pdfapp-evidence-item-q">"{s.question.slice(0, 100)}{s.question.length > 100 ? '…' : ''}"</div>}
-                          <div className="pdfapp-evidence-item-text">{s.chunkText.slice(0, 220)}{s.chunkText.length > 220 ? '…' : ''}</div>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                  {unassigned.map(s => (
-                    <div key={s.id} className="pdfapp-evidence-item">
-                      <div className="pdfapp-evidence-item-meta">
-                        <span className="pdfapp-evidence-item-page">p.{s.pageNum}</span>
-                        {s.score != null && <span className="pdfapp-evidence-item-score">{s.score}%</span>}
-                        <button className="pdfapp-evidence-goto" onClick={() => goToSource(s)}>→</button>
-                        <button className="pdfapp-evidence-remove" onClick={() => handleRemoveStar(s.id)}>✕</button>
-                      </div>
-                      <div className="pdfapp-evidence-item-text">{s.chunkText.slice(0, 220)}{s.chunkText.length > 220 ? '…' : ''}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* ── Notes grouped by party → doc ── */}
-              {noteGroups.length > 0 && (
-                <div className="pdfapp-evidence-section">
-                  <div className="pdfapp-evidence-section-title">📝 Notes ({totalNotes})</div>
-                  {noteGroups.map(({ party, docNotes }) => (
-                    <div key={party.id}>
-                      <div className="pdfapp-evidence-party-header">{party.name}</div>
-                      {docNotes.map(({ doc, notes: docNoteList }) => (
-                        <div key={doc.id}>
-                          <div className="pdfapp-evidence-doc-header">{doc.name}</div>
-                          {docNoteList.map(n => (
-                            <div key={n.id} className={`pdfapp-evidence-item${doc.id !== activeDocumentId ? ' pdfapp-evidence-item--other-doc' : ''}`}>
-                              <div className="pdfapp-evidence-item-meta">
-                                <span className="pdfapp-evidence-item-page">p.{n.pageNum}</span>
-                                <button className="pdfapp-evidence-goto" title={doc.id !== activeDocumentId ? `Switch to ${doc.name}` : 'Go to page'} onClick={() => goToNote(doc.id, n.pageNum)}>→</button>
+                <div className="nt-section">
+                  <div className="nt-section-row" onClick={() => toggle('section:starred')}>
+                    <ChevronSvg collapsed={isCol('section:starred')} />
+                    <span className="nt-section-title">⭐ Starred</span>
+                    <span className="nt-count">{starredSources.length}</span>
+                  </div>
+                  {!isCol('section:starred') && (
+                    <div className="nt-children">
+                      {starGroups.map(({ party, sources }) => {
+                        const pk = `star-party:${party.id}`
+                        return (
+                          <div key={party.id}>
+                            <div className="nt-party-row" onClick={() => toggle(pk)}>
+                              <ChevronSvg collapsed={isCol(pk)} />
+                              <span className="nt-row-name">{party.name}</span>
+                              {isCol(pk) && <span className="nt-count">{sources.length}</span>}
+                            </div>
+                            {!isCol(pk) && (
+                              <div className="nt-children">
+                                {sources.map(s => (
+                                  <div key={s.id} className="nt-star-row">
+                                    <div className="nt-note-meta">
+                                      <span className="nt-row-name nt-doc-label" title={s.docName}>{s.docName}</span>
+                                      <span className="nt-page-badge">p.{s.pageNum}</span>
+                                      {s.score != null && <span className="nt-score">{s.score}%</span>}
+                                      <div className="nt-row-actions">
+                                        <button className="nt-action-btn" title="Go to source" onClick={() => goToSource(s)}>→</button>
+                                        <button className="nt-action-btn nt-action-btn--danger" title="Unstar" onClick={() => handleRemoveStar(s.id)}>✕</button>
+                                      </div>
+                                    </div>
+                                    <div className="nt-star-text">{s.chunkText.slice(0, 120)}{s.chunkText.length > 120 ? '…' : ''}</div>
+                                  </div>
+                                ))}
                               </div>
-                              <div className="pdfapp-evidence-item-text">{n.text}</div>
+                            )}
+                          </div>
+                        )
+                      })}
+                      {unassigned.length > 0 && (
+                        <div className="nt-children">
+                          {unassigned.map(s => (
+                            <div key={s.id} className="nt-star-row">
+                              <div className="nt-note-meta">
+                                <span className="nt-page-badge">p.{s.pageNum}</span>
+                                {s.score != null && <span className="nt-score">{s.score}%</span>}
+                                <div className="nt-row-actions">
+                                  <button className="nt-action-btn" onClick={() => goToSource(s)}>→</button>
+                                  <button className="nt-action-btn nt-action-btn--danger" onClick={() => handleRemoveStar(s.id)}>✕</button>
+                                </div>
+                              </div>
+                              <div className="nt-star-text">{s.chunkText.slice(0, 120)}{s.chunkText.length > 120 ? '…' : ''}</div>
                             </div>
                           ))}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
 
+              {/* ── Notes ── */}
+              {noteGroups.length > 0 && (
+                <div className="nt-section">
+                  <div className="nt-section-row" onClick={() => toggle('section:notes')}>
+                    <ChevronSvg collapsed={isCol('section:notes')} />
+                    <span className="nt-section-title">📝 Notes</span>
+                    <span className="nt-count">{totalNotes}</span>
+                  </div>
+                  {!isCol('section:notes') && (
+                    <div className="nt-children">
+                      {noteGroups.map(({ party, docNotes }) => {
+                        const pk = `note-party:${party.id}`
+                        const partyCount = docNotes.reduce((s, dn) => s + dn.notes.length, 0)
+                        return (
+                          <div key={party.id}>
+                            <div className="nt-party-row" onClick={() => toggle(pk)}>
+                              <ChevronSvg collapsed={isCol(pk)} />
+                              <span className="nt-row-name">{party.name}</span>
+                              {isCol(pk) && <span className="nt-count">{partyCount}</span>}
+                            </div>
+                            {!isCol(pk) && (
+                              <div className="nt-children">
+                                {docNotes.map(({ doc, notes: docNoteList }) => {
+                                  const dk = `doc:${doc.id}`
+                                  const chunkLinked = docNoteList.filter(n => n.chunkIdx != null)
+                                  const pageOnly = docNoteList.filter(n => n.chunkIdx == null)
+                                  const chunkGroups = []
+                                  const seenChunks = new Map()
+                                  for (const n of chunkLinked) {
+                                    const key = `${n.pageNum}-${n.chunkIdx}`
+                                    if (!seenChunks.has(key)) {
+                                      seenChunks.set(key, { key, pageNum: n.pageNum, chunkText: n.chunkText || '', notes: [] })
+                                      chunkGroups.push(seenChunks.get(key))
+                                    }
+                                    seenChunks.get(key).notes.push(n)
+                                  }
+                                  return (
+                                    <div key={doc.id}>
+                                      <div className="nt-doc-row" onClick={() => toggle(dk)}>
+                                        <ChevronSvg collapsed={isCol(dk)} />
+                                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ flexShrink: 0, color: 'var(--text-dim)' }}>
+                                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                                        </svg>
+                                        <span className="nt-row-name" title={doc.name}>{doc.name}</span>
+                                        <span className="nt-count">{docNoteList.length}</span>
+                                      </div>
+                                      {!isCol(dk) && (
+                                        <div className="nt-children">
+                                          {chunkGroups.map(group => (
+                                            <div key={group.key}>
+                                              <div className="nt-chunk-header" title="Go to chunk" onClick={() => goToChunk(doc.id, group.notes[0])}>
+                                                {group.chunkText
+                                                  ? `"${group.chunkText.slice(0, 65)}${group.chunkText.length > 65 ? '…' : ''}"`
+                                                  : `p.${group.pageNum} · chunk #${group.notes[0].chunkIdx}`}
+                                              </div>
+                                              <div className="nt-children">
+                                                {group.notes.map(n => renderNoteRow(n, doc))}
+                                              </div>
+                                            </div>
+                                          ))}
+                                          {pageOnly.map(n => renderNoteRow(n, doc))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )
         })()}
 
-        {/* ── Agent tab ── */}
-        {rightTab === 'agent' && (
-          <div className="pdfapp-agent-panel">
+        {/* ── Aide tab ── */}
+        {rightTab === 'aide' && (
+          <div className="pdfapp-aide-panel">
 
-            {/* Intent + Task form — always visible */}
-            <div className="pdfapp-agent-form">
-              <div className="pdfapp-agent-form-field">
-                <label className="pdfapp-agent-label">Task</label>
-                <textarea
-                  className="pdfapp-agent-textarea"
-                  placeholder="What should the agent do? e.g. 'Find all liability clauses across all contracts and flag any conflicts'"
-                  value={agentTask}
-                  rows={2}
-                  onChange={e => setAgentTask(e.target.value)}
-                  disabled={agentStatus === 'running'}
-                />
-              </div>
-              <div className="pdfapp-agent-form-field">
-                <label className="pdfapp-agent-label">Your goal <span className="pdfapp-agent-label-hint">(helps the agent focus)</span></label>
-                <textarea
-                  className="pdfapp-agent-textarea"
-                  placeholder="e.g. 'Acting for the buyer. Flag anything that exposes the client to unlimited liability.'"
-                  value={agentIntent}
-                  rows={2}
-                  onChange={e => setAgentIntent(e.target.value)}
-                  disabled={agentStatus === 'running'}
-                />
-              </div>
-              <div className="pdfapp-agent-form-row">
-                <select
-                  className="pdfapp-agent-select"
-                  value={agentRole}
-                  onChange={e => setAgentRole(e.target.value)}
-                  disabled={agentStatus === 'running'}
-                >
-                  <option value="">— Perspective —</option>
-                  <option value="Acting for buyer">Acting for buyer</option>
-                  <option value="Acting for seller">Acting for seller</option>
-                  <option value="Acting for contractor">Acting for contractor</option>
-                  <option value="Acting for client">Acting for client</option>
-                  <option value="Neutral due diligence">Neutral due diligence</option>
-                  <option value="Litigation — claimant">Litigation — claimant</option>
-                  <option value="Litigation — defendant">Litigation — defendant</option>
-                </select>
-                {agentStatus === 'running'
-                  ? <button className="pdfapp-agent-run-btn pdfapp-agent-run-btn--stop" onClick={handleAgentStop}>■ Stop</button>
-                  : <button
-                      className="pdfapp-agent-run-btn"
-                      onClick={handleAgentStart}
-                      disabled={!agentTask.trim() || !caseId}
-                    >
-                      {agentStatus === 'idle' ? 'Run Agent →' : 'Run Again →'}
-                    </button>
-                }
-              </div>
-              {!caseId && <div className="pdfapp-agent-no-case">Open a case to use the agent.</div>}
+            {/* Sub-tab bar */}
+            <div className="pdfapp-aide-subtabs">
+              <button className={`pdfapp-aide-subtab${aideSoulTab === 'run' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('run')}>Run</button>
+              <button className={`pdfapp-aide-subtab${aideSoulTab === 'soul' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('soul')}>Soul</button>
+              <button className={`pdfapp-aide-subtab${aideSoulTab === 'memory' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('memory')}>
+                Memory
+                {aideDiary.length > 0 && <span className="pdfapp-aide-subtab-badge">{aideDiary.length}</span>}
+              </button>
             </div>
 
-            {/* Step audit trail */}
-            {agentSteps.length === 0 && agentStatus === 'idle' && (
-              <div className="pdfapp-evidence-empty">
-                Describe your task and goal above, then run the agent. It will search your documents step-by-step and save findings to Notes.
+            {/* ── Run sub-tab ── */}
+            {aideSoulTab === 'run' && (<>
+              <div className="pdfapp-aide-form">
+                <div className="pdfapp-aide-form-field">
+                  <label className="pdfapp-aide-label">Task</label>
+                  <textarea
+                    className="pdfapp-aide-textarea"
+                    placeholder="What should the agent do? e.g. 'Find all liability clauses across all contracts and flag any conflicts'"
+                    value={aideTask}
+                    rows={2}
+                    onChange={e => setAideTask(e.target.value)}
+                    disabled={aideStatus === 'running'}
+                  />
+                </div>
+                <div className="pdfapp-aide-form-field">
+                  <label className="pdfapp-aide-label">Your goal <span className="pdfapp-aide-label-hint">(helps your Aide focus)</span></label>
+                  <textarea
+                    className="pdfapp-aide-textarea"
+                    placeholder="e.g. 'Acting for the buyer. Flag anything that exposes the client to unlimited liability.'"
+                    value={aideIntent}
+                    rows={2}
+                    onChange={e => setAideIntent(e.target.value)}
+                    disabled={aideStatus === 'running'}
+                  />
+                </div>
+                <div className="pdfapp-aide-form-row">
+                  <select
+                    className="pdfapp-aide-select"
+                    value={aideRole}
+                    onChange={e => setAideRole(e.target.value)}
+                    disabled={aideStatus === 'running'}
+                  >
+                    <option value="">— Perspective —</option>
+                    <option value="Acting for buyer">Acting for buyer</option>
+                    <option value="Acting for seller">Acting for seller</option>
+                    <option value="Acting for contractor">Acting for contractor</option>
+                    <option value="Acting for client">Acting for client</option>
+                    <option value="Neutral due diligence">Neutral due diligence</option>
+                    <option value="Litigation — claimant">Litigation — claimant</option>
+                    <option value="Litigation — defendant">Litigation — defendant</option>
+                  </select>
+                  {aideStatus === 'running'
+                    ? <button className="pdfapp-aide-run-btn pdfapp-aide-run-btn--stop" onClick={handleAideStop}>■ Stop</button>
+                    : <button
+                        className="pdfapp-aide-run-btn"
+                        onClick={handleAideStart}
+                        disabled={!aideTask.trim() || !caseId}
+                      >
+                        {aideStatus === 'idle' ? 'Run Aide →' : 'Run Again →'}
+                      </button>
+                  }
+                </div>
+                {!caseId && <div className="pdfapp-aide-no-case">Open a case to use your Aide.</div>}
               </div>
-            )}
 
-            {(agentSteps.length > 0 || agentStatus === 'running') && (
-              <div className="pdfapp-agent-trail">
-                {agentStatus === 'running' && (
-                  <div className="pdfapp-agent-thinking">
-                    <span className="pdfapp-agent-thinking-dot" />
-                    <span className="pdfapp-agent-thinking-dot" />
-                    <span className="pdfapp-agent-thinking-dot" />
-                    <span className="pdfapp-agent-thinking-label">Thinking…</span>
-                  </div>
-                )}
-                {agentSteps.map((step, i) => (
-                  <div key={i} className={`pdfapp-agent-step pdfapp-agent-step--${step.type}`}>
-                    {step.type === 'tool_call' && (
-                      <>
-                        <span className="pdfapp-agent-step-icon">⚙</span>
-                        <div className="pdfapp-agent-step-body">
-                          <span className="pdfapp-agent-step-tool">{step.tool}</span>
-                          {step.tool === 'search_case' && <span className="pdfapp-agent-step-args">"{step.args?.query}"</span>}
-                          {step.tool === 'search_doc'  && <span className="pdfapp-agent-step-args">"{step.args?.query}" in {step.args?.docId?.slice(0,8)}…</span>}
-                          {step.tool === 'add_note'    && <span className="pdfapp-agent-step-args">saving note…</span>}
-                        </div>
-                      </>
-                    )}
-                    {step.type === 'tool_result' && (
-                      <>
-                        <span className="pdfapp-agent-step-icon">↩</span>
-                        <div className="pdfapp-agent-step-body">
-                          {step.tool === 'add_note' && step.result?.ok
-                            ? <span className="pdfapp-agent-step-note-saved">Note saved to Notes tab</span>
-                            : Array.isArray(step.result)
-                              ? <span className="pdfapp-agent-step-result-count">{step.result.length} result{step.result.length !== 1 ? 's' : ''} found</span>
-                              : <span className="pdfapp-agent-step-result-count">{step.result?.error || 'done'}</span>
-                          }
-                        </div>
-                      </>
-                    )}
-                    {step.type === 'error' && (
-                      <>
-                        <span className="pdfapp-agent-step-icon">✕</span>
-                        <div className="pdfapp-agent-step-body pdfapp-agent-step-body--error">{step.content}</div>
-                      </>
-                    )}
-                  </div>
-                ))}
+              {aideSteps.length === 0 && aideStatus === 'idle' && (
+                <div className="pdfapp-evidence-empty">
+                  Describe your task and goal above, then run your Aide. It will search your documents step-by-step and save findings to Notes.
+                </div>
+              )}
 
-                {/* Final answer */}
-                {agentResult && (
-                  <div className="pdfapp-agent-answer">
-                    <div className="pdfapp-agent-answer-header">
-                      <span>Agent finding</span>
-                      <button className="pdfapp-agent-answer-copy" onClick={() => navigator.clipboard.writeText(agentResult).catch(() => {})}>Copy</button>
+              {(aideSteps.length > 0 || aideStatus === 'running') && (
+                <div className="pdfapp-aide-trail">
+                  {aideStatus === 'running' && (
+                    <div className="pdfapp-aide-thinking">
+                      <span className="pdfapp-aide-thinking-dot" />
+                      <span className="pdfapp-aide-thinking-dot" />
+                      <span className="pdfapp-aide-thinking-dot" />
+                      <span className="pdfapp-aide-thinking-label">Thinking…</span>
                     </div>
-                    <div className="pdfapp-agent-answer-body">{agentResult}</div>
-                  </div>
-                )}
+                  )}
+                  {aideSteps.map((step, i) => (
+                    <div key={i} className={`pdfapp-aide-step pdfapp-aide-step--${step.type}`}>
+                      {step.type === 'tool_call' && (
+                        <>
+                          <span className="pdfapp-aide-step-icon">⚙</span>
+                          <div className="pdfapp-aide-step-body">
+                            <span className="pdfapp-aide-step-tool">{step.tool}</span>
+                            {step.tool === 'search_case' && <span className="pdfapp-aide-step-args">"{step.args?.query}"</span>}
+                            {step.tool === 'search_doc'  && <span className="pdfapp-aide-step-args">"{step.args?.query}" in {step.args?.docId?.slice(0,8)}…</span>}
+                            {step.tool === 'add_note'    && <span className="pdfapp-aide-step-args">saving note…</span>}
+                          </div>
+                        </>
+                      )}
+                      {step.type === 'tool_result' && (
+                        <>
+                          <span className="pdfapp-aide-step-icon">↩</span>
+                          <div className="pdfapp-aide-step-body">
+                            {step.tool === 'add_note' && step.result?.ok
+                              ? <span className="pdfapp-aide-step-note-saved">Note saved to Notes tab</span>
+                              : Array.isArray(step.result)
+                                ? <span className="pdfapp-aide-step-result-count">{step.result.length} result{step.result.length !== 1 ? 's' : ''} found</span>
+                                : <span className="pdfapp-aide-step-result-count">{step.result?.error || 'done'}</span>
+                            }
+                          </div>
+                        </>
+                      )}
+                      {step.type === 'error' && (
+                        <>
+                          <span className="pdfapp-aide-step-icon">✕</span>
+                          <div className="pdfapp-aide-step-body pdfapp-aide-step-body--error">{step.content}</div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                  {aideResult && (
+                    <div className="pdfapp-aide-answer">
+                      <div className="pdfapp-aide-answer-header">
+                        <span>Aide finding</span>
+                        <button className="pdfapp-aide-answer-copy" onClick={() => navigator.clipboard.writeText(aideResult).catch(() => {})}>Copy</button>
+                      </div>
+                      <div className="pdfapp-aide-answer-body">{aideResult}</div>
+                    </div>
+                  )}
+                  {aideStatus === 'cancelled' && (
+                    <div className="pdfapp-aide-step pdfapp-aide-step--cancelled">
+                      <span className="pdfapp-aide-step-icon">⏹</span>
+                      <div className="pdfapp-aide-step-body">Stopped by user</div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>)}
 
-                {agentStatus === 'cancelled' && (
-                  <div className="pdfapp-agent-step pdfapp-agent-step--cancelled">
-                    <span className="pdfapp-agent-step-icon">⏹</span>
-                    <div className="pdfapp-agent-step-body">Stopped by user</div>
+            {/* ── Soul sub-tab ── */}
+            {aideSoulTab === 'soul' && (
+              <div className="pdfapp-aide-soul-panel">
+                <div className="pdfapp-aide-soul-header">
+                  <span className="pdfapp-aide-soul-title">Your Aide's Identity</span>
+                  <div className="pdfapp-aide-soul-actions">
+                    {aideSoulSavedAt && !aideSoulDirty && (
+                      <span className="pdfapp-aide-soul-saved">Saved {new Date(aideSoulSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    )}
+                    <button
+                      className={`pdfapp-aide-soul-save-btn${aideSoulDirty ? ' pdfapp-aide-soul-save-btn--dirty' : ''}`}
+                      onClick={handleAideSoulSave}
+                      disabled={!aideSoulDirty || aideSoulSaving || !caseId}
+                    >
+                      {aideSoulSaving ? 'Saving…' : 'Save Soul'}
+                    </button>
                   </div>
-                )}
+                </div>
+
+                {/* Skill.md upload */}
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label">Skill file <span className="pdfapp-aide-soul-hint">(defines who your Aide is)</span></div>
+                  {aideSoul.skillMd ? (
+                    <div className="pdfapp-aide-skill-loaded">
+                      <span className="pdfapp-aide-skill-filename">{aideSkillFileName || 'skill.md'}</span>
+                      <span className="pdfapp-aide-skill-preview">{aideSoul.skillMd.slice(0, 120)}{aideSoul.skillMd.length > 120 ? '…' : ''}</span>
+                      <button className="pdfapp-aide-skill-remove" onClick={() => { patchSoul('skillMd', ''); setAideSkillFileName('') }}>× Remove</button>
+                    </div>
+                  ) : (
+                    <label className="pdfapp-aide-skill-drop">
+                      <input type="file" accept=".md,.txt" style={{ display: 'none' }} onChange={e => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const reader = new FileReader()
+                        reader.onload = ev => { patchSoul('skillMd', ev.target.result); setAideSkillFileName(file.name) }
+                        reader.readAsText(file)
+                        e.target.value = ''
+                      }} />
+                      <span className="pdfapp-aide-skill-drop-icon">↑</span>
+                      <span>Drop a .md file or click to upload</span>
+                    </label>
+                  )}
+                  {!aideSoul.skillMd && (
+                    <textarea
+                      className="pdfapp-aide-soul-textarea"
+                      placeholder="Or paste your skill / persona here…"
+                      rows={4}
+                      value=""
+                      onChange={e => { if (e.target.value) patchSoul('skillMd', e.target.value) }}
+                    />
+                  )}
+                </div>
+
+                {/* Red flags checklist */}
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label">Standing checklist <span className="pdfapp-aide-soul-hint">(red flags to always look for)</span></div>
+                  <textarea
+                    className="pdfapp-aide-soul-textarea"
+                    placeholder="e.g. Unlimited liability clauses&#10;Automatic renewal terms&#10;Jurisdiction outside home country"
+                    rows={4}
+                    value={aideSoul.redFlags || ''}
+                    onChange={e => patchSoul('redFlags', e.target.value)}
+                  />
+                </div>
+
+                {/* Style guide */}
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label">Writing style <span className="pdfapp-aide-soul-hint">(how your Aide should sound)</span></div>
+                  <textarea
+                    className="pdfapp-aide-soul-textarea"
+                    placeholder="e.g. Concise bullet points. Plain language. Avoid legal jargon. Always cite page numbers."
+                    rows={3}
+                    value={aideSoul.styleGuide || ''}
+                    onChange={e => patchSoul('styleGuide', e.target.value)}
+                  />
+                </div>
+
+                {/* Style samples */}
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label-row">
+                    <span className="pdfapp-aide-soul-section-label">Example outputs <span className="pdfapp-aide-soul-hint">(show your Aide what good looks like)</span></span>
+                    <button className="pdfapp-aide-soul-add-btn" onClick={addStyleSample}>+ Add</button>
+                  </div>
+                  {(aideSoul.styleSamples || []).map(s => (
+                    <div key={s.id} className="pdfapp-aide-sample-row">
+                      <textarea
+                        className="pdfapp-aide-soul-textarea pdfapp-aide-sample-textarea"
+                        placeholder="Paste an example of ideal output…"
+                        rows={3}
+                        value={s.text}
+                        onChange={e => updateStyleSample(s.id, e.target.value)}
+                      />
+                      <button className="pdfapp-aide-sample-remove" onClick={() => removeStyleSample(s.id)}>×</button>
+                    </div>
+                  ))}
+                  {(aideSoul.styleSamples || []).length === 0 && (
+                    <div className="pdfapp-aide-soul-empty">No examples yet. Add one to show your Aide your preferred output format.</div>
+                  )}
+                </div>
+
+                {/* Corrections */}
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label">Corrections <span className="pdfapp-aide-soul-hint">(things you've told your Aide to stop doing)</span></div>
+                  <div className="pdfapp-aide-correction-input-row">
+                    <input
+                      className="pdfapp-aide-correction-input"
+                      placeholder="e.g. Stop summarising — give me findings only"
+                      value={aideNewCorrection}
+                      onChange={e => setAideNewCorrection(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCorrection() } }}
+                    />
+                    <button className="pdfapp-aide-soul-add-btn" onClick={addCorrection}>Add</button>
+                  </div>
+                  {(aideSoul.corrections || []).map(c => (
+                    <div key={c.id} className="pdfapp-aide-correction-row">
+                      <span className="pdfapp-aide-correction-text">{c.text}</span>
+                      <button className="pdfapp-aide-sample-remove" onClick={() => removeCorrection(c.id)}>×</button>
+                    </div>
+                  ))}
+                  {(aideSoul.corrections || []).length === 0 && (
+                    <div className="pdfapp-aide-soul-empty">No corrections yet. These are added automatically when you correct your Aide mid-run.</div>
+                  )}
+                </div>
               </div>
             )}
+
+            {/* ── Memory sub-tab ── */}
+            {aideSoulTab === 'memory' && (
+              <div className="pdfapp-aide-memory-panel">
+                {/* Token audit */}
+                <div className="pdfapp-aide-audit">
+                  <span className="pdfapp-aide-audit-label">Soul context</span>
+                  <span className={`pdfapp-aide-audit-tokens${aideSoulTokenEstimate > 2000 ? ' pdfapp-aide-audit-tokens--warn' : ''}`}>
+                    ~{aideSoulTokenEstimate.toLocaleString()} tokens
+                  </span>
+                  {aideSoulTokenEstimate > 2000 && <span className="pdfapp-aide-audit-warn">⚠ Over budget — trim Soul content</span>}
+                </div>
+
+                {/* Session diary */}
+                <div className="pdfapp-aide-memory-header">Session Diary</div>
+                {aideDiary.length === 0 && (
+                  <div className="pdfapp-aide-soul-empty" style={{ margin: '8px 12px' }}>
+                    No sessions yet. Run your Aide and it will write a diary entry summarising what it learned.
+                  </div>
+                )}
+                {aideDiary.map((entry, i) => {
+                  const key = entry.id || i
+                  const open = aideDiaryOpen.has(key)
+                  return (
+                    <div key={key} className="pdfapp-aide-diary-entry">
+                      <button
+                        className="pdfapp-aide-diary-row"
+                        onClick={() => setAideDiaryOpen(prev => {
+                          const next = new Set(prev)
+                          open ? next.delete(key) : next.add(key)
+                          return next
+                        })}
+                      >
+                        <span className={`pdfapp-aide-diary-chevron${open ? ' open' : ''}`}>›</span>
+                        <span className="pdfapp-aide-diary-task">{entry.task || 'Session'}</span>
+                        <span className="pdfapp-aide-diary-date">{entry.createdAt ? new Date(entry.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' }) : ''}</span>
+                      </button>
+                      {open && (
+                        <div className="pdfapp-aide-diary-body">
+                          {entry.reflection && <div className="pdfapp-aide-diary-reflection">{entry.reflection}</div>}
+                          {entry.findings && <div className="pdfapp-aide-diary-section"><span className="pdfapp-aide-diary-section-label">Findings</span><div>{entry.findings}</div></div>}
+                          {entry.gaps && <div className="pdfapp-aide-diary-section"><span className="pdfapp-aide-diary-section-label">Gaps</span><div>{entry.gaps}</div></div>}
+                          {entry.suggestions && <div className="pdfapp-aide-diary-section"><span className="pdfapp-aide-diary-section-label">For next time</span><div>{entry.suggestions}</div></div>}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
           </div>
         )}
 
@@ -2686,15 +3312,40 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
               {/* Actions */}
               {activeDoc?.file && (
                 <div className="pdfapp-guide-actions">
-                  <button
-                    className="pdfapp-guide-action-btn"
-                    onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
-                  >Re-extract text</button>
-                  {ragStatus === 'indexed' && (
+                  {/* First-time: nothing extracted yet */}
+                  {!extractedPages && ragStatus !== 'indexed' && (
                     <button
                       className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
-                      onClick={() => { setChunkGuideOpen(false); handleIndexDocument({ forceClear: true }) }}
-                    >Re-index</button>
+                      disabled={pdfLoading}
+                      onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
+                    >Extract &amp; Index</button>
+                  )}
+                  {/* Chunks extracted but not yet indexed */}
+                  {extractedPages && ragStatus !== 'indexed' && ragStatus !== 'indexing' && (
+                    <button
+                      className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
+                      onClick={() => { setChunkGuideOpen(false); handleIndexDocument() }}
+                    >Index for search</button>
+                  )}
+                  {/* Already indexed — offer re-extraction and re-index */}
+                  {ragStatus === 'indexed' && (
+                    <>
+                      <button
+                        className="pdfapp-guide-action-btn"
+                        onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
+                      >Re-extract text</button>
+                      <button
+                        className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
+                        onClick={() => { setChunkGuideOpen(false); handleIndexDocument({ forceClear: true }) }}
+                      >Re-index</button>
+                    </>
+                  )}
+                  {/* Extracted but not indexed — also allow re-extraction */}
+                  {extractedPages && ragStatus !== 'indexed' && (
+                    <button
+                      className="pdfapp-guide-action-btn"
+                      onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
+                    >Re-extract text</button>
                   )}
                 </div>
               )}

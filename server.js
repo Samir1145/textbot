@@ -254,6 +254,40 @@ app.get('/api/cases/:caseId/all-highlights', (req, res) => {
   res.json(result)
 })
 
+// ── Aide Soul & Diary ────────────────────────────────────────────────────
+
+app.get('/api/cases/:caseId/aide/soul', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'soul.json')
+  if (!fs.existsSync(filePath)) return res.json({ soul: { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }, savedAt: null })
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  // Support both old format (flat) and new format ({ soul, savedAt })
+  if (data.soul) return res.json(data)
+  const { savedAt, ...soul } = data
+  res.json({ soul, savedAt: savedAt || null })
+})
+
+app.post('/api/cases/:caseId/aide/soul', express.json(), (req, res) => {
+  const savedAt = new Date().toISOString()
+  fs.writeFileSync(
+    path.join(getCaseSubdir(req.params.caseId, 'aide'), 'soul.json'),
+    JSON.stringify({ soul: req.body.soul || req.body, savedAt })
+  )
+  res.json({ ok: true, savedAt })
+})
+
+app.get('/api/cases/:caseId/aide/diary', (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'diary.json')
+  if (!fs.existsSync(filePath)) return res.json([])
+  res.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+})
+
+app.post('/api/cases/:caseId/aide/diary/entry', express.json(), (req, res) => {
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'diary.json')
+  const existing = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : []
+  fs.writeFileSync(filePath, JSON.stringify([req.body, ...existing]))  // newest first
+  res.json({ ok: true })
+})
+
 // ── Case Delete (cascade) ──
 
 app.delete('/api/cases/:caseId', (req, res) => {
@@ -829,18 +863,38 @@ async function agentExecuteTool(name, args, caseId) {
     return { error: `Unknown tool: ${name}` }
 }
 
-async function runAgentLoop({ jobId, task, intent, role, caseId }) {
+async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diary = [] }) {
     const job = agentJobs.get(jobId)
 
+    // Last 3 diary entries — most recent first, injected as compounding memory
+    const recentDiary = [...diary].reverse().slice(0, 3)
+
     const systemPrompt = [
-        'You are a legal research assistant with access to tools that search case documents.',
-        intent ? `\nLawyer\'s goal: ${intent}` : '',
+        soul?.skillMd?.trim() || 'You are a professional document analyst with access to tools that search case documents.',
+        soul?.redFlags?.trim()    ? `\n## Standing Checklist — Always Apply\n${soul.redFlags}` : '',
+        soul?.styleGuide?.trim()  ? `\n## Your Writing Style\n${soul.styleGuide}` : '',
+        soul?.styleSamples?.length
+            ? `\n## Example Outputs (match this style)\n${soul.styleSamples.map(s => s.text).filter(Boolean).join('\n\n---\n\n')}`
+            : '',
+        soul?.corrections?.length
+            ? `\n## Corrections — Things To Stop Doing\n${soul.corrections.map(c => `- ${c.text || c.rule || c}`).join('\n')}`
+            : '',
+        recentDiary.length
+            ? `\n## What You Learned in Previous Sessions\n${recentDiary.map((e, i) => {
+                const parts = [`### Session ${recentDiary.length - i} (${e.date ? new Date(e.date).toLocaleDateString() : 'recent'})`]
+                if (e.task)       parts.push(`Task: ${e.task}`)
+                if (e.reflection) parts.push(`Reflection: ${e.reflection}`)
+                return parts.join('\n')
+              }).join('\n\n')}`
+            : '',
+        intent ? `\n## Your Goal for This Task\n${intent}` : '',
         role   ? `\nActing as: ${role}` : '',
-        '\nInstructions:',
+        '\n## Instructions',
         '- Use search_case to search broadly, search_doc to search a specific document.',
         '- Use add_note to save important findings as you discover them.',
         '- Only cite text you have directly retrieved via tools.',
         '- When search results are weak, rephrase and search again.',
+        '- Apply everything you have learned from previous sessions.',
         '- After gathering evidence, give a clear final answer with citations (doc ID and page number).',
         '- Stop after 15 tool calls maximum.',
     ].filter(Boolean).join('\n')
@@ -884,6 +938,51 @@ async function runAgentLoop({ jobId, task, intent, role, caseId }) {
             job.result = msg.content
             job.status = 'done'
             agentBroadcast(job.clients, { type: 'status', status: 'done', result: msg.content })
+
+            // ── Reflexion: self-critique ──
+            let reflection = ''
+            if (!job.cancelled && msg.content) {
+                try {
+                    const rRes = await fetch('http://localhost:11434/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'qwen2.5:7b',
+                            messages: [
+                                { role: 'system', content: 'Review your work briefly and honestly.' },
+                                { role: 'user', content: `Task: ${task}\n\nYour analysis:\n${msg.content}\n\nIn 3 concise bullets:\n• What was most valuable in this analysis?\n• What might you have missed or could improve?\n• What would you do differently next time?` },
+                            ],
+                            stream: false,
+                        }),
+                    })
+                    if (rRes.ok) reflection = (await rRes.json()).message?.content?.trim() || ''
+                } catch {}
+                if (reflection) {
+                    const reflStep = { type: 'reflection', content: reflection }
+                    job.steps.push(reflStep)
+                    agentBroadcast(job.clients, reflStep)
+                }
+            }
+
+            // ── Write session diary entry ──
+            try {
+                const notesAdded = job.steps.filter(s => s.type === 'tool_call' && s.tool === 'add_note').length
+                const entry = {
+                    id: randomUUID(),
+                    createdAt: new Date().toISOString(),
+                    task,
+                    steps: stepCount,
+                    result: msg.content,
+                    reflection,
+                    notesAdded,
+                }
+                const diaryPath = path.join(getCaseSubdir(caseId, 'aide'), 'diary.json')
+                const existing = fs.existsSync(diaryPath) ? JSON.parse(fs.readFileSync(diaryPath, 'utf8')) : []
+                const updated = [entry, ...existing]   // newest first
+                fs.writeFileSync(diaryPath, JSON.stringify(updated))
+                agentBroadcast(job.clients, { type: 'diary_entry', entry })
+            } catch {}
+
             return
         }
 
@@ -929,10 +1028,25 @@ app.post('/api/agent/start', express.json(), async (req, res) => {
     if (!task?.trim()) return res.status(400).json({ error: 'task is required' })
     if (!caseId)       return res.status(400).json({ error: 'caseId is required' })
 
+    // Load soul and recent diary entries from disk
+    let soul = { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }
+    let diary = []
+    try {
+        const soulPath = path.join(getCaseSubdir(caseId, 'aide'), 'soul.json')
+        if (fs.existsSync(soulPath)) {
+            const raw = JSON.parse(fs.readFileSync(soulPath, 'utf8'))
+            soul = raw.soul || raw
+        }
+    } catch {}
+    try {
+        const diaryPath = path.join(getCaseSubdir(caseId, 'aide'), 'diary.json')
+        if (fs.existsSync(diaryPath)) diary = JSON.parse(fs.readFileSync(diaryPath, 'utf8'))
+    } catch {}
+
     const jobId = randomUUID()
     agentJobs.set(jobId, { status: 'running', steps: [], clients: new Set(), result: null, error: null, cancelled: false })
 
-    runAgentLoop({ jobId, task, intent, role, caseId }).catch(err => {
+    runAgentLoop({ jobId, task, intent, role, caseId, soul, diary }).catch(err => {
         const job = agentJobs.get(jobId)
         if (job) { job.status = 'error'; job.error = err.message; agentBroadcast(job.clients, { type: 'error', content: err.message }) }
     })
