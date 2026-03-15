@@ -4,6 +4,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequire } from 'module'
 import { createHash, randomUUID } from 'crypto'
+import { searchCaselaw, getCaselawStatus, swapCaselawDb, fileSha256, INCOMING_DIR as CASELAW_INCOMING } from './caselawDb.js'
 
 const require = createRequire(import.meta.url)
 const Database = require('better-sqlite3')
@@ -299,6 +300,89 @@ app.post('/api/cases/:caseId/aide/diary/entry', express.json(), (req, res) => {
   const existing = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : []
   fs.writeFileSync(filePath, JSON.stringify([req.body, ...existing]))  // newest first
   res.json({ ok: true })
+})
+
+// ── Caselaw DB ────────────────────────────────────────────────────────────────
+
+// GET /api/caselaw/status — health + version info
+app.get('/api/caselaw/status', (req, res) => {
+    res.json(getCaselawStatus())
+})
+
+// POST /api/caselaw/search — semantic search against the caselaw corpus
+app.post('/api/caselaw/search', express.json(), async (req, res) => {
+    const { query, k = 5, filters = {} } = req.body
+    if (!query?.trim()) return res.status(400).json({ error: 'query is required' })
+
+    const status = getCaselawStatus()
+    if (!status.available) return res.json({ results: [], message: status.message })
+
+    try {
+        const vec     = await embed(query)
+        const results = searchCaselaw(vec, Math.min(k, 20), filters)
+        res.json({ results, query })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+})
+
+// POST /api/admin/caselaw/swap — promote a validated incoming .db to active
+// Body: { filename: 'caselaw-20260322.db', checksum?: 'sha256hex', meta?: { version, model } }
+app.post('/api/admin/caselaw/swap', express.json(), async (req, res) => {
+    const { filename, checksum, meta = {} } = req.body ?? {}
+    if (!filename) return res.status(400).json({ error: 'filename is required' })
+
+    // Sanitise — only allow files from the incoming directory
+    const safeName = path.basename(filename)
+    if (!safeName.endsWith('.db')) return res.status(400).json({ error: 'filename must end with .db' })
+
+    const incomingPath = path.join(CASELAW_INCOMING, safeName)
+    if (!fs.existsSync(incomingPath)) {
+        return res.status(404).json({ error: `File not found in incoming/: ${safeName}` })
+    }
+
+    // Optional checksum verification
+    if (checksum) {
+        const actual = fileSha256(incomingPath)
+        if (actual !== checksum) {
+            return res.status(400).json({ error: `Checksum mismatch. Expected ${checksum}, got ${actual}` })
+        }
+    }
+
+    const result = await swapCaselawDb(incomingPath, meta)
+    res.json(result)
+})
+
+// POST /api/admin/caselaw/upload — upload a .db file directly (for smaller corpora)
+// Streams the body straight to incoming/, then optionally auto-swaps.
+app.post('/api/admin/caselaw/upload',
+    express.raw({ type: 'application/octet-stream', limit: '2gb' }),
+    async (req, res) => {
+        const filename = req.query.filename
+        if (!filename?.endsWith('.db')) {
+            return res.status(400).json({ error: '?filename=caselaw-YYYYMMDD.db is required' })
+        }
+        const safeName = path.basename(filename)
+        const destPath = path.join(CASELAW_INCOMING, safeName)
+        try {
+            fs.writeFileSync(destPath, req.body)
+            const autoSwap = req.query.autoSwap === 'true'
+            if (autoSwap) {
+                const result = await swapCaselawDb(destPath, {})
+                return res.json({ uploaded: safeName, swap: result })
+            }
+            res.json({ ok: true, uploaded: safeName, size: req.body.length,
+                       next: `POST /api/admin/caselaw/swap with { filename: "${safeName}" }` })
+        } catch (err) {
+            res.status(500).json({ error: err.message })
+        }
+    }
+)
+
+// GET /api/admin/caselaw/versions — list all versioned backup files
+app.get('/api/admin/caselaw/versions', (req, res) => {
+    const status = getCaselawStatus()
+    res.json(status)
 })
 
 // ── Case Delete (cascade) ──
@@ -806,6 +890,24 @@ const AGENT_TOOLS = [
     {
         type: 'function',
         function: {
+            name: 'search_caselaw',
+            description: 'Search the offline case law database to verify a citation or find relevant precedents. Use this when the user mentions a case name, citation, or asks to verify legal authority. Returns matching cases with citation, court, year, and a snippet of the holding.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    query: { type: 'string', description: 'Case name, citation, or legal concept to search for' },
+                    k:     { type: 'number', description: 'Number of results (default 3)' },
+                    court: { type: 'string', description: 'Optional: filter by court name (e.g. "UKSC", "EWCA", "HK CFA")' },
+                    yearFrom: { type: 'number', description: 'Optional: earliest year' },
+                    yearTo:   { type: 'number', description: 'Optional: latest year' },
+                },
+                required: ['query'],
+            },
+        },
+    },
+    {
+        type: 'function',
+        function: {
             name: 'add_note',
             description: 'Save an important finding as a note. Use this to record key discoveries so the lawyer can review them.',
             parameters: {
@@ -862,6 +964,31 @@ async function agentExecuteTool(name, args, caseId) {
         }))
     }
 
+    if (name === 'search_caselaw') {
+        const { query, k = 3, court, yearFrom, yearTo } = args
+        const status = getCaselawStatus()
+        if (!status.available) return { error: 'Case law database not available. Ask the administrator to import the corpus.' }
+        try {
+            const vec     = await embed(query)
+            const filters = {}
+            if (court)    filters.court    = court
+            if (yearFrom) filters.yearFrom = yearFrom
+            if (yearTo)   filters.yearTo   = yearTo
+            const results = searchCaselaw(vec, Math.min(k, 10), filters)
+            if (!results.length) return { results: [], message: 'No matching case law found for this query.' }
+            return results.map(r => ({
+                citation:     r.citation,
+                court:        r.court,
+                year:         r.year,
+                jurisdiction: r.jurisdiction,
+                snippet:      r.text.slice(0, 300),
+                score:        r.score,
+            }))
+        } catch (err) {
+            return { error: `Caselaw search failed: ${err.message}` }
+        }
+    }
+
     if (name === 'add_note') {
         const { docId, pageNum = 1, text } = args
         const notesDir = getCaseSubdir(caseId, 'notes')
@@ -905,12 +1032,14 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
         intent ? `\n## Your Goal for This Task\n${intent}` : '',
         role   ? `\nActing as: ${role}` : '',
         '\n## Instructions',
-        '- Use search_case to search broadly, search_doc to search a specific document.',
+        '- Use search_case to search broadly across all case documents.',
+        '- Use search_doc to search a specific document by ID.',
+        '- Use search_caselaw to verify a case citation or find legal precedent — always verify citations mentioned in documents.',
         '- Use add_note to save important findings as you discover them.',
         '- Only cite text you have directly retrieved via tools.',
         '- When search results are weak, rephrase and search again.',
         '- Apply everything you have learned from previous sessions.',
-        '- After gathering evidence, give a clear final answer with citations (doc ID and page number).',
+        '- After gathering evidence, give a clear final answer with citations (doc ID, page number, and case citation where relevant).',
         '- Stop after 15 tool calls maximum.',
     ].filter(Boolean).join('\n')
 
