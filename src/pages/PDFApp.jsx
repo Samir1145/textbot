@@ -779,7 +779,7 @@ const fileInputRef = useRef(null)
     try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
   })
   const [allCaseNotes, setAllCaseNotes] = useState({}) // { [docId]: NoteObject[] }
-  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'aide'
+  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'aide' | 'law'
   const [notesCollapsed, setNotesCollapsed] = useState({}) // { 'section:starred'|'party:id'|'doc:id'|'note-exp:id': bool }
   const [editingNoteId, setEditingNoteId] = useState(null)
   const [editingNoteDraft, setEditingNoteDraft] = useState('')
@@ -804,6 +804,20 @@ const fileInputRef = useRef(null)
   const [aideDiaryOpen,  setAideDiaryOpen]  = useState(new Set())
   const [aideSkillFileName, setAideSkillFileName] = useState('')
   const isIndexingRef = useRef(false)   // ref guard — prevents concurrent / loop-triggered indexing
+
+  // ── Law tab state ─────────────────────────────────────────────────────────
+  const [lawSubTab,      setLawSubTab]      = useState('search') // 'search' | 'import'
+  const [lawQuery,       setLawQuery]       = useState('')
+  const [lawResults,     setLawResults]     = useState([])
+  const [lawSearching,   setLawSearching]   = useState(false)
+  const [lawFilters,     setLawFilters]     = useState({ court: '', jurisdiction: '', yearFrom: '', yearTo: '' })
+  const [lawStatus,      setLawStatus]      = useState(null)   // corpus status from /api/caselaw/status
+  const [lawUploadFile,  setLawUploadFile]  = useState(null)   // staged .db file for import
+  const [lawUploading,   setLawUploading]   = useState(false)
+  const [lawVersions,    setLawVersions]    = useState([])
+  const [lawImportMsg,   setLawImportMsg]   = useState(null)   // { type: 'ok'|'err', text }
+  const [lawDragOver,    setLawDragOver]    = useState(false)
+  const lawFileInputRef = useRef(null)
 
   // ── Activity log ──
   const [logs, setLogs] = useState([])
@@ -1228,6 +1242,94 @@ const fileInputRef = useRef(null)
     const texts = [s.skillMd, s.redFlags, s.styleGuide, ...(s.corrections || []).map(c => c.text), ...(s.styleSamples || []).map(x => x.text)]
     return Math.round(texts.reduce((sum, t) => sum + (t?.length || 0), 0) / 4)
   }, [aideSoul])
+
+  // ── Law tab handlers ───────────────────────────────────────────────────────
+
+  // Load caselaw status + versions when Law tab is first opened
+  const _refreshLawStatus = useCallback(async () => {
+    try {
+      const d = await fetch('/api/caselaw/status').then(r => r.json())
+      setLawStatus(d)
+      // Build ordered version list: active first, then backups
+      const versions = []
+      if (d.activeFile) versions.push(d.activeFile)
+      if (Array.isArray(d.backups)) versions.push(...d.backups)
+      setLawVersions(versions)
+    } catch {
+      setLawStatus({ available: false, message: 'Server unreachable' })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (rightTab !== 'law') return
+    _refreshLawStatus()
+  }, [rightTab, _refreshLawStatus])
+
+  const handleLawSearch = useCallback(async () => {
+    if (!lawQuery.trim() || lawSearching) return
+    setLawSearching(true)
+    setLawResults([])
+    try {
+      const body = { query: lawQuery, k: 8, filters: {} }
+      if (lawFilters.court)        body.filters.court        = lawFilters.court
+      if (lawFilters.jurisdiction) body.filters.jurisdiction = lawFilters.jurisdiction
+      if (lawFilters.yearFrom)     body.filters.yearFrom     = Number(lawFilters.yearFrom)
+      if (lawFilters.yearTo)       body.filters.yearTo       = Number(lawFilters.yearTo)
+      const r = await fetch('/api/caselaw/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'Search failed')
+      setLawResults(d.results || [])
+    } catch (err) {
+      setLawResults([])
+      setLawImportMsg({ type: 'err', text: err.message })
+    } finally {
+      setLawSearching(false)
+    }
+  }, [lawQuery, lawSearching, lawFilters])
+
+  const handleLawDbDrop = useCallback((e) => {
+    e.preventDefault()
+    setLawDragOver(false)
+    const file = e.dataTransfer?.files?.[0] || e.target?.files?.[0]
+    if (!file) return
+    if (!file.name.endsWith('.db')) {
+      setLawImportMsg({ type: 'err', text: 'Only .db files are accepted' })
+      return
+    }
+    setLawUploadFile(file)
+    setLawImportMsg(null)
+  }, [])
+
+  const handleLawSwap = useCallback(async () => {
+    if (!lawUploadFile || lawUploading) return
+    setLawUploading(true)
+    setLawImportMsg(null)
+    try {
+      // Send as raw binary; server reads req.body via express.raw
+      const safeName = lawUploadFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+      const arrayBuf = await lawUploadFile.arrayBuffer()
+      const r = await fetch(`/api/admin/caselaw/upload?filename=${encodeURIComponent(safeName)}&autoSwap=true`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/octet-stream' },
+        body: arrayBuf,
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'Upload failed')
+      const swapResult = d.swap || d
+      if (swapResult.ok === false) throw new Error(swapResult.message || 'Swap failed')
+      setLawImportMsg({ type: 'ok', text: swapResult.message || `Activated ${safeName}` })
+      setLawUploadFile(null)
+      await _refreshLawStatus()
+    } catch (err) {
+      setLawImportMsg({ type: 'err', text: err.message })
+    } finally {
+      setLawUploading(false)
+    }
+  }, [lawUploadFile, lawUploading, _refreshLawStatus])
 
   const handlePageClick = useCallback((e, pageNum) => {
     if (!noteMode) return
@@ -2539,6 +2641,9 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           <button className={`pdfapp-right-tab${rightTab === 'aide' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('aide')}>
             Aide{aideStatus === 'running' ? ' ⟳' : aideStatus === 'done' ? ' ✓' : ''}
           </button>
+          <button className={`pdfapp-right-tab${rightTab === 'law' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('law')}>
+            Law{lawStatus?.available ? ' ✓' : ''}
+          </button>
         </div>
 
         {/* ── Chat tab ── */}
@@ -3220,6 +3325,204 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     </div>
                   )
                 })}
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* ── Law tab ── */}
+        {rightTab === 'law' && (
+          <div className="pdfapp-law-panel">
+
+            {/* Sub-tab bar */}
+            <div className="pdfapp-law-subtabs">
+              <button className={`pdfapp-law-subtab${lawSubTab === 'search' ? ' pdfapp-law-subtab--active' : ''}`} onClick={() => setLawSubTab('search')}>Search</button>
+              <button className={`pdfapp-law-subtab${lawSubTab === 'import' ? ' pdfapp-law-subtab--active' : ''}`} onClick={() => setLawSubTab('import')}>Import</button>
+            </div>
+
+            {/* ── Search sub-tab ── */}
+            {lawSubTab === 'search' && (
+              <div className="pdfapp-law-search-panel">
+
+                {/* Status banner when no corpus */}
+                {lawStatus && !lawStatus.available && (
+                  <div className="pdfapp-law-no-corpus">
+                    <span className="pdfapp-law-no-corpus-icon">⚖</span>
+                    <span>No caselaw corpus loaded. Go to <button className="pdfapp-law-link-btn" onClick={() => setLawSubTab('import')}>Import</button> to add one.</span>
+                  </div>
+                )}
+
+                {/* Search bar */}
+                <div className="pdfapp-law-search-bar">
+                  <input
+                    className="pdfapp-law-search-input"
+                    placeholder="Search caselaw… e.g. 'duty of care in negligence'"
+                    value={lawQuery}
+                    onChange={e => setLawQuery(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleLawSearch() }}
+                    disabled={!lawStatus?.available || lawSearching}
+                  />
+                  <button
+                    className="pdfapp-law-search-btn"
+                    onClick={handleLawSearch}
+                    disabled={!lawStatus?.available || !lawQuery.trim() || lawSearching}
+                  >
+                    {lawSearching ? '…' : 'Search'}
+                  </button>
+                </div>
+
+                {/* Filters */}
+                <div className="pdfapp-law-filters">
+                  <input
+                    className="pdfapp-law-filter-input"
+                    placeholder="Court (e.g. UKSC)"
+                    value={lawFilters.court}
+                    onChange={e => setLawFilters(f => ({ ...f, court: e.target.value }))}
+                  />
+                  <input
+                    className="pdfapp-law-filter-input"
+                    placeholder="Jurisdiction"
+                    value={lawFilters.jurisdiction}
+                    onChange={e => setLawFilters(f => ({ ...f, jurisdiction: e.target.value }))}
+                  />
+                  <input
+                    className="pdfapp-law-filter-input pdfapp-law-filter-year"
+                    placeholder="From year"
+                    type="number"
+                    min="1800" max="2099"
+                    value={lawFilters.yearFrom}
+                    onChange={e => setLawFilters(f => ({ ...f, yearFrom: e.target.value }))}
+                  />
+                  <input
+                    className="pdfapp-law-filter-input pdfapp-law-filter-year"
+                    placeholder="To year"
+                    type="number"
+                    min="1800" max="2099"
+                    value={lawFilters.yearTo}
+                    onChange={e => setLawFilters(f => ({ ...f, yearTo: e.target.value }))}
+                  />
+                </div>
+
+                {/* Results */}
+                <div className="pdfapp-law-results">
+                  {lawSearching && (
+                    <div className="pdfapp-law-searching">Searching corpus…</div>
+                  )}
+                  {!lawSearching && lawResults.length === 0 && lawQuery && !lawImportMsg && (
+                    <div className="pdfapp-law-no-results">No results. Try different keywords or broaden filters.</div>
+                  )}
+                  {lawResults.map((r, i) => (
+                    <div key={r.id || i} className="pdfapp-law-result">
+                      <div className="pdfapp-law-result-header">
+                        <span className="pdfapp-law-citation">{r.citation}</span>
+                        <div className="pdfapp-law-result-meta">
+                          {r.court && <span className="pdfapp-law-badge">{r.court}</span>}
+                          {r.year  && <span className="pdfapp-law-year">{r.year}</span>}
+                          <span className="pdfapp-law-score">{(r.score * 100).toFixed(0)}%</span>
+                        </div>
+                      </div>
+                      {r.jurisdiction && <div className="pdfapp-law-jurisdiction">{r.jurisdiction}</div>}
+                      <div className="pdfapp-law-snippet">{r.text}</div>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            )}
+
+            {/* ── Import sub-tab ── */}
+            {lawSubTab === 'import' && (
+              <div className="pdfapp-law-import-panel">
+
+                {/* Corpus status */}
+                <div className="pdfapp-law-corpus-status">
+                  <div className="pdfapp-law-corpus-header">
+                    <span className="pdfapp-law-corpus-title">Corpus Status</span>
+                    {lawStatus?.available
+                      ? <span className="pdfapp-law-corpus-badge pdfapp-law-corpus-badge--ok">Active</span>
+                      : <span className="pdfapp-law-corpus-badge pdfapp-law-corpus-badge--none">No corpus</span>
+                    }
+                  </div>
+                  {lawStatus?.available ? (
+                    <div className="pdfapp-law-corpus-meta">
+                      <span>{lawStatus.rows?.toLocaleString()} entries</span>
+                      <span className="pdfapp-law-corpus-dot">·</span>
+                      <span>{lawStatus.model}</span>
+                      <span className="pdfapp-law-corpus-dot">·</span>
+                      <span>dim {lawStatus.embeddingDim}</span>
+                      {lawStatus.lastSwapped && <>
+                        <span className="pdfapp-law-corpus-dot">·</span>
+                        <span>Updated {new Date(lawStatus.lastSwapped).toLocaleDateString()}</span>
+                      </>}
+                    </div>
+                  ) : (
+                    <div className="pdfapp-law-corpus-empty">{lawStatus?.message || 'No database loaded.'}</div>
+                  )}
+                </div>
+
+                {/* Drop zone */}
+                <div
+                  className={`pdfapp-law-drop-zone${lawDragOver ? ' pdfapp-law-drop-zone--over' : ''}${lawUploadFile ? ' pdfapp-law-drop-zone--staged' : ''}`}
+                  onDragOver={e => { e.preventDefault(); setLawDragOver(true) }}
+                  onDragLeave={() => setLawDragOver(false)}
+                  onDrop={handleLawDbDrop}
+                  onClick={() => !lawUploadFile && lawFileInputRef.current?.click()}
+                >
+                  <input
+                    ref={lawFileInputRef}
+                    type="file"
+                    accept=".db"
+                    style={{ display: 'none' }}
+                    onChange={e => handleLawDbDrop({ target: e.target, preventDefault: () => {}, dataTransfer: null })}
+                  />
+                  {lawUploadFile ? (
+                    <>
+                      <span className="pdfapp-law-drop-icon">📦</span>
+                      <span className="pdfapp-law-drop-file">{lawUploadFile.name}</span>
+                      <span className="pdfapp-law-drop-size">({(lawUploadFile.size / 1024 / 1024).toFixed(1)} MB)</span>
+                      <button className="pdfapp-law-drop-clear" onClick={e => { e.stopPropagation(); setLawUploadFile(null); setLawImportMsg(null) }}>× Clear</button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="pdfapp-law-drop-icon">⚖</span>
+                      <span>Drop a caselaw <strong>.db</strong> file here or click to browse</span>
+                      <span className="pdfapp-law-drop-hint">Generated by import-caselaw.mjs or a 3rd party provider</span>
+                    </>
+                  )}
+                </div>
+
+                {/* Import message */}
+                {lawImportMsg && (
+                  <div className={`pdfapp-law-import-msg pdfapp-law-import-msg--${lawImportMsg.type}`}>
+                    {lawImportMsg.type === 'ok' ? '✓ ' : '✗ '}{lawImportMsg.text}
+                  </div>
+                )}
+
+                {/* Activate button */}
+                {lawUploadFile && (
+                  <button
+                    className="pdfapp-law-swap-btn"
+                    onClick={handleLawSwap}
+                    disabled={lawUploading}
+                  >
+                    {lawUploading ? 'Uploading & validating…' : 'Validate & activate corpus'}
+                  </button>
+                )}
+
+                {/* Version history */}
+                {lawVersions.length > 0 && (
+                  <div className="pdfapp-law-versions">
+                    <div className="pdfapp-law-versions-title">Backup versions</div>
+                    {lawVersions.map((v, i) => (
+                      <div key={v} className={`pdfapp-law-version-row${i === 0 ? ' pdfapp-law-version-row--active' : ''}`}>
+                        <span className="pdfapp-law-version-name">{v}</span>
+                        {i === 0 && <span className="pdfapp-law-version-active-badge">active</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
               </div>
             )}
 

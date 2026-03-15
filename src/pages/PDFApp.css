@@ -3652,4 +3652,451 @@
   border-left: 2px solid rgba(96, 165, 250, 0.35);
 }
 
+/* ── Law tab ──────────────────────────────────────────────────────────────── */
+
+.pdfapp-law-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Sub-tab bar */
+.pdfapp-law-subtabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 10px 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.pdfapp-law-subtab {
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+  transition: color 120ms, background 120ms;
+}
+
+.pdfapp-law-subtab:hover { color: var(--text); background: var(--bg-2); }
+
+.pdfapp-law-subtab--active {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--border);
+  border-bottom-color: var(--bg);
+  margin-bottom: -1px;
+}
+
+/* ── Search sub-tab ── */
+.pdfapp-law-search-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  padding: 10px;
+  gap: 8px;
+}
+
+.pdfapp-law-no-corpus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.pdfapp-law-no-corpus-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+.pdfapp-law-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Search bar */
+.pdfapp-law-search-bar {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pdfapp-law-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+  background: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 120ms;
+}
+
+.pdfapp-law-search-input:focus { border-color: #3b82f6; }
+
+.pdfapp-law-search-btn {
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms, opacity 120ms;
+}
+
+.pdfapp-law-search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pdfapp-law-search-btn:not(:disabled):hover { background: #2563eb; }
+
+/* Filters row */
+.pdfapp-law-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.pdfapp-law-filter-input {
+  flex: 1;
+  min-width: 90px;
+  padding: 5px 8px;
+  font-size: 0.75rem;
+  background: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 120ms;
+}
+
+.pdfapp-law-filter-input:focus { border-color: #3b82f6; }
+
+.pdfapp-law-filter-year { max-width: 90px; }
+
+/* Results list */
+.pdfapp-law-results {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pdfapp-law-searching,
+.pdfapp-law-no-results {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 24px;
+}
+
+.pdfapp-law-result {
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 120ms;
+}
+
+.pdfapp-law-result:hover { border-color: #3b82f6; }
+
+.pdfapp-law-result-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pdfapp-law-citation {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.pdfapp-law-result-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.pdfapp-law-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  border-radius: 4px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  white-space: nowrap;
+}
+
+.pdfapp-law-year {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.pdfapp-law-score {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.pdfapp-law-jurisdiction {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.pdfapp-law-snippet {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Import sub-tab ── */
+.pdfapp-law-import-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  gap: 12px;
+}
+
+/* Corpus status card */
+.pdfapp-law-corpus-status {
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.pdfapp-law-corpus-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.pdfapp-law-corpus-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pdfapp-law-corpus-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.pdfapp-law-corpus-badge--ok {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pdfapp-law-corpus-badge--none {
+  background: rgba(156, 163, 175, 0.12);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.pdfapp-law-corpus-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+}
+
+.pdfapp-law-corpus-dot { opacity: 0.4; }
+
+.pdfapp-law-corpus-empty {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* Drop zone */
+.pdfapp-law-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px 16px;
+  background: var(--bg-2);
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  transition: border-color 150ms, background 150ms;
+}
+
+.pdfapp-law-drop-zone:hover,
+.pdfapp-law-drop-zone--over {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.04);
+  color: var(--text);
+}
+
+.pdfapp-law-drop-zone--staged {
+  border-style: solid;
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
+  cursor: default;
+}
+
+.pdfapp-law-drop-icon { font-size: 1.6rem; }
+
+.pdfapp-law-drop-file {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.pdfapp-law-drop-size {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.pdfapp-law-drop-hint {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.pdfapp-law-drop-clear {
+  margin-top: 4px;
+  padding: 3px 10px;
+  font-size: 0.73rem;
+  background: var(--bg-3);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+
+.pdfapp-law-drop-clear:hover { background: var(--bg-4); color: var(--text); }
+
+/* Import message */
+.pdfapp-law-import-msg {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.pdfapp-law-import-msg--ok {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.pdfapp-law-import-msg--err {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Activate button */
+.pdfapp-law-swap-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 120ms, opacity 120ms;
+}
+
+.pdfapp-law-swap-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pdfapp-law-swap-btn:not(:disabled):hover { background: #059669; }
+
+/* Version history */
+.pdfapp-law-versions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pdfapp-law-versions-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.pdfapp-law-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.pdfapp-law-version-row--active {
+  border-color: rgba(16, 185, 129, 0.35);
+  color: var(--text);
+}
+
+.pdfapp-law-version-name {
+  font-family: monospace;
+  font-size: 0.72rem;
+}
+
+.pdfapp-law-version-active-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
 

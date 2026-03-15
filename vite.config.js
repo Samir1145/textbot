@@ -26,6 +26,9 @@ export default defineConfig({
       '/api/skill-results': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/rag': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/cases': { target: 'http://localhost:3001', changeOrigin: true },
+      '/api/agent': { target: 'http://localhost:3001', changeOrigin: true },
+      '/api/caselaw': { target: 'http://localhost:3001', changeOrigin: true },
+      '/api/admin': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/blobs': {
         target: 'http://localhost:3001',
         changeOrigin: true,

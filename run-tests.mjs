@@ -66,6 +66,10 @@ const TESTS = [
   // Folder sidebar + Notes tree
   { file: 'test-folder-sidebar.mjs',  name: 'folder-sidebar',  tags: [] },
 
+  // Law tab — caselaw search & import
+  { file: 'test-law-tab-api.mjs',     name: 'law-tab-api',     tags: [] },
+  { file: 'test-law-tab-ui.mjs',      name: 'law-tab-ui',      tags: [] },
+
   // System features
   { file: 'test-ocr.mjs',            name: 'ocr',             tags: [] },
   { file: 'test-case-mgmt.mjs',      name: 'case-mgmt',       tags: [] },
@@ -73,9 +77,12 @@ const TESTS = [
 
 // ── Parse args ────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2)
-const onlyPattern  = args[args.indexOf('--only') + 1]  || null
-const skipPattern  = args[args.indexOf('--skip') + 1]  || null
-const baseUrl      = args[args.indexOf('--base') + 1]  || null
+const _onlyIdx = args.indexOf('--only')
+const _skipIdx = args.indexOf('--skip')
+const _baseIdx = args.indexOf('--base')
+const onlyPattern  = _onlyIdx !== -1 ? args[_onlyIdx + 1] : null
+const skipPattern  = _skipIdx !== -1 ? args[_skipIdx + 1] : null
+const baseUrl      = _baseIdx !== -1 ? args[_baseIdx + 1] : null
 const includeLLM   = args.includes('--llm')
 
 // ── Filter tests ──────────────────────────────────────────────────────────────
