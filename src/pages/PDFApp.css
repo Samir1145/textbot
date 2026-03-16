@@ -1549,6 +1549,15 @@
   color: var(--text-faint);
   font-style: italic;
 }
+.pdfapp-reload-chunks-btn {
+  all: unset;
+  font-style: normal;
+  color: var(--accent, #4a9eff);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+}
+.pdfapp-reload-chunks-btn:hover { color: var(--accent-hover, #6ab4ff); }
 
 .pdfapp-extracted-prompt {
   flex: 1;
@@ -2913,10 +2922,20 @@
 .nt-page-badge {
   flex-shrink: 0;
   font-size: 0.62rem;
-  padding: 1px 4px;
+  padding: 1px 5px;
   background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
   border-radius: 3px;
+  font-weight: 500;
+}
+.nt-chunk-badge {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  padding: 1px 5px;
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-muted, #64748b);
+  border-radius: 3px;
+  font-weight: 500;
 }
 .nt-date {
   flex-shrink: 0;
@@ -2960,44 +2979,40 @@
 .nt-action-btn:hover { background: var(--bg-2); color: var(--text); }
 .nt-action-btn--danger:hover { background: rgba(239, 68, 68, 0.12); color: #f87171; }
 
-/* ── Chunk group header ── */
-.nt-chunk-header {
-  font-size: 0.63rem;
-  color: var(--text-muted);
-  font-style: italic;
-  padding: 2px 6px;
-  margin: 2px 0;
-  border-radius: 3px;
-  background: var(--bg-2, rgba(0,0,0,0.04));
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.nt-chunk-header:hover {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-}
 
 /* ── Note row ── */
 .nt-note-row {
-  padding: 3px 4px;
-  border-radius: 4px;
+  padding: 6px 6px 8px;
+  border-radius: 6px;
+  border-bottom: 1px solid var(--border, rgba(0,0,0,0.06));
 }
+.nt-note-row:last-child { border-bottom: none; }
 .nt-note-row:hover { background: var(--bg-2, rgba(0,0,0,0.03)); }
 .nt-note-row--other { opacity: 0.7; }
 .nt-note-meta {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 2px;
+  margin-bottom: 5px;
+}
+.nt-chunk-quote {
+  font-size: 0.71rem;
+  color: var(--text-2);
+  line-height: 1.5;
+  padding: 5px 10px;
+  margin-bottom: 6px;
+  border-left: 2.5px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0 4px 4px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-style: italic;
 }
 .nt-note-text {
   font-size: 0.72rem;
   color: var(--text-2);
   line-height: 1.45;
-  cursor: pointer;
-  padding: 1px 0;
+  padding: 1px 2px;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -4152,92 +4167,40 @@
 }
 
 
-/* ── Connectivity Warning Banner ─────────────────────────────────────────── */
-.pdfapp-conn-banner {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 9999;
-  background: #78350f;
-  border-bottom: 1px solid #92400e;
-  color: #fef3c7;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 16px;
-  font-size: 12.5px;
-  line-height: 1.5;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
-}
-
-.pdfapp-conn-banner-body {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  flex: 1;
-  min-width: 0;
-}
-
-.pdfapp-conn-banner-icon {
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: #fcd34d;
-}
-
-.pdfapp-conn-banner-items {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.pdfapp-conn-banner-item {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.pdfapp-conn-banner-label {
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.pdfapp-conn-banner-fix {
-  font-family: monospace;
-  font-size: 11.5px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 3px;
-  padding: 1px 6px;
-  color: #fde68a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  display: inline-block;
-}
-
-.pdfapp-conn-banner-actions {
-  display: flex;
+/* ── Service status dot (embed / llm) shown in Text Chunks header ─────────── */
+.pdfapp-svc-dot {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.pdfapp-conn-banner-retry,
-.pdfapp-conn-banner-dismiss {
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fef3c7;
-  border-radius: 4px;
-  padding: 2px 8px;
-  font-size: 11.5px;
+  gap: 3px;
+  border-radius: 10px;
+  padding: 1px 6px 1px 5px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   cursor: pointer;
+  user-select: none;
   white-space: nowrap;
-  transition: background 0.12s;
 }
-.pdfapp-conn-banner-retry:hover,
-.pdfapp-conn-banner-dismiss:hover {
-  background: rgba(255,255,255,0.22);
+.pdfapp-svc-dot::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pdfapp-svc-dot--down {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.pdfapp-svc-dot--down::before {
+  background: #ef4444;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
+}
+.pdfapp-svc-dot--down:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+.pdfapp-svc-dot-label {
+  line-height: 1;
 }

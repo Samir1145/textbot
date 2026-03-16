@@ -406,6 +406,7 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
   const [renderScale, setRenderScale] = useState(1.0)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [pdfError, setPdfError] = useState(null)
+  const [pdfMainThreadReady, setPdfMainThreadReady] = useState(false)
   const [thumbsOpen, setThumbsOpen] = useState(false)
 const fileInputRef = useRef(null)
   const pagesContainerRef = useRef(null)
@@ -428,6 +429,31 @@ const fileInputRef = useRef(null)
     addLogRef.current(`[SCROLL] → page ${pageNum} (${block}) scrollTop: ${Math.round(top)}`, 'info')
     container.scrollTo({ top, behavior: 'instant' })
   }, [])
+
+  // Scroll so the bbox (or lineRects) midpoint is centered in the container viewport.
+  // bbox / lineRects coords are normalized [0,1] fractions of the page height.
+  const scrollBboxIntoView = useCallback((pageNum, bboxOrRects) => {
+    const container = pagesContainerRef.current
+    if (!container || !bboxOrRects) return scrollPageIntoView(pageNum, 'center')
+    const el = container.querySelector(`[data-page="${pageNum}"]`)
+    if (!el) return scrollPageIntoView(pageNum, 'center')
+    // Determine the vertical centre of the highlighted region as a [0,1] fraction.
+    let yCenterFrac
+    if (Array.isArray(bboxOrRects[0])) {
+      // lineRects — array of [x1,y1,x2,y2]; span from first top to last bottom
+      yCenterFrac = (bboxOrRects[0][1] + bboxOrRects[bboxOrRects.length - 1][3]) / 2
+    } else {
+      // single bbox [x1,y1,x2,y2]
+      yCenterFrac = (bboxOrRects[1] + bboxOrRects[3]) / 2
+    }
+    const elRect = el.getBoundingClientRect()
+    const cRect  = container.getBoundingClientRect()
+    // Absolute offset of the bbox centre from the top of the container's scroll area
+    const bboxCenterAbs = container.scrollTop + elRect.top - cRect.top + yCenterFrac * elRect.height
+    const top = bboxCenterAbs - cRect.height / 2
+    addLogRef.current(`[SCROLL] → page ${pageNum} bbox-center yCtr=${yCenterFrac.toFixed(3)} scrollTop: ${Math.round(top)}`, 'info')
+    container.scrollTo({ top, behavior: 'smooth' })
+  }, [scrollPageIntoView])
   // ── Auto-fit: scale PDF to fill container width ────────────────────────
   const recalcScale = useCallback(() => {
     const container = pagesContainerRef.current
@@ -738,6 +764,7 @@ const fileInputRef = useRef(null)
       if (extractionAbortRef.current) { extractionAbortRef.current.abort(); extractionAbortRef.current = null }
       if (pdfDocRef.current) { pdfDocRef.current.destroy(); pdfDocRef.current = null }
       pdfBufferRef.current = null
+      setPdfMainThreadReady(false)
     }
     // (Zoom-only: extraction state kept; canvases remount via renderScale in key)
 
@@ -828,10 +855,9 @@ const fileInputRef = useRef(null)
           setupObserver()
           // Consume any pending cross-doc navigation (set before switching activeDocumentId)
           if (pendingNavRef.current) {
-            const { pageNum, chunkText, bbox, narrowBbox, chunkIdx } = pendingNavRef.current
+            const { pageNum, chunkText, bbox, narrowBbox, lineRects, chunkIdx } = pendingNavRef.current
             pendingNavRef.current = null
-            scrollPageIntoView(pageNum, 'center')
-            setActiveCitations(new Map([[1, { text: chunkText, page_num: pageNum, bbox, narrowBbox }]]))
+            setActiveCitations(new Map([[1, { text: chunkText, page_num: pageNum, bbox, narrowBbox, lineRects }]]))
             if (chunkIdx != null) {
               setActiveChunkKey(`${pageNum}-${chunkIdx}`)
               setExtractedTextOpen(true)
@@ -904,6 +930,7 @@ const fileInputRef = useRef(null)
         }).promise.then(pdf => {
           if (cancelled) { pdf.destroy(); return }
           pdfDocRef.current = pdf
+          setPdfMainThreadReady(true)
         }).catch(() => {})
       }
     } else {
@@ -931,6 +958,7 @@ const fileInputRef = useRef(null)
           const pdf  = await task.promise
           if (cancelled) { pdf.destroy(); return }
           pdfDocRef.current = pdf
+          setPdfMainThreadReady(true)
         })
         .catch(err => {
           if (!cancelled) { setPdfError(err?.message || 'Failed to load PDF'); if (isDocChange) setPdfLoading(false) }
@@ -1057,7 +1085,6 @@ const fileInputRef = useRef(null)
   const [deleteDocConfirm, setDeleteDocConfirm] = useState(null) // { docId, docName, noteCount, isIndexed }
   // ── Connectivity warnings ──────────────────────────────────────────────
   const [connectivity, setConnectivity] = useState({ llm: null, embed: null }) // null=checking, {ok,error}=result
-  const [connectivityDismissed, setConnectivityDismissed] = useState(false)
   // ── Connectivity check — runs once on mount, can be re-triggered ──────────
   const checkConnectivity = useCallback(async () => {
     setConnectivityDismissed(false)
@@ -1071,7 +1098,12 @@ const fileInputRef = useRef(null)
     })
   }, [])
 
-  useEffect(() => { checkConnectivity() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // Initial check + one automatic retry after 4 s (covers slow Ollama startup)
+    checkConnectivity()
+    const retryId = setTimeout(checkConnectivity, 4000)
+    return () => clearTimeout(retryId)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persistence effects for chunking + chunk counts — must be after their declarations (TDZ)
   useEffect(() => {
@@ -1183,8 +1215,10 @@ const fileInputRef = useRef(null)
       `[CITATION] page=${firstChunk.page_num} bbox=${bboxStr} area=${bboxArea}${isLarge ? ' ⚠ LARGE BBOX (covers most of page)' : ''} ${lineRects ? `lineRects=${lineRects.length}` : narrowBbox ? `narrowBbox=[${narrowBbox.map(v => v.toFixed(3)).join(', ')}] source=${firstChunk.narrowBboxSource ?? 'unknown'}` : 'narrowBbox=none'}`,
       isLarge ? 'error' : 'ok'
     )
-    scrollPageIntoView(firstChunk.page_num, 'center')
-  }, [activeCitations])
+    // Center the bbox itself in the viewport, not just the page
+    const target = firstChunk.lineRects ?? firstChunk.narrowBbox ?? firstChunk.bbox
+    scrollBboxIntoView(firstChunk.page_num, target)
+  }, [activeCitations]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Stage 4: upgrade active citations with DOM-based bbox after text layer renders.
   // Retries up to 10 × 200ms while waiting for PDF.js to populate the text layer spans.
@@ -1387,6 +1421,7 @@ const fileInputRef = useRef(null)
       createdAt: new Date().toISOString(),
       chunkText: chunk.text,
       chunkBbox: bbox,
+      chunkLineRects: chunk.lineRects ?? null,
       chunkIdx,
     }
     const next = [...notes, note]
@@ -1868,6 +1903,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       setRagStatus('indexed')
       setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'indexed' }))
       setDocChunkCountsById(prev => ({ ...prev, [activeDocumentId]: allChunks.length }))
+      // Embedding succeeded — clear any stale "embed unavailable" banner
+      setConnectivity(prev => prev.embed?.ok === false ? { ...prev, embed: { ...prev.embed, ok: true } } : prev)
 
     } catch (err) {
       console.error('[RAG] indexing failed:', err)
@@ -1882,6 +1919,54 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       setRagProgress('')
     }
   }, [activeDocumentId, caseId, chunkingStrategy, addLog])
+
+  // Lightweight chunk reload — display-only, never re-embeds.
+  // Used by: recovery effect + manual "Reload chunks" button.
+  // Path 1: try server extraction cache → apply strategy → set extractedPages.
+  // Path 2: if cache missing, re-extract from the main-thread pdfDoc → apply strategy.
+  // Embeddings are NOT touched (they already exist in SQLite).
+  const reloadChunksOnly = useCallback(async () => {
+    if (!activeDocumentId) return
+    const applyStrategy = (rawPages) => {
+      let rawChunks
+      if (chunkingStrategy === 'clause') rawChunks = chunkByClauses(rawPages)
+      else if (chunkingStrategy === 'sentence') rawChunks = chunkBySentences(rawPages)
+      else rawChunks = chunkRecursive(rawPages, CHUNKING_STRATEGIES[chunkingStrategy]?.targetWords ?? 300)
+      const byPage = new Map()
+      for (const c of rawChunks) {
+        if (!byPage.has(c.pageNum)) byPage.set(c.pageNum, [])
+        byPage.get(c.pageNum).push(c)
+      }
+      return rawPages.map(p => ({ ...p, chunks: byPage.get(p.pageNum) ?? [] }))
+    }
+
+    // Path 1 — server cache
+    try {
+      const saved = await loadExtraction(activeDocumentId, { caseId })
+      const totalCached = saved?.pages?.reduce((s, p) => s + (p.chunks?.length ?? 0), 0) ?? 0
+      if (saved?.pages?.length && totalCached > 0) {
+        const pages = applyStrategy(saved.pages)
+        setExtractedPages(pages)
+        lastExtractionPagesRef.current = { docId: activeDocumentId, pages }
+        return
+      }
+    } catch { /* fall through to path 2 */ }
+
+    // Path 2 — re-extract from loaded PDF (no embedding)
+    if (!pdfDocRef.current) return
+    setExtractionStatus('Re-extracting text…')
+    setExtractingText(true)
+    try {
+      const rawPages = await extractPageChunksFromPDF(pdfDocRef.current, { onStatus: setExtractionStatus })
+      if (!rawPages) return
+      const pages = applyStrategy(rawPages)
+      setExtractedPages(pages)
+      lastExtractionPagesRef.current = { docId: activeDocumentId, pages }
+    } finally {
+      setExtractingText(false)
+      setExtractionStatus('')
+    }
+  }, [activeDocumentId, caseId, chunkingStrategy]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
@@ -2031,6 +2116,17 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       handleIndexDocument()
     }
   }, [extractedPages, ragStatus, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Recovery: doc is confirmed indexed in SQLite but extraction cache is missing (extractedPages
+  // still null after loadExtraction returned nothing). Re-extract from the loaded PDF so the Text
+  // Chunks panel shows content. Uses pdfMainThreadReady (state) so the effect reliably re-fires
+  // once the main-thread pdfDoc is available — pageCount alone isn't enough because the render
+  // worker sends 'ready' before the main-thread pdfjsLib.getDocument() promise resolves.
+  // forceClear:false keeps existing embeddings; server re-upserts unchanged chunks harmlessly.
+  useEffect(() => {
+    if (ragStatus !== 'indexed' || extractedPages || !activeDocumentId || !pdfMainThreadReady) return
+    reloadChunksOnly()
+  }, [ragStatus, extractedPages, activeDocumentId, pdfMainThreadReady]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const textPanelDragging = useRef(false)
   const textPanelDragStartY = useRef(0)
@@ -2365,8 +2461,12 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                     </div>
                                     <div className="pdfapp-doc-card-info">
                                       <span className="pdfapp-doc-card-name" title={doc.name}>{doc.name}</span>
-                                      {pageCountsById[doc.id] != null && (
-                                        <span className="pdfapp-doc-card-pages">{pageCountsById[doc.id]} pages</span>
+                                      {(pageCountsById[doc.id] != null || docChunkCountsById[doc.id] != null) && (
+                                        <span className="pdfapp-doc-card-pages">
+                                          {pageCountsById[doc.id] != null ? `${pageCountsById[doc.id]} page${pageCountsById[doc.id] === 1 ? '' : 's'}` : ''}
+                                          {pageCountsById[doc.id] != null && docChunkCountsById[doc.id] != null ? ' · ' : ''}
+                                          {docChunkCountsById[doc.id] != null ? `${docChunkCountsById[doc.id]} chunks` : ''}
+                                        </span>
                                       )}
                                     </div>
                                     <div className="pdfapp-doc-card-right">
@@ -2762,6 +2862,32 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                         onClick={() => { setRagStatus('failed'); setRagProgress('') }}
                       >■ Cancel</button>
                     )}
+                    {/* Service status dots — only shown when a service is confirmed down */}
+                    {connectivity.embed && !connectivity.embed.ok && (() => {
+                      const embedIsLlamafile = (connectivity.embed?.backend ?? 'ollama') === 'llamafile'
+                      const embedModel = connectivity.embed?.model ?? import.meta.env.VITE_OLLAMA_EMBED_MODEL ?? 'nomic-embed-text:latest'
+                      const tip = embedIsLlamafile
+                        ? `Embedding offline — start: ./llamafile/llamafiler -m ./llamafile/nomic-embed-text-v1.5.Q8_0.gguf --embedding`
+                        : `Embedding offline — run: ollama serve  then: ollama pull ${embedModel}`
+                      return (
+                        <span className="pdfapp-svc-dot pdfapp-svc-dot--down" title={tip}
+                          onClick={checkConnectivity}>
+                          <span className="pdfapp-svc-dot-label">embed</span>
+                        </span>
+                      )
+                    })()}
+                    {connectivity.llm && !connectivity.llm.ok && (() => {
+                      const isLlamafile = LLM_BACKEND_NAME === 'llamafile'
+                      const tip = isLlamafile
+                        ? `LLM offline — start: ./llamafile/llamafiler -m ./llamafile/${LLM_MODEL_NAME} -l 0.0.0.0:8081`
+                        : `LLM offline — run: ollama serve  then: ollama pull ${LLM_MODEL_NAME}`
+                      return (
+                        <span className="pdfapp-svc-dot pdfapp-svc-dot--down" title={tip}
+                          onClick={checkConnectivity}>
+                          <span className="pdfapp-svc-dot-label">llm</span>
+                        </span>
+                      )
+                    })()}
                     <button
                       className="pdfapp-action-btn pdfapp-action-btn--menu"
                       title="Text processing guide & settings"
@@ -2984,7 +3110,9 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     <div className="pdfapp-extracted-prompt">
                       <span className="pdfapp-extracted-placeholder">
                         {activeDoc?.file
-                          ? <>Press <strong>Prepare for search</strong> above to start extraction.</>
+                          ? ragStatus === 'indexed'
+                            ? <>Chunks not loaded. <button className="pdfapp-reload-chunks-btn" onClick={reloadChunksOnly}>Reload chunks</button></>
+                            : <>Press <strong>Prepare for search</strong> above to start extraction.</>
                           : 'No file loaded — upload a PDF to get started.'}
                       </span>
                     </div>
@@ -3202,13 +3330,21 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
             }
           }
           const goToChunk = (docId, n) => {
-            const nav = { pageNum: n.pageNum, chunkText: n.chunkText || '', bbox: n.chunkBbox || null, narrowBbox: null, chunkIdx: n.chunkIdx }
+            // Prefer live chunk data (up-to-date after re-chunking); fall back to frozen snapshot on note
+            const livePage = docId === activeDocumentId
+              ? extractedPages?.find(p => p.pageNum === n.pageNum)
+              : null
+            const liveChunk = livePage?.chunks?.[n.chunkIdx] ?? null
+            const bbox      = liveChunk?.bbox      ?? n.chunkBbox      ?? null
+            const lineRects = liveChunk?.lineRects ?? n.chunkLineRects ?? null
+            const chunkText = liveChunk?.text      ?? n.chunkText      ?? ''
+            const nav = { pageNum: n.pageNum, chunkText, bbox, narrowBbox: null, lineRects, chunkIdx: n.chunkIdx }
             if (docId !== activeDocumentId) {
               pendingNavRef.current = nav
               setActiveDocumentId(docId)
             } else {
-              scrollPageIntoView(n.pageNum, 'center')
-              setActiveCitations(new Map([[1, { text: n.chunkText || '', page_num: n.pageNum, bbox: n.chunkBbox || null, narrowBbox: null }]]))
+              scrollBboxIntoView(n.pageNum, lineRects ?? bbox)
+              setActiveCitations(new Map([[1, { text: chunkText, page_num: n.pageNum, bbox, narrowBbox: null, lineRects }]]))
               setActiveChunkKey(`${n.pageNum}-${n.chunkIdx}`)
               setExtractedTextOpen(true)
             }
@@ -3217,13 +3353,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           // ── Note row renderer ──
           const renderNoteRow = (n, doc) => {
             const isEditing = editingNoteId === n.id
-            const isExpanded = !!notesCollapsed[`note-exp:${n.id}`]
             const dateStr = n.createdAt ? new Date(n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''
             const navigate = () => n.chunkIdx != null ? goToChunk(doc.id, n) : goToNote(doc.id, n.pageNum)
             return (
               <div key={n.id} className={`nt-note-row${doc.id !== activeDocumentId ? ' nt-note-row--other' : ''}`}>
                 <div className="nt-note-meta">
-                  <span className="nt-page-badge">p.{n.pageNum}</span>
+                  <span className="nt-page-badge">page {n.pageNum}</span>
+                  {n.chunkIdx != null && <span className="nt-chunk-badge">chunk {n.chunkIdx}</span>}
                   {dateStr && <span className="nt-date">{dateStr}</span>}
                   <div className="nt-row-actions">
                     <button className="nt-action-btn" title="Navigate" onClick={navigate}>→</button>
@@ -3244,9 +3380,12 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                     }}
                   />
                 ) : (
-                  <div className="nt-note-text" onClick={() => toggle(`note-exp:${n.id}`)}>
-                    {isExpanded || n.text.length <= 80 ? n.text : n.text.slice(0, 80) + '…'}
-                  </div>
+                  <>
+                    {n.chunkText && (
+                      <div className="nt-chunk-quote">{n.chunkText}</div>
+                    )}
+                    <div className="nt-note-text">{n.text}</div>
+                  </>
                 )}
               </div>
             )
@@ -3377,18 +3516,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                       </div>
                                       {!isCol(dk) && (
                                         <div className="nt-children">
-                                          {chunkGroups.map(group => (
-                                            <div key={group.key}>
-                                              <div className="nt-chunk-header" title="Go to chunk" onClick={() => goToChunk(doc.id, group.notes[0])}>
-                                                {group.chunkText
-                                                  ? `"${group.chunkText.slice(0, 65)}${group.chunkText.length > 65 ? '…' : ''}"`
-                                                  : `p.${group.pageNum} · chunk #${group.notes[0].chunkIdx}`}
-                                              </div>
-                                              <div className="nt-children">
-                                                {group.notes.map(n => renderNoteRow(n, doc))}
-                                              </div>
-                                            </div>
-                                          ))}
+                                          {chunkGroups.flatMap(group => group.notes.map(n => renderNoteRow(n, doc)))}
                                           {pageOnly.map(n => renderNoteRow(n, doc))}
                                         </div>
                                       )}
@@ -3972,65 +4100,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         </div>
       , document.body)}
 
-      {/* ── Connectivity Warning Banner ── */}
-      {!connectivityDismissed && (() => {
-        const llmDown   = connectivity.llm   && !connectivity.llm.ok
-        const embedDown = connectivity.embed && !connectivity.embed.ok
-        if (!llmDown && !embedDown) return null
-
-        const isLlamafile = LLM_BACKEND_NAME === 'llamafile'
-        const embedBackend = connectivity.embed?.backend ?? 'ollama'
-        const embedIsLlamafile = embedBackend === 'llamafile'
-
-        // Build one item per distinct issue, de-duplicating when both use Ollama
-        const items = []
-        if (llmDown) {
-          items.push({
-            label: 'AI chat is unavailable.',
-            fix: isLlamafile
-              ? `Start llamafile chat: ./llamafile/llamafiler -m ./llamafile/${LLM_MODEL_NAME} -l 0.0.0.0:8081`
-              : `Start Ollama: ollama serve   then:  ollama pull ${LLM_MODEL_NAME}`,
-          })
-        }
-        if (embedDown) {
-          // If both down and same Ollama backend, already covered above
-          const alreadyCovered = llmDown && !isLlamafile && !embedIsLlamafile
-          if (!alreadyCovered) {
-            items.push({
-              label: 'Document search (embedding) is unavailable.',
-              fix: embedIsLlamafile
-                ? `Start llamafile embed: ./llamafile/llamafiler -m ./llamafile/nomic-embed-text-v1.5.Q8_0.gguf --embedding`
-                : `Start Ollama: ollama serve   then:  ollama pull ${connectivity.embed?.model ?? 'nomic-embed-text'}`,
-            })
-          }
-        }
-
-        return createPortal(
-          <div className="pdfapp-conn-banner">
-            <div className="pdfapp-conn-banner-body">
-              <svg className="pdfapp-conn-banner-icon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>
-              </svg>
-              <div className="pdfapp-conn-banner-items">
-                {items.map((item, i) => (
-                  <div key={i} className="pdfapp-conn-banner-item">
-                    <span className="pdfapp-conn-banner-label">{item.label}</span>
-                    <code className="pdfapp-conn-banner-fix">{item.fix}</code>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="pdfapp-conn-banner-actions">
-              <button className="pdfapp-conn-banner-retry" onClick={checkConnectivity} title="Re-check connectivity">
-                ↻ Retry
-              </button>
-              <button className="pdfapp-conn-banner-dismiss" onClick={() => setConnectivityDismissed(true)} title="Dismiss">
-                ✕
-              </button>
-            </div>
-          </div>
-        , document.body)
-      })()}
 
       {/* ── Delete Document Confirmation Modal ── */}
       {deleteDocConfirm && createPortal(
