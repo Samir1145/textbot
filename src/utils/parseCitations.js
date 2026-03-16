@@ -107,8 +107,8 @@ function _computeNarrowBbox(chunk, contextText, extractionPages) {
   const page = extractionPages.find(p => p.pageNum === chunk.page_num)
   if (!page) return null
 
-  // Match chunk in extraction cache by index, fall back to text prefix
-  const ec = page.chunks[chunk.chunk_idx]
+  // Match by page-local idx (set by enrichCitationsWithLiveData), fall back to text prefix
+  const ec = (chunk.pageLocalIdx != null ? page.chunks[chunk.pageLocalIdx] : null)
     ?? page.chunks.find(c => c.text.slice(0, 60) === chunk.text.slice(0, 60))
 
   // Prefer persisted sourceWords; fall back to rawWords rebuild (fixes reload bug)

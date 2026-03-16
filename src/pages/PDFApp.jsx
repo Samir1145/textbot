@@ -30,6 +30,30 @@ async function _fetchSuggestions(question, answer) {
   } catch { return [] }
 }
 
+// ── Citation live-data enrichment ───────────────────────────────────────────
+// Replaces stale SQLite bbox/chunk_idx on citation objects with live data from
+// extractedPages: fresh bbox, lineRects, and the PAGE-LOCAL chunk index needed
+// for chunk panel scrolling. Matches by text prefix (first 60 chars).
+function enrichCitationsWithLiveData(citations, extractedPages) {
+  if (!extractedPages || !citations.size) return citations
+  const out = new Map()
+  for (const [n, chunk] of citations) {
+    const page = extractedPages.find(p => p.pageNum === chunk.page_num)
+    if (!page) { out.set(n, chunk); continue }
+    const prefix = chunk.text.slice(0, 60)
+    const localIdx = page.chunks.findIndex(c => c.text.slice(0, 60) === prefix)
+    if (localIdx < 0) { out.set(n, chunk); continue }
+    const live = page.chunks[localIdx]
+    out.set(n, {
+      ...chunk,
+      bbox:         live.bbox      ?? chunk.bbox,
+      lineRects:    live.lineRects ?? null,
+      pageLocalIdx: localIdx,
+    })
+  }
+  return out
+}
+
 // ── Word-count-based chunk merging ──────────────────────────────────────────
 // Merges paragraph chunks so each resulting chunk is ≤ targetWords words.
 function estimateTokens(text) {
@@ -189,103 +213,7 @@ function _splitParaIntoSentences(para) {
   return sentences.length > 0 ? sentences : [{ text: para.text, words }]
 }
 
-// ── Strategy 1: Clause ───────────────────────────────────────────────────
-// Splits at sentence boundaries, semicolons (legal enumeration), and
-// legal section markers (ARTICLE, Section, (a), numbered items).
-// Best for precise citation lookup and clause-level highlights.
-function chunkByClauses(pages) {
-  const MIN_WORDS = 6
-  const MAX_WORDS = 100
-  const SECTION_RE = /^(ARTICLE|Section|CLAUSE|SCHEDULE|WHEREAS|NOW|WITNESSETH)\b/i
-  const LEGAL_ITEM_RE = /^(\([a-z]\)|\([ivxIVX]+\)|\d+\.\s)/
-  const result = []
-
-  for (const page of pages) {
-    const words = page.rawWords?.length
-      ? page.rawWords
-      : (page.chunks ?? []).flatMap(c => c.sourceWords ?? [])
-
-    if (!words.length) {
-      for (const c of (page.chunks ?? []))
-        if (c.text?.trim()) result.push({ pageNum: page.pageNum, text: c.text, bbox: c.bbox, lineRects: _lineRectsFromWords(c.sourceWords), sourceWords: c.sourceWords })
-      continue
-    }
-
-    let buf = []
-    const flush = () => {
-      if (buf.length < MIN_WORDS) return
-      if (buf.length > MAX_WORDS) {
-        for (let i = 0; i < buf.length; i += MAX_WORDS) {
-          const s = buf.slice(i, i + MAX_WORDS)
-          result.push({ pageNum: page.pageNum, text: s.map(w => w.text).join(' '), bbox: _bboxFromWords(s), lineRects: _lineRectsFromWords(s), sourceWords: s })
-        }
-      } else {
-        result.push({ pageNum: page.pageNum, text: buf.map(w => w.text).join(' '), bbox: _bboxFromWords(buf), lineRects: _lineRectsFromWords(buf), sourceWords: buf })
-      }
-      buf = []
-    }
-
-    for (let i = 0; i < words.length; i++) {
-      buf.push(words[i])
-      const raw = words[i].text.trimEnd()
-      const next = words[i + 1]
-      const isSentenceEnd = /[.?!]$/.test(raw) && !_ABBREVS.test(raw) && (!next || /^[A-Z("]/.test(next.text.trim()))
-      const isSemicolon   = raw.endsWith(';')
-      const nextIsMarker  = next && (SECTION_RE.test(next.text) || LEGAL_ITEM_RE.test(next.text))
-      if ((isSentenceEnd || isSemicolon || nextIsMarker) && buf.length >= MIN_WORDS) flush()
-    }
-    flush()
-  }
-  return result
-}
-
-// ── Strategy 2: Sentence ────────────────────────────────────────────────
-// Splits at sentence boundaries only. Each sentence is one chunk.
-// The LLM receives ±windowSize surrounding sentences at query time for context.
-// Best for precise search + full-context answers.
-function chunkBySentences(pages) {
-  const MIN_WORDS = 5
-  const MAX_WORDS = 80
-  const result = []
-
-  for (const page of pages) {
-    const words = page.rawWords?.length
-      ? page.rawWords
-      : (page.chunks ?? []).flatMap(c => c.sourceWords ?? [])
-
-    if (!words.length) {
-      for (const c of (page.chunks ?? []))
-        if (c.text?.trim()) result.push({ pageNum: page.pageNum, text: c.text, bbox: c.bbox, lineRects: _lineRectsFromWords(c.sourceWords), sourceWords: c.sourceWords })
-      continue
-    }
-
-    let buf = []
-    const flush = () => {
-      if (buf.length < MIN_WORDS) return
-      if (buf.length > MAX_WORDS) {
-        for (let i = 0; i < buf.length; i += MAX_WORDS) {
-          const s = buf.slice(i, i + MAX_WORDS)
-          result.push({ pageNum: page.pageNum, text: s.map(w => w.text).join(' '), bbox: _bboxFromWords(s), lineRects: _lineRectsFromWords(s), sourceWords: s })
-        }
-      } else {
-        result.push({ pageNum: page.pageNum, text: buf.map(w => w.text).join(' '), bbox: _bboxFromWords(buf), lineRects: _lineRectsFromWords(buf), sourceWords: buf })
-      }
-      buf = []
-    }
-
-    for (let i = 0; i < words.length; i++) {
-      buf.push(words[i])
-      const raw = words[i].text.trimEnd()
-      const next = words[i + 1]
-      const isSentenceEnd = /[.?!]$/.test(raw) && !_ABBREVS.test(raw) && (!next || /^[A-Z("]/.test(next.text.trim()))
-      if (isSentenceEnd && buf.length >= MIN_WORDS) flush()
-    }
-    flush()
-  }
-  return result
-}
-
-// ── Strategy 3: Recursive ───────────────────────────────────────────────
+// ── Chunking: Recursive ─────────────────────────────────────────────────
 // Accumulates paragraphs up to targetWords. If a paragraph exceeds the
 // target it's split into sentences; sentences that still exceed are split
 // by words. Merges adjacent small units to avoid orphan fragments.
@@ -508,8 +436,6 @@ const fileInputRef = useRef(null)
   useEffect(() => {
     if (caseId) localStorage.setItem(`pdf-pagecounts-${caseId}`, JSON.stringify(pageCountsById))
   }, [pageCountsById, caseId])
-  // NOTE: chunking persistence useEffect is placed AFTER chunkingStrategy declaration (below)
-  // to avoid TDZ — dep arrays are evaluated immediately when useEffect() is called.
 
   // ── PDF Notes ──
   const [notes, setNotes] = useState([])          // [{id, pageNum, x, y, text, createdAt}]
@@ -1072,15 +998,7 @@ const fileInputRef = useRef(null)
   const [ragProgress, setRagProgress] = useState('')
 
   // ── Chunking strategy (Option D — case-level setting) ──────────────────
-  const CHUNKING_STRATEGIES = {
-    clause:    { label: 'Clause',    windowSize: 0 },
-    sentence:  { label: 'Sentence',  windowSize: 2 },
-    recursive: { label: 'Recursive', windowSize: 0, targetWords: 300 },
-  }
-  const [chunkingStrategy, setChunkingStrategy] = useState(() => {
-    const saved = caseId && localStorage.getItem(`chunking-${caseId}`)
-    return (saved && CHUNKING_STRATEGIES[saved]) ? saved : 'recursive'
-  })
+  const CHUNK_TARGET_WORDS = 300
   const [chunkGuideOpen, setChunkGuideOpen] = useState(false)
   const [deleteDocConfirm, setDeleteDocConfirm] = useState(null) // { docId, docName, noteCount, isIndexed }
   // ── Connectivity warnings ──────────────────────────────────────────────
@@ -1105,10 +1023,7 @@ const fileInputRef = useRef(null)
     return () => clearTimeout(retryId)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Persistence effects for chunking + chunk counts — must be after their declarations (TDZ)
-  useEffect(() => {
-    if (caseId) localStorage.setItem(`chunking-${caseId}`, chunkingStrategy)
-  }, [chunkingStrategy, caseId])
+  // Persistence effects for chunk counts — must be after their declarations (TDZ)
   useEffect(() => {
     if (caseId) localStorage.setItem(`pdf-chunkcounts-${caseId}`, JSON.stringify(docChunkCountsById))
   }, [docChunkCountsById, caseId])
@@ -1220,50 +1135,6 @@ const fileInputRef = useRef(null)
     scrollBboxIntoView(firstChunk.page_num, target)
   }, [activeCitations]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Stage 4: upgrade active citations with DOM-based bbox after text layer renders.
-  // Retries up to 10 × 200ms while waiting for PDF.js to populate the text layer spans.
-  useEffect(() => {
-    if (!activeCitations.size || !pagesContainerRef.current) return
-
-    const toUpgrade = [...activeCitations.entries()].filter(
-      ([, chunk]) => chunk.bbox && chunk.narrowBboxSource !== 'textlayer'
-    )
-    if (!toUpgrade.length) return
-
-    let cancelled = false
-    let attempts = 0
-
-    function tryUpgrade() {
-      if (cancelled) return
-      attempts++
-      const upgrades = []
-
-      for (const [n, chunk] of toUpgrade) {
-        const textLayerDiv = pagesContainerRef.current?.querySelector(`[data-textlayer="${chunk.page_num}"]`)
-        if (!textLayerDiv) continue
-        if (!textLayerDiv.querySelectorAll('span').length) continue // not yet rendered
-
-        const pageWrapper = textLayerDiv.parentElement
-        const domBbox = findTextInTextLayer(pageWrapper, chunk.text)
-        if (domBbox) upgrades.push([n, { ...chunk, narrowBbox: domBbox, narrowBboxSource: 'textlayer' }])
-      }
-
-      if (upgrades.length) {
-        if (!cancelled) {
-          setActiveCitations(prev => {
-            const next = new Map(prev)
-            for (const [n, upgraded] of upgrades) next.set(n, upgraded)
-            return next
-          })
-        }
-      } else if (attempts < 10) {
-        setTimeout(tryUpgrade, 200)
-      }
-    }
-
-    const t = setTimeout(tryUpgrade, 150)
-    return () => { cancelled = true; clearTimeout(t) }
-  }, [activeCitations]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const chatAbortRef = useRef(null)
   const chatMessagesRef = useRef(null)
@@ -1730,7 +1601,7 @@ const fileInputRef = useRef(null)
       if (!rawChunks) {
         rawChunks = caseSearchActive && caseId
           ? await searchCaseChunks(caseId, text, 5)
-          : await searchDocChunks(activeDocumentId, text, 3, { caseId, windowSize: CHUNKING_STRATEGIES[chunkingStrategy]?.windowSize ?? 0 })
+          : await searchDocChunks(activeDocumentId, text, 3, { caseId })
         if (rawChunks?.length) ragQueryCacheRef.current.set(cacheKey, rawChunks)
       }
       // Build doc-name labels so the LLM prompt shows human-readable provenance
@@ -1751,13 +1622,13 @@ const fileInputRef = useRef(null)
         : ''
 
     // Build message history for Ollama
-    const systemPrompt = `You are LexChat, an expert legal AI assistant. You help legal professionals analyze documents, answer legal questions, and provide guidance on legal matters.${docContext}
+    const systemPrompt = `You are LexChat, a legal AI assistant. Analyze documents and answer legal questions concisely. Not a substitute for qualified legal counsel.${docContext}`
 
-Important: You assist with legal workflows but do not provide legal advice. Always recommend qualified legal professionals for final decisions.`
-
+    // Keep only the last 6 messages (3 exchanges) to limit context growth
+    const recentHistory = chatMessages.slice(-6)
     const ollamaMessages = [
       { role: 'system', content: systemPrompt },
-      ...chatMessages,
+      ...recentHistory,
       userMsg,
     ]
 
@@ -1773,13 +1644,14 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       })
       let accumulated_final = accumulated
 
-      // ATG: parse which [n] citations the LLM actually used
+      // Parse which [n] citations the LLM used, then enrich with live bbox + pageLocalIdx
       let msgCitations = parseCitations(accumulated_final, chunkMap)
-      // Narrow paragraph-level bboxes to sentence-level using extraction cache
       if (msgCitations.size) {
         const cachedPages = lastExtractionPagesRef.current?.docId === activeDocumentId
-          ? lastExtractionPagesRef.current.pages
-          : null
+          ? lastExtractionPagesRef.current.pages : null
+        // Enrich first: replaces stale SQLite bbox with live coords + page-local idx + lineRects
+        msgCitations = enrichCitationsWithLiveData(msgCitations, cachedPages)
+        // Then narrow to sentence-level bbox where possible (now uses correct pageLocalIdx)
         msgCitations = narrowCitations(msgCitations, accumulated_final, cachedPages)
       }
       const assistantMsg = msgCitations.size
@@ -1794,14 +1666,6 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       if (caseId) saveChatHistory(activeDocumentId, finalMessages, { caseId }).catch(() => {})
 
       addLog('LexChat response received', 'ok')
-
-      // Fire follow-up suggestions async — non-blocking
-      _fetchSuggestions(text, accumulated_final).then(suggestions => {
-        if (!suggestions?.length) return
-        setChatMessages(prev => prev.map(m =>
-          m.id === assistantId ? { ...m, suggestions } : m
-        ))
-      }).catch(() => {})
     } catch (err) {
       if (err.name === 'AbortError') return
       addLog(`LexChat error: ${err.message}`, 'error')
@@ -1849,16 +1713,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         pages = await extractPageChunksFromPDF(pdf, { onStatus: setRagProgress })
       }
 
-      // Step 4 — chunk using selected strategy (works from rawWords for free re-chunking)
-      let rawChunks
-      if (chunkingStrategy === 'clause') {
-        rawChunks = chunkByClauses(pages)
-      } else if (chunkingStrategy === 'sentence') {
-        rawChunks = chunkBySentences(pages)
-      } else {
-        // 'recursive' (default) — paragraph → sentence → word hierarchy
-        rawChunks = chunkRecursive(pages, CHUNKING_STRATEGIES[chunkingStrategy]?.targetWords ?? 300)
-      }
+      // Step 4 — chunk using recursive strategy (paragraph → sentence → word, ~300 words)
+      const rawChunks = chunkRecursive(pages, CHUNK_TARGET_WORDS)
       const allChunks = rawChunks.map((c, idx) => ({
         pageNum: c.pageNum,
         chunkIdx: idx,
@@ -1918,7 +1774,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       isIndexingRef.current = false
       setRagProgress('')
     }
-  }, [activeDocumentId, caseId, chunkingStrategy, addLog])
+  }, [activeDocumentId, caseId, addLog])
 
   // Lightweight chunk reload — display-only, never re-embeds.
   // Used by: recovery effect + manual "Reload chunks" button.
@@ -1928,10 +1784,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
   const reloadChunksOnly = useCallback(async () => {
     if (!activeDocumentId) return
     const applyStrategy = (rawPages) => {
-      let rawChunks
-      if (chunkingStrategy === 'clause') rawChunks = chunkByClauses(rawPages)
-      else if (chunkingStrategy === 'sentence') rawChunks = chunkBySentences(rawPages)
-      else rawChunks = chunkRecursive(rawPages, CHUNKING_STRATEGIES[chunkingStrategy]?.targetWords ?? 300)
+      const rawChunks = chunkRecursive(rawPages, CHUNK_TARGET_WORDS)
       const byPage = new Map()
       for (const c of rawChunks) {
         if (!byPage.has(c.pageNum)) byPage.set(c.pageNum, [])
@@ -1966,7 +1819,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
       setExtractingText(false)
       setExtractionStatus('')
     }
-  }, [activeDocumentId, caseId, chunkingStrategy]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeDocumentId, caseId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
@@ -2076,14 +1929,11 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         setExtractionSource(saved.isOcr ? 'ocr' : 'text')
         setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'extracted' }))
         if (saved.pages) {
-          // If getDocRagStatus already resolved (doc confirmed indexed), apply strategy chunks
+          // If getDocRagStatus already resolved (doc confirmed indexed), apply chunking
           // immediately for display — otherwise auto-index will apply them after embedding.
           let pages = saved.pages
           if (ragStatusByDocRef.current[activeDocumentId]) {
-            let rawChunks
-            if (chunkingStrategy === 'clause') rawChunks = chunkByClauses(saved.pages)
-            else if (chunkingStrategy === 'sentence') rawChunks = chunkBySentences(saved.pages)
-            else rawChunks = chunkRecursive(saved.pages, CHUNKING_STRATEGIES[chunkingStrategy]?.targetWords ?? 300)
+            const rawChunks = chunkRecursive(saved.pages, CHUNK_TARGET_WORDS)
             const byPage = new Map()
             for (const c of rawChunks) {
               if (!byPage.has(c.pageNum)) byPage.set(c.pageNum, [])
@@ -2714,12 +2564,16 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                   if (!extractedPages) return
                                   const pg = extractedPages.find(p => p.pageNum === chunk.page_num)
                                   if (!pg) return
-                                  const idx = chunk.chunk_idx ?? pg.chunks.findIndex(c =>
+                                  // pageLocalIdx set by enrichCitationsWithLiveData; fall back to bbox match
+                                  const idx = chunk.pageLocalIdx ?? pg.chunks.findIndex(c =>
                                     c.bbox && chunk.bbox &&
                                     Math.abs(c.bbox[0] - chunk.bbox[0]) < 0.005 &&
                                     Math.abs(c.bbox[1] - chunk.bbox[1]) < 0.005
                                   )
-                                  if (idx >= 0) setActiveChunkKey(`${chunk.page_num}-${idx}`)
+                                  if (idx >= 0) {
+                                    setActiveChunkKey(`${chunk.page_num}-${idx}`)
+                                    setExtractedTextOpen(true)
+                                  }
                                 }
                                 // Per-line highlight: one stripe per text row — no whitespace gaps,
                                 // no column spillover. Falls back to single-rect for LLM citations
@@ -4066,22 +3920,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
               <div className="pdfapp-guide-section pdfapp-guide-section--settings">
                 <p className="pdfapp-guide-text">
-                  Controls how the document is split into searchable passages. Change strategy then click <strong>Chunk Text</strong> — no re-upload needed.
+                  Splits the document into ~300-word passages for semantic search. Click <strong>Chunk Text</strong> to re-index with the latest extraction.
                 </p>
-                <div className="pdfapp-strategy-btns" style={{ margin: '8px 0 6px' }}>
-                  {Object.entries(CHUNKING_STRATEGIES).map(([key, { label }]) => (
-                    <button
-                      key={key}
-                      className={`pdfapp-strategy-btn${chunkingStrategy === key ? ' pdfapp-strategy-btn--active' : ''}`}
-                      onClick={() => setChunkingStrategy(key)}
-                    >{label}</button>
-                  ))}
-                </div>
-                <div className="pdfapp-strategy-desc">
-                  {chunkingStrategy === 'clause'    && 'Clause — splits at sentences, semicolons, and legal markers (ARTICLE, Section, (a)). Best for precise clause citation and quote lookup.'}
-                  {chunkingStrategy === 'sentence'  && 'Sentence — each sentence is one chunk; the AI receives ±2 surrounding sentences for context. Best for precise search with full-context answers.'}
-                  {chunkingStrategy === 'recursive' && 'Recursive — fills ~300 words by merging paragraphs, splitting oversized ones into sentences. Best for general Q&A and balanced retrieval.'}
-                </div>
               </div>
 
               {activeDoc?.file && (
