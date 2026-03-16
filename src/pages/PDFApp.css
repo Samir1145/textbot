@@ -1972,6 +1972,11 @@
   background: rgba(59, 130, 246, 0.08);
   border-color: rgba(59, 130, 246, 0.4);
 }
+.pdfapp-source-item--current {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
 
 .pdfapp-source-num {
   font-size: 0.63rem;
@@ -2177,6 +2182,12 @@
   border-color: #3b82f6;
   color: #fff;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+.pdfapp-citation-chip--current {
+  background: #3b82f6;
+  border-color: #60a5fa;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
 }
 
 .pdfapp-cursor {
@@ -2989,6 +3000,11 @@
 .nt-note-row:last-child { border-bottom: none; }
 .nt-note-row:hover { background: var(--bg-2, rgba(0,0,0,0.03)); }
 .nt-note-row--other { opacity: 0.7; }
+.nt-note-row--active {
+  border-left: 2.5px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.04);
+  padding-left: 4px;
+}
 .nt-note-meta {
   display: flex;
   align-items: center;

@@ -382,6 +382,43 @@ const fileInputRef = useRef(null)
     addLogRef.current(`[SCROLL] → page ${pageNum} bbox-center yCtr=${yCenterFrac.toFixed(3)} scrollTop: ${Math.round(top)}`, 'info')
     container.scrollTo({ top, behavior: 'smooth' })
   }, [scrollPageIntoView])
+
+  // ── Unified chunk selection — single entry point for all four panels ───
+  // Calling selectChunk updates: PDF highlight, chunk panel card, notes panel
+  // scroll+highlight, and the reverse-active [n] badge in chat — all in one
+  // synchronous React batch, so the panels stay in sync regardless of which
+  // panel the user interacted with.
+  const selectChunk = useCallback(({ pageNum, pageLocalIdx, text, bbox, lineRects }) => {
+    const chunkKey = `${pageNum}-${pageLocalIdx}`
+
+    // 1. PDF highlight + scroll
+    setActiveCitations(new Map([[1, { text, page_num: pageNum, bbox, lineRects, pageLocalIdx }]]))
+    scrollBboxIntoView(pageNum, lineRects ?? bbox)
+
+    // 2. Chunk panel
+    setActiveChunkKey(chunkKey)
+    setExtractedTextOpen(true)
+
+    // 3. Notes panel
+    setActiveNoteChunkKey(chunkKey)
+
+    // 4. Chat [n] reverse lookup — find if any [n] in the last assistant
+    //    message maps to this chunk; if so, light up that badge.
+    const msgs = latestChatMsgsRef.current
+    const lastCited = [...msgs].reverse().find(m => m.role === 'assistant' && m.citations?.size)
+    let matched = null
+    if (lastCited?.citations) {
+      for (const [n, c] of lastCited.citations) {
+        if (c.page_num === pageNum && (c.pageLocalIdx === pageLocalIdx ||
+            (c.pageLocalIdx == null && c.text?.slice(0, 40) === text?.slice(0, 40)))) {
+          matched = n
+          break
+        }
+      }
+    }
+    setActiveCitationNum(matched)
+  }, [scrollBboxIntoView]) // latestChatMsgsRef is a ref — no dep needed
+
   // ── Auto-fit: scale PDF to fill container width ────────────────────────
   const recalcScale = useCallback(() => {
     const container = pagesContainerRef.current
@@ -785,7 +822,9 @@ const fileInputRef = useRef(null)
             pendingNavRef.current = null
             setActiveCitations(new Map([[1, { text: chunkText, page_num: pageNum, bbox, narrowBbox, lineRects }]]))
             if (chunkIdx != null) {
-              setActiveChunkKey(`${pageNum}-${chunkIdx}`)
+              const ck = `${pageNum}-${chunkIdx}`
+              setActiveChunkKey(ck)
+              setActiveNoteChunkKey(ck)
               setExtractedTextOpen(true)
             }
           }
@@ -1137,9 +1176,13 @@ const fileInputRef = useRef(null)
 
 
   const chatAbortRef = useRef(null)
-  const chatMessagesRef = useRef(null)
-  const chunksPanelRef = useRef(null)
-  const [activeChunkKey, setActiveChunkKey] = useState(null)
+  const chatMessagesRef    = useRef(null)
+  const chunksPanelRef     = useRef(null)
+  const notesPanelRef      = useRef(null)
+  const latestChatMsgsRef  = useRef([])   // mirror of chatMessages for stable selectChunk closure
+  const [activeChunkKey, setActiveChunkKey]         = useState(null)
+  const [activeNoteChunkKey, setActiveNoteChunkKey] = useState(null) // "${pageNum}-${localIdx}"
+  const [activeCitationNum, setActiveCitationNum]   = useState(null) // which [n] is reverse-active
   const [chunkQuery, setChunkQuery] = useState('')
   const [chunkSearchMode, setChunkSearchMode] = useState('idle') // 'idle' | 'filter' | 'semantic'
   const [chunkSemanticResults, setChunkSemanticResults] = useState(null) // null | array of {page_num, chunk_idx}
@@ -1159,12 +1202,22 @@ const fileInputRef = useRef(null)
     }
   }, [chatMessages])
 
+  // Keep stable ref for selectChunk's reverse-citation lookup
+  useEffect(() => { latestChatMsgsRef.current = chatMessages }, [chatMessages])
+
   // Scroll chunk panel to the active card when activeChunkKey changes
   useEffect(() => {
     if (!activeChunkKey || !chunksPanelRef.current) return
     const card = chunksPanelRef.current.querySelector(`[data-chunk-key="${activeChunkKey}"]`)
     if (card) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [activeChunkKey])
+
+  // Scroll notes panel to the active chunk group when activeNoteChunkKey changes
+  useEffect(() => {
+    if (!activeNoteChunkKey || !notesPanelRef.current) return
+    const el = notesPanelRef.current.querySelector(`[data-note-chunk-key="${activeNoteChunkKey}"]`)
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, [activeNoteChunkKey])
 
   // Reset chat + RAG state when document changes; load persisted chat history
   useEffect(() => {
@@ -1174,6 +1227,8 @@ const fileInputRef = useRef(null)
     setChatMessages(sessionMsgs)
     setActiveCitations(sessionLastCited?.citations ?? new Map())
     setActiveChunkKey(null)
+    setActiveNoteChunkKey(null)
+    setActiveCitationNum(null)
     setChunkQuery('')
     setChunkSearchMode('idle')
     setChunkSemanticResults(null)
@@ -1660,7 +1715,7 @@ const fileInputRef = useRef(null)
 
       finalMessages = [...finalMessages.slice(0, -1), assistantMsg]
       setChatMessages(prev => [...prev.slice(0, -1), assistantMsg])
-      if (msgCitations.size) setActiveCitations(msgCitations)
+      if (msgCitations.size) { setActiveCitations(msgCitations); setActiveCitationNum(null) }
 
       // Persist chat history (case mode only)
       if (caseId) saveChatHistory(activeDocumentId, finalMessages, { caseId }).catch(() => {})
@@ -2085,11 +2140,12 @@ const fileInputRef = useRef(null)
             return (
               <button
                 key={i}
-                className={`pdfapp-citation-chip${displayCitations.has(token) ? ' pdfapp-citation-chip--active' : ''}`}
+                className={`pdfapp-citation-chip${displayCitations.has(token) ? ' pdfapp-citation-chip--active' : ''}${activeCitationNum === token ? ' pdfapp-citation-chip--current' : ''}`}
                 title={`Page ${chunk.page_num} — ${chunk.text.slice(0, 120)}${chunk.text.length > 120 ? '…' : ''}`}
                 onClick={() => {
                   addLog(`[CLICK] citation chip [${token}] → page ${chunk.page_num}`, 'info')
-                  setActiveCitations(new Map([[token, chunk]]))
+                  setActiveCitationNum(token)
+                  selectChunk({ pageNum: chunk.page_num, pageLocalIdx: chunk.pageLocalIdx, text: chunk.text, bbox: chunk.bbox, lineRects: chunk.lineRects ?? null })
                 }}
               >
                 {token}
@@ -2564,16 +2620,14 @@ const fileInputRef = useRef(null)
                                   if (!extractedPages) return
                                   const pg = extractedPages.find(p => p.pageNum === chunk.page_num)
                                   if (!pg) return
-                                  // pageLocalIdx set by enrichCitationsWithLiveData; fall back to bbox match
-                                  const idx = chunk.pageLocalIdx ?? pg.chunks.findIndex(c =>
+                                  const localIdx = chunk.pageLocalIdx ?? pg.chunks.findIndex(c =>
                                     c.bbox && chunk.bbox &&
                                     Math.abs(c.bbox[0] - chunk.bbox[0]) < 0.005 &&
                                     Math.abs(c.bbox[1] - chunk.bbox[1]) < 0.005
                                   )
-                                  if (idx >= 0) {
-                                    setActiveChunkKey(`${chunk.page_num}-${idx}`)
-                                    setExtractedTextOpen(true)
-                                  }
+                                  if (localIdx < 0) return
+                                  const live = pg.chunks[localIdx]
+                                  selectChunk({ pageNum: chunk.page_num, pageLocalIdx: localIdx, text: live?.text ?? chunk.text, bbox: live?.bbox ?? chunk.bbox, lineRects: live?.lineRects ?? chunk.lineRects ?? null })
                                 }
                                 // Per-line highlight: one stripe per text row — no whitespace gaps,
                                 // no column spillover. Falls back to single-rect for LLM citations
@@ -2857,18 +2911,8 @@ const fileInputRef = useRef(null)
                               data-chunk-key={chunkKey}
                               className={`pdfapp-chunk-card${activeChunkKey === chunkKey ? ' pdfapp-chunk-card--active' : ''}`}
                               onClick={e => {
-                                // Don't trigger PDF scroll when clicking note button/textarea
                                 if (e.target.closest('.pdfapp-chunk-note-btn') || e.target.closest('.pdfapp-chunk-note-area')) return
-                                setActiveChunkKey(chunkKey)
-                                // lineRects gives per-line stripes directly from sourceWords —
-                                // single render, no async textlayer upgrade needed for chunk clicks.
-                                setActiveCitations(new Map([[1, {
-                                  text: chunk.text,
-                                  page_num: page.pageNum,
-                                  bbox: chunk.bbox,
-                                  lineRects: chunk.lineRects ?? null,
-                                  chunk_idx: idx,
-                                }]]))
+                                selectChunk({ pageNum: page.pageNum, pageLocalIdx: idx, text: chunk.text, bbox: chunk.bbox, lineRects: chunk.lineRects ?? null })
                               }}
                             >
                               <div className="pdfapp-chunk-meta">
@@ -3053,10 +3097,11 @@ const fileInputRef = useRef(null)
                           return (
                             <div key={n} className="pdfapp-source-row">
                               <button
-                                className={`pdfapp-source-item${displayCitations.has(n) ? ' pdfapp-source-item--active' : ''}`}
+                                className={`pdfapp-source-item${displayCitations.has(n) ? ' pdfapp-source-item--active' : ''}${activeCitationNum === n ? ' pdfapp-source-item--current' : ''}`}
                                 onClick={() => {
                                   addLog(`[CLICK] source [${n}] → page ${chunk.page_num}`, 'info')
-                                  setActiveCitations(new Map([[n, chunk]]))
+                                  setActiveCitationNum(n)
+                                  selectChunk({ pageNum: chunk.page_num, pageLocalIdx: chunk.pageLocalIdx, text: chunk.text, bbox: chunk.bbox, lineRects: chunk.lineRects ?? null })
                                 }}
                                 title={hasNarrow ? 'Sentence-level highlight available' : 'Paragraph highlight'}
                               >
@@ -3192,15 +3237,11 @@ const fileInputRef = useRef(null)
             const bbox      = liveChunk?.bbox      ?? n.chunkBbox      ?? null
             const lineRects = liveChunk?.lineRects ?? n.chunkLineRects ?? null
             const chunkText = liveChunk?.text      ?? n.chunkText      ?? ''
-            const nav = { pageNum: n.pageNum, chunkText, bbox, narrowBbox: null, lineRects, chunkIdx: n.chunkIdx }
             if (docId !== activeDocumentId) {
-              pendingNavRef.current = nav
+              pendingNavRef.current = { pageNum: n.pageNum, chunkText, bbox, narrowBbox: null, lineRects, chunkIdx: n.chunkIdx }
               setActiveDocumentId(docId)
             } else {
-              scrollBboxIntoView(n.pageNum, lineRects ?? bbox)
-              setActiveCitations(new Map([[1, { text: chunkText, page_num: n.pageNum, bbox, narrowBbox: null, lineRects }]]))
-              setActiveChunkKey(`${n.pageNum}-${n.chunkIdx}`)
-              setExtractedTextOpen(true)
+              selectChunk({ pageNum: n.pageNum, pageLocalIdx: n.chunkIdx, text: chunkText, bbox, lineRects })
             }
           }
 
@@ -3209,8 +3250,12 @@ const fileInputRef = useRef(null)
             const isEditing = editingNoteId === n.id
             const dateStr = n.createdAt ? new Date(n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''
             const navigate = () => n.chunkIdx != null ? goToChunk(doc.id, n) : goToNote(doc.id, n.pageNum)
+            const noteChunkKey = n.chunkIdx != null ? `${n.pageNum}-${n.chunkIdx}` : null
+            const isActiveChunk = noteChunkKey && activeNoteChunkKey === noteChunkKey && doc.id === activeDocumentId
             return (
-              <div key={n.id} className={`nt-note-row${doc.id !== activeDocumentId ? ' nt-note-row--other' : ''}`}>
+              <div key={n.id}
+                data-note-chunk-key={noteChunkKey ?? undefined}
+                className={`nt-note-row${doc.id !== activeDocumentId ? ' nt-note-row--other' : ''}${isActiveChunk ? ' nt-note-row--active' : ''}`}>
                 <div className="nt-note-meta">
                   <span className="nt-page-badge">page {n.pageNum}</span>
                   {n.chunkIdx != null && <span className="nt-chunk-badge">chunk {n.chunkIdx}</span>}
@@ -3253,7 +3298,7 @@ const fileInputRef = useRef(null)
           )
 
           return (
-            <div className="nt-root">
+            <div className="nt-root" ref={notesPanelRef}>
               {isEmpty && (
                 <div className="pdfapp-evidence-empty">
                   Star sources (★) from chat responses, or add notes from text chunks (✏), to build your evidence collection.
