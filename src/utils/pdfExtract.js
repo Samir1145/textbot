@@ -11,11 +11,15 @@ const SCANNED_THRESHOLD = 50
 
 function clamp01(v) { return Math.max(0, Math.min(1, v)) }
 
+// Max lines per paragraph — prevents dense text from becoming one huge paragraph per page
+const MAX_LINES_PER_PARA = 8
+
 /**
  * Group word objects { text, x1_pct, y1_pct, x2_pct, y2_pct } into paragraph
  * chunks. Returns [{ text, bbox: [x1,y1,x2,y2], sourceWords }].
  * Coords are normalized fractions [0,1] with top-left origin.
  */
+
 export function groupIntoParagraphs(words) {
   if (!words.length) return []
 
@@ -38,14 +42,17 @@ export function groupIntoParagraphs(words) {
   lines.push(curLine)
   for (const l of lines) l.sort((a, b) => a.x1_pct - b.x1_pct)
 
-  // Pass 2: group lines into paragraphs (larger gap = new paragraph)
+  // Pass 2: group lines into paragraphs.
+  // Break on: visual gap > 1.5× line height, OR max line cap (prevents whole-page paragraphs).
   const PARA_GAP = avgH * 1.5
   const paragraphs = []
   let curLines = [lines[0]]
   for (let i = 1; i < lines.length; i++) {
     const prevBottom = Math.max(...curLines[curLines.length - 1].map(w => w.y2_pct))
     const nextTop = Math.min(...lines[i].map(w => w.y1_pct))
-    if (nextTop - prevBottom > PARA_GAP) {
+    const visualBreak = nextTop - prevBottom > PARA_GAP
+    const tooLong = curLines.length >= MAX_LINES_PER_PARA
+    if (visualBreak || tooLong) {
       paragraphs.push(_makePara(curLines.flat()))
       curLines = [lines[i]]
     } else {
@@ -54,6 +61,26 @@ export function groupIntoParagraphs(words) {
   }
   paragraphs.push(_makePara(curLines.flat()))
   return paragraphs
+}
+
+function _lineRectsFromWords(words) {
+  if (!words?.length) return null
+  const avgH = words.reduce((s, w) => s + (w.y2_pct - w.y1_pct), 0) / words.length || 0.01
+  const sorted = [...words].sort((a, b) => a.y1_pct - b.y1_pct || a.x1_pct - b.x1_pct)
+  const lines = []
+  let cur = [sorted[0]]
+  for (let i = 1; i < sorted.length; i++) {
+    const lineBottom = Math.max(...cur.map(x => x.y2_pct))
+    if (sorted[i].y1_pct - lineBottom > avgH * 0.3) { lines.push(cur); cur = [sorted[i]] }
+    else cur.push(sorted[i])
+  }
+  lines.push(cur)
+  return lines.map(line => [
+    clamp01(Math.min(...line.map(w => w.x1_pct))),
+    clamp01(Math.min(...line.map(w => w.y1_pct))),
+    clamp01(Math.max(...line.map(w => w.x2_pct))),
+    clamp01(Math.max(...line.map(w => w.y2_pct))),
+  ])
 }
 
 function _makePara(words) {
@@ -65,7 +92,7 @@ function _makePara(words) {
     clamp01(Math.max(...words.map(w => w.x2_pct))),
     clamp01(Math.max(...words.map(w => w.y2_pct))),
   ]
-  return { text, bbox, sourceWords: sorted }
+  return { text, bbox, lineRects: _lineRectsFromWords(sorted), sourceWords: sorted }
 }
 
 /** Extract word bboxes from PDF.js getTextContent() items + viewport.

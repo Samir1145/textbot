@@ -150,6 +150,12 @@ app.post('/api/cases/:caseId/skill-results/:docId/:skillId', (req, res) => {
   res.json({ ok: true })
 })
 
+app.delete('/api/cases/:caseId/skill-results/:docId', (req, res) => {
+  const docDir = path.join(getCaseSubdir(req.params.caseId, 'skill-results'), safeId(req.params.docId))
+  if (fs.existsSync(docDir)) fs.rmSync(docDir, { recursive: true, force: true })
+  res.json({ ok: true })
+})
+
 // ── Case-scoped Blobs ──
 
 app.get('/api/cases/:caseId/blobs/:docId', (req, res) => {
@@ -403,13 +409,37 @@ app.delete('/api/cases/:caseId', (req, res) => {
   res.json({ ok: true })
 })
 
+// ── Health check ──────────────────────────────────────────────────────────
+// Lightweight ping — does NOT call embed(); just checks if the service port is up.
+app.get('/api/health', async (req, res) => {
+    const embedPingUrl = (process.env.EMBED_BACKEND || 'ollama').toLowerCase() === 'llamafile'
+        ? `http://localhost:${process.env.LLAMAFILE_PORT || 8080}/health`
+        : 'http://localhost:11434/'   // Ollama root returns "Ollama is running"
+    let embedOk = false
+    let embedError = null
+    try {
+        const r = await fetch(embedPingUrl, { signal: AbortSignal.timeout(2500) })
+        embedOk = r.status < 500
+    } catch (err) {
+        embedError = err.code === 'ECONNREFUSED' ? 'not running' : err.message
+    }
+    res.json({
+        embed: {
+            backend: (process.env.EMBED_BACKEND || 'ollama').toLowerCase(),
+            model:   process.env.OLLAMA_EMBED_MODEL || process.env.LLAMAFILE_EMBED_MODEL || 'nomic-embed-text',
+            ok:      embedOk,
+            error:   embedError,
+        },
+    })
+})
+
 // ── RAG (Local vector search via sqlite-vec) ──────────────────────────────
 
 const RAG_DB_PATH = path.join(DATA_DIR, 'rag.db')
 
 // ── Embed backend config ──────────────────────────────────────────────────
 // Set EMBED_BACKEND=llamafile in env to use llamafiler instead of Ollama.
-//   Ollama:    http://localhost:11434  model=nomic-embed-text (768-dim, 8192 ctx)
+//   Ollama:    http://localhost:11434  model=nomic-embed-text:latest (768-dim, 8192 ctx)
 //   Llamafile: http://localhost:8080   model=all-MiniLM-L6-v2.F16.gguf
 //              (run: ./llamafile/llamafiler -m ./llamafile/all-MiniLM-L6-v2.F16.gguf --embedding)
 const EMBED_BACKEND = (process.env.EMBED_BACKEND || 'ollama').toLowerCase()
@@ -417,7 +447,7 @@ const EMBED_BACKEND = (process.env.EMBED_BACKEND || 'ollama').toLowerCase()
 const EMBED_CONFIG = {
     ollama: {
         api:   'http://localhost:11434/api/embeddings',
-        model: process.env.OLLAMA_EMBED_MODEL || 'nomic-embed-text',
+        model: process.env.OLLAMA_EMBED_MODEL || 'nomic-embed-text:latest',
         async call(text) {
             const res = await fetch(this.api, {
                 method: 'POST',
@@ -459,6 +489,21 @@ async function embed(text) {
 
 function toBlob(floats) {
     return Buffer.from(new Float32Array(floats).buffer)
+}
+
+// Open the RAG DB for read/write without requiring the embed model to be running.
+// Used for delete/prune operations that need no embeddings.
+// Returns null if the DB file does not exist yet (nothing to delete).
+function openRagDbDirect(caseId = 'default') {
+    const key = caseId === 'default' ? 'default' : safeId(caseId)
+    if (_ragDbs.has(key)) return _ragDbs.get(key).db
+    const dbPath = key === 'default'
+        ? RAG_DB_PATH
+        : path.join(DATA_DIR, `rag-${key}.db`)
+    if (!fs.existsSync(dbPath)) return null
+    const db = new Database(dbPath)
+    sqliteVec.load(db)
+    return db
 }
 
 // Lazy-init: one SQLite DB per case so KNN is always case-isolated.
@@ -562,12 +607,12 @@ async function embedCached(text, db) {
 }
 
 // DELETE /api/rag/clear-doc/:docId  — remove all chunks for a doc (call before re-indexing)
-app.delete('/api/rag/clear-doc/:docId', async (req, res) => {
+app.delete('/api/rag/clear-doc/:docId', (req, res) => {
     const { caseId = 'default' } = req.query
     const safeDocId = safeId(req.params.docId)
     try {
-        const { db } = await getRagDb(caseId)
-        // In a per-case DB every row belongs to this case, so filter by doc_id only
+        const db = openRagDbDirect(caseId)
+        if (!db) return res.json({ ok: true, deleted: 0 }) // DB not yet created — nothing to clear
         const rows = db.prepare('SELECT id FROM doc_chunks WHERE doc_id = ?').all(safeDocId)
         for (const row of rows) {
             db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
@@ -634,12 +679,13 @@ app.post('/api/rag/index-doc', async (req, res) => {
 
 // POST /api/rag/prune-doc  — remove chunks that are no longer present (incremental indexing cleanup)
 // body: { docId, caseId, keep: [{pageNum, chunkIdx}] }
-app.post('/api/rag/prune-doc', async (req, res) => {
+app.post('/api/rag/prune-doc', (req, res) => {
     try {
         const { docId, caseId = 'default', keep } = req.body
         if (!docId || !Array.isArray(keep)) return res.status(400).json({ error: 'Missing docId or keep' })
 
-        const { db } = await getRagDb(caseId)
+        const db = openRagDbDirect(caseId)
+        if (!db) return res.json({ ok: true, pruned: 0 })
         const safeDocId = safeId(docId)
 
         // Per-case DB: filter by doc_id only
@@ -701,7 +747,7 @@ function rerank(chunks, distMap, query, k) {
 // POST /api/rag/search  — semantic search within a document
 app.post('/api/rag/search', async (req, res) => {
     try {
-        const { docId, query, k = 5, caseId = 'default' } = req.body
+        const { docId, query, k = 5, caseId = 'default', windowSize = 0 } = req.body
         const { db } = await getRagDb(caseId)
         const emb = await embed(query)
 
@@ -722,10 +768,27 @@ app.post('/api/rag/search', async (req, res) => {
             `SELECT id, page_num, chunk_idx, text, bbox FROM doc_chunks WHERE doc_id = ? AND id IN (${placeholders})`
         ).all(safeId(docId), ...ids)
 
-        res.json(rerank(chunks, distMap, query, k).map(c => ({
+        const results = rerank(chunks, distMap, query, k).map(c => ({
             ...c,
             bbox: c.bbox ? JSON.parse(c.bbox) : null,
-        })))
+        }))
+
+        // Sentence-window expansion: fetch ±windowSize neighboring chunks and attach as
+        // windowText. The LLM uses windowText for context; bbox/text stay sentence-tight.
+        if (windowSize > 0) {
+            const safeDocId = safeId(docId)
+            const safeCaseId = safeId(caseId)
+            for (const chunk of results) {
+                const lo = Math.max(0, chunk.chunk_idx - windowSize)
+                const hi = chunk.chunk_idx + windowSize
+                const neighbors = db.prepare(
+                    'SELECT text FROM doc_chunks WHERE doc_id = ? AND case_id = ? AND chunk_idx BETWEEN ? AND ? ORDER BY chunk_idx'
+                ).all(safeDocId, safeCaseId, lo, hi)
+                chunk.windowText = neighbors.map(n => n.text).join(' ')
+            }
+        }
+
+        res.json(results)
     } catch (err) {
         console.error('[RAG] search error:', err.message)
         res.status(500).json({ error: err.message })

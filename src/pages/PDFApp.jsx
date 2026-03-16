@@ -10,7 +10,7 @@ import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupInto
 import { getCachedThumb, setCachedThumb } from '../utils/thumbnailCache.js'
 import { buildEvidenceBlock, parseCitations, tokeniseMessage, narrowCitations, distanceToScore } from '../utils/parseCitations.js'
 import { findTextInTextLayer } from '../utils/textLayerSearch.js'
-import { streamOllamaChat, callOllama } from '../utils/ollamaStream.js'
+import { streamOllamaChat, callOllama, checkLlmHealth, LLM_BACKEND_NAME, LLM_MODEL_NAME } from '../utils/ollamaStream.js'
 import './PDFApp.css'
 
 // ── Follow-up suggestion generator ─────────────────────────────────────────
@@ -36,35 +36,306 @@ function estimateTokens(text) {
   return text.trim().split(/\s+/).length
 }
 
+// Bbox from a list of sourceWords (tight, word-level).
+function _bboxFromWords(words) {
+  if (!words?.length) return null
+  return [
+    Math.min(...words.map(w => w.x1_pct)),
+    Math.min(...words.map(w => w.y1_pct)),
+    Math.max(...words.map(w => w.x2_pct)),
+    Math.max(...words.map(w => w.y2_pct)),
+  ]
+}
+
+// Per-line bboxes from a list of sourceWords.
+// Groups words into lines by y-band, returns [[x1,y1,x2,y2], ...] — one rect per line.
+// This produces multi-stripe highlights that hug each text row without covering
+// whitespace between lines or column gutters.
+function _lineRectsFromWords(words) {
+  if (!words?.length) return null
+  const valid = words.filter(w => w.x2_pct > 0)
+  if (!valid.length) return null
+  const avgH = valid.reduce((s, w) => s + (w.y2_pct - w.y1_pct), 0) / valid.length || 0.01
+  const sorted = [...valid].sort((a, b) => a.y1_pct - b.y1_pct || a.x1_pct - b.x1_pct)
+  const lines = []
+  let cur = [sorted[0]]
+  for (let i = 1; i < sorted.length; i++) {
+    const lineBottom = Math.max(...cur.map(x => x.y2_pct))
+    if (sorted[i].y1_pct - lineBottom > avgH * 0.3) { lines.push(cur); cur = [sorted[i]] }
+    else cur.push(sorted[i])
+  }
+  lines.push(cur)
+  return lines.map(line => [
+    Math.min(...line.map(w => w.x1_pct)),
+    Math.min(...line.map(w => w.y1_pct)),
+    Math.max(...line.map(w => w.x2_pct)),
+    Math.max(...line.map(w => w.y2_pct)),
+  ])
+}
+
+// Split a single chunk that exceeds targetTokens into smaller pieces.
+// Uses sourceWords for word-level splits with precise per-piece bboxes.
+// Falls back to sentence-level splits with the paragraph bbox when sourceWords absent.
+function splitChunk(chunk, targetTokens) {
+  const t = estimateTokens(chunk.text)
+  if (t <= targetTokens) return [chunk]
+
+  const words = chunk.sourceWords
+  if (words?.length >= 2) {
+    // Word-level split — each piece gets a tight bbox from its own words
+    const pieces = []
+    let wBuf = []
+    for (const word of words) {
+      if (wBuf.length >= targetTokens) {
+        pieces.push({ text: wBuf.map(w => w.text).join(' '), bbox: _bboxFromWords(wBuf), sourceWords: wBuf })
+        wBuf = []
+      }
+      wBuf.push(word)
+    }
+    if (wBuf.length) pieces.push({ text: wBuf.map(w => w.text).join(' '), bbox: _bboxFromWords(wBuf), sourceWords: wBuf })
+    return pieces
+  }
+
+  // Fallback: sentence split — pieces share the paragraph bbox (no sourceWords)
+  const sentences = chunk.text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 5)
+  if (sentences.length <= 1) return [chunk]
+  const pieces = []
+  let sBuf = []
+  let sBufTokens = 0
+  for (const sent of sentences) {
+    const st = estimateTokens(sent)
+    if (sBuf.length > 0 && sBufTokens + st > targetTokens) {
+      pieces.push({ text: sBuf.join(' '), bbox: chunk.bbox })
+      sBuf = []
+      sBufTokens = 0
+    }
+    sBuf.push(sent)
+    sBufTokens += st
+  }
+  if (sBuf.length) pieces.push({ text: sBuf.join(' '), bbox: chunk.bbox })
+  return pieces.length ? pieces : [chunk]
+}
+
 function mergeChunksByTokens(pages, targetTokens) {
   const merged = []
   for (const page of pages) {
-    let buf = []
+    let buf = []         // accumulates chunk pieces to merge
+    let bufWords = []    // sourceWords from all pieces in buf (for tight bbox)
     let bufTokens = 0
     const flush = () => {
       if (!buf.length) return
       const text = buf.map(c => c.text).join(' ')
-      const hasBbox = buf.every(c => c.bbox)
-      const bbox = hasBbox ? [
-        Math.min(...buf.map(c => c.bbox[0])),
-        Math.min(...buf.map(c => c.bbox[1])),
-        Math.max(...buf.map(c => c.bbox[2])),
-        Math.max(...buf.map(c => c.bbox[3])),
-      ] : null
+      // Prefer tight word-level bbox; fall back to envelope union of paragraph bboxes
+      const bbox = bufWords.length >= 2
+        ? _bboxFromWords(bufWords)
+        : buf.every(c => c.bbox)
+          ? [
+              Math.min(...buf.map(c => c.bbox[0])),
+              Math.min(...buf.map(c => c.bbox[1])),
+              Math.max(...buf.map(c => c.bbox[2])),
+              Math.max(...buf.map(c => c.bbox[3])),
+            ]
+          : null
       merged.push({ pageNum: page.pageNum, text, bbox })
       buf = []
+      bufWords = []
       bufTokens = 0
     }
-    for (const chunk of page.chunks) {
-      if (!chunk.text?.trim() || chunk.text.length < 15) continue
-      const t = estimateTokens(chunk.text)
-      if (buf.length > 0 && bufTokens + t > targetTokens) flush()
-      buf.push(chunk)
-      bufTokens += t
+    for (const rawChunk of page.chunks) {
+      if (!rawChunk.text?.trim() || rawChunk.text.length < 15) continue
+      // Split oversized chunks before merging — this is what makes precision actually work
+      const pieces = splitChunk(rawChunk, targetTokens)
+      for (const chunk of pieces) {
+        if (!chunk.text?.trim()) continue
+        const t = estimateTokens(chunk.text)
+        if (buf.length > 0 && bufTokens + t > targetTokens) flush()
+        buf.push(chunk)
+        if (chunk.sourceWords?.length) bufWords.push(...chunk.sourceWords)
+        bufTokens += t
+      }
     }
     flush()
   }
   return merged
+}
+
+// ── Shared abbreviation guard (prevents splitting on "Dr.", "Inc.", etc.) ──
+const _ABBREVS = /^(Mr|Mrs|Ms|Dr|Prof|Inc|Ltd|Co|Corp|vs|cf|et|al|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec|No|Art|Sec|cl|para)\.$/
+
+// Split a paragraph (with sourceWords) into sentence objects [{text, words}].
+// Shared by all three chunkers below.
+function _splitParaIntoSentences(para) {
+  const words = para.sourceWords ?? []
+  if (!words.length) {
+    return para.text
+      .split(/(?<=[.?!])\s+(?=[A-Z"])/)
+      .filter(s => s.trim())
+      .map(s => ({ text: s.trim(), words: [] }))
+  }
+  const sentences = []
+  let cur = []
+  for (let i = 0; i < words.length; i++) {
+    cur.push(words[i])
+    const raw = words[i].text.trimEnd()
+    const next = words[i + 1]
+    const isBoundary = /[.?!]$/.test(raw) && !_ABBREVS.test(raw)
+      && (!next || /^[A-Z("]/.test(next.text.trim()))
+    if (isBoundary && cur.length >= 5) {
+      sentences.push({ text: cur.map(w => w.text).join(' '), words: [...cur] })
+      cur = []
+    }
+  }
+  if (cur.length >= 3) sentences.push({ text: cur.map(w => w.text).join(' '), words: cur })
+  return sentences.length > 0 ? sentences : [{ text: para.text, words }]
+}
+
+// ── Strategy 1: Clause ───────────────────────────────────────────────────
+// Splits at sentence boundaries, semicolons (legal enumeration), and
+// legal section markers (ARTICLE, Section, (a), numbered items).
+// Best for precise citation lookup and clause-level highlights.
+function chunkByClauses(pages) {
+  const MIN_WORDS = 6
+  const MAX_WORDS = 100
+  const SECTION_RE = /^(ARTICLE|Section|CLAUSE|SCHEDULE|WHEREAS|NOW|WITNESSETH)\b/i
+  const LEGAL_ITEM_RE = /^(\([a-z]\)|\([ivxIVX]+\)|\d+\.\s)/
+  const result = []
+
+  for (const page of pages) {
+    const words = page.rawWords?.length
+      ? page.rawWords
+      : (page.chunks ?? []).flatMap(c => c.sourceWords ?? [])
+
+    if (!words.length) {
+      for (const c of (page.chunks ?? []))
+        if (c.text?.trim()) result.push({ pageNum: page.pageNum, text: c.text, bbox: c.bbox, lineRects: _lineRectsFromWords(c.sourceWords), sourceWords: c.sourceWords })
+      continue
+    }
+
+    let buf = []
+    const flush = () => {
+      if (buf.length < MIN_WORDS) return
+      if (buf.length > MAX_WORDS) {
+        for (let i = 0; i < buf.length; i += MAX_WORDS) {
+          const s = buf.slice(i, i + MAX_WORDS)
+          result.push({ pageNum: page.pageNum, text: s.map(w => w.text).join(' '), bbox: _bboxFromWords(s), lineRects: _lineRectsFromWords(s), sourceWords: s })
+        }
+      } else {
+        result.push({ pageNum: page.pageNum, text: buf.map(w => w.text).join(' '), bbox: _bboxFromWords(buf), lineRects: _lineRectsFromWords(buf), sourceWords: buf })
+      }
+      buf = []
+    }
+
+    for (let i = 0; i < words.length; i++) {
+      buf.push(words[i])
+      const raw = words[i].text.trimEnd()
+      const next = words[i + 1]
+      const isSentenceEnd = /[.?!]$/.test(raw) && !_ABBREVS.test(raw) && (!next || /^[A-Z("]/.test(next.text.trim()))
+      const isSemicolon   = raw.endsWith(';')
+      const nextIsMarker  = next && (SECTION_RE.test(next.text) || LEGAL_ITEM_RE.test(next.text))
+      if ((isSentenceEnd || isSemicolon || nextIsMarker) && buf.length >= MIN_WORDS) flush()
+    }
+    flush()
+  }
+  return result
+}
+
+// ── Strategy 2: Sentence ────────────────────────────────────────────────
+// Splits at sentence boundaries only. Each sentence is one chunk.
+// The LLM receives ±windowSize surrounding sentences at query time for context.
+// Best for precise search + full-context answers.
+function chunkBySentences(pages) {
+  const MIN_WORDS = 5
+  const MAX_WORDS = 80
+  const result = []
+
+  for (const page of pages) {
+    const words = page.rawWords?.length
+      ? page.rawWords
+      : (page.chunks ?? []).flatMap(c => c.sourceWords ?? [])
+
+    if (!words.length) {
+      for (const c of (page.chunks ?? []))
+        if (c.text?.trim()) result.push({ pageNum: page.pageNum, text: c.text, bbox: c.bbox, lineRects: _lineRectsFromWords(c.sourceWords), sourceWords: c.sourceWords })
+      continue
+    }
+
+    let buf = []
+    const flush = () => {
+      if (buf.length < MIN_WORDS) return
+      if (buf.length > MAX_WORDS) {
+        for (let i = 0; i < buf.length; i += MAX_WORDS) {
+          const s = buf.slice(i, i + MAX_WORDS)
+          result.push({ pageNum: page.pageNum, text: s.map(w => w.text).join(' '), bbox: _bboxFromWords(s), lineRects: _lineRectsFromWords(s), sourceWords: s })
+        }
+      } else {
+        result.push({ pageNum: page.pageNum, text: buf.map(w => w.text).join(' '), bbox: _bboxFromWords(buf), lineRects: _lineRectsFromWords(buf), sourceWords: buf })
+      }
+      buf = []
+    }
+
+    for (let i = 0; i < words.length; i++) {
+      buf.push(words[i])
+      const raw = words[i].text.trimEnd()
+      const next = words[i + 1]
+      const isSentenceEnd = /[.?!]$/.test(raw) && !_ABBREVS.test(raw) && (!next || /^[A-Z("]/.test(next.text.trim()))
+      if (isSentenceEnd && buf.length >= MIN_WORDS) flush()
+    }
+    flush()
+  }
+  return result
+}
+
+// ── Strategy 3: Recursive ───────────────────────────────────────────────
+// Accumulates paragraphs up to targetWords. If a paragraph exceeds the
+// target it's split into sentences; sentences that still exceed are split
+// by words. Merges adjacent small units to avoid orphan fragments.
+// Best for general Q&A with balanced precision and context.
+function chunkRecursive(pages, targetWords = 300) {
+  const result = []
+  for (const page of pages) {
+    const paragraphs = page.rawWords?.length
+      ? groupIntoParagraphs(page.rawWords)
+      : (page.chunks ?? [])
+
+    let acc = [], accT = 0
+    const flushAcc = () => {
+      if (!acc.length) return
+      result.push({ pageNum: page.pageNum, text: acc.map(w => w.text).join(' '), bbox: _bboxFromWords(acc), lineRects: _lineRectsFromWords(acc), sourceWords: acc })
+      acc = []; accT = 0
+    }
+
+    for (const para of paragraphs) {
+      const paraWords = para.sourceWords ?? []
+      const t = estimateTokens(para.text)
+
+      if (t <= targetWords) {
+        if (accT > 0 && accT + t > targetWords) flushAcc()
+        acc.push(...paraWords); accT += t
+      } else {
+        flushAcc()
+        for (const sent of _splitParaIntoSentences(para)) {
+          const st = estimateTokens(sent.text)
+          if (st > targetWords) {
+            flushAcc()
+            const sw = sent.words.length ? sent.words
+              : sent.text.split(/\s+/).map(t => ({ text: t, x1_pct: 0, y1_pct: 0, x2_pct: 0, y2_pct: 0 }))
+            for (let i = 0; i < sw.length; i += targetWords) {
+              const sl = sw.slice(i, i + targetWords)
+              const slValid = sl.filter(w => w.x2_pct > 0)
+              result.push({ pageNum: page.pageNum, text: sl.map(w => w.text).join(' '), bbox: _bboxFromWords(slValid), lineRects: _lineRectsFromWords(slValid), sourceWords: sl })
+            }
+          } else {
+            if (accT > 0 && accT + st > targetWords) flushAcc()
+            const sw = sent.words.length ? sent.words
+              : [{ text: sent.text, x1_pct: 0, y1_pct: 0, x2_pct: 0, y2_pct: 0 }]
+            acc.push(...sw); accT += st
+          }
+        }
+      }
+    }
+    flushAcc()
+  }
+  return result
 }
 
 // Configure pdfjs worker for bundlers like Vite
@@ -286,7 +557,21 @@ const fileInputRef = useRef(null)
   const handleRemoveDocument = (docId) => {
     const doc = parties.flatMap(p => p.documents).find(d => d.id === docId)
     const docName = doc?.name || 'this document'
-    if (!window.confirm(`Delete "${docName}"?\n\nThis will permanently remove the PDF, all notes, and all indexed embeddings for this document.`)) return
+    const noteCount = (allCaseNotes[docId] || []).length
+    const isIndexed = docChunkCountsById[docId] > 0
+    setDeleteDocConfirm({ docId, docName, noteCount, isIndexed })
+  }
+
+  const confirmRemoveDocument = () => {
+    if (!deleteDocConfirm) return
+    const { docId } = deleteDocConfirm
+    setDeleteDocConfirm(null)
+
+    // Abort any in-flight extraction or indexing for this doc
+    if (activeDocumentId === docId) {
+      if (extractionAbortRef.current) { extractionAbortRef.current.abort(); extractionAbortRef.current = null }
+      isIndexingRef.current = false
+    }
 
     // 1. Remove from UI state immediately
     setParties(prev => prev.map(p => ({ ...p, documents: p.documents.filter(d => d.id !== docId) })))
@@ -308,6 +593,8 @@ const fileInputRef = useRef(null)
       deleteSummary(docId, { caseId }).catch(onDeleteError('summary'))
       fetch(`/api/cases/${encodeURIComponent(caseId)}/extractions/${docId}`, { method: 'DELETE' }).catch(onDeleteError('extractions'))
       fetch(`/api/cases/${encodeURIComponent(caseId)}/chat/${docId}`, { method: 'DELETE' }).catch(onDeleteError('chat'))
+      fetch(`/api/cases/${encodeURIComponent(caseId)}/highlights/${encodeURIComponent(docId)}`, { method: 'DELETE' }).catch(onDeleteError('highlights'))
+      fetch(`/api/cases/${encodeURIComponent(caseId)}/skill-results/${encodeURIComponent(docId)}`, { method: 'DELETE' }).catch(onDeleteError('skill-results'))
       clearDocChunks(docId, { caseId }).catch(onDeleteError('chunks'))
     }
   }
@@ -758,14 +1045,34 @@ const fileInputRef = useRef(null)
 
   // ── Chunking strategy (Option D — case-level setting) ──────────────────
   const CHUNKING_STRATEGIES = {
-    fine:     { label: 'Fine',     words: 50 },
-    balanced: { label: 'Balanced', words: 100 },
-    broad:    { label: 'Broad',    words: 200 },
+    clause:    { label: 'Clause',    windowSize: 0 },
+    sentence:  { label: 'Sentence',  windowSize: 2 },
+    recursive: { label: 'Recursive', windowSize: 0, targetWords: 300 },
   }
-  const [chunkingStrategy, setChunkingStrategy] = useState(() =>
-    (caseId && localStorage.getItem(`chunking-${caseId}`)) || 'balanced'
-  )
+  const [chunkingStrategy, setChunkingStrategy] = useState(() => {
+    const saved = caseId && localStorage.getItem(`chunking-${caseId}`)
+    return (saved && CHUNKING_STRATEGIES[saved]) ? saved : 'recursive'
+  })
   const [chunkGuideOpen, setChunkGuideOpen] = useState(false)
+  const [deleteDocConfirm, setDeleteDocConfirm] = useState(null) // { docId, docName, noteCount, isIndexed }
+  // ── Connectivity warnings ──────────────────────────────────────────────
+  const [connectivity, setConnectivity] = useState({ llm: null, embed: null }) // null=checking, {ok,error}=result
+  const [connectivityDismissed, setConnectivityDismissed] = useState(false)
+  // ── Connectivity check — runs once on mount, can be re-triggered ──────────
+  const checkConnectivity = useCallback(async () => {
+    setConnectivityDismissed(false)
+    const [llmRes, embedRes] = await Promise.allSettled([
+      checkLlmHealth(),
+      fetch('/api/health', { signal: AbortSignal.timeout(3000) }).then(r => r.json()),
+    ])
+    setConnectivity({
+      llm:   llmRes.status   === 'fulfilled' ? llmRes.value   : { ok: false, error: 'unreachable' },
+      embed: embedRes.status === 'fulfilled' ? embedRes.value.embed : { ok: false, error: 'unreachable' },
+    })
+  }, [])
+
+  useEffect(() => { checkConnectivity() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Persistence effects for chunking + chunk counts — must be after their declarations (TDZ)
   useEffect(() => {
     if (caseId) localStorage.setItem(`chunking-${caseId}`, chunkingStrategy)
@@ -871,8 +1178,9 @@ const fileInputRef = useRef(null)
     const bboxStr = bbox ? `[${bbox.map(v => v.toFixed(3)).join(', ')}]` : 'none'
     const bboxArea = bbox ? ((bbox[2] - bbox[0]) * (bbox[3] - bbox[1])).toFixed(3) : 'n/a'
     const isLarge = bbox && (bbox[2] - bbox[0]) > 0.8 && (bbox[3] - bbox[1]) > 0.5
+    const lineRects = firstChunk.lineRects
     addLog(
-      `[CITATION] page=${firstChunk.page_num} bbox=${bboxStr} area=${bboxArea}${isLarge ? ' ⚠ LARGE BBOX (covers most of page)' : ''} narrowBbox=${narrowBbox ? `[${narrowBbox.map(v => v.toFixed(3)).join(', ')}] source=${firstChunk.narrowBboxSource ?? 'unknown'}` : 'none'}`,
+      `[CITATION] page=${firstChunk.page_num} bbox=${bboxStr} area=${bboxArea}${isLarge ? ' ⚠ LARGE BBOX (covers most of page)' : ''} ${lineRects ? `lineRects=${lineRects.length}` : narrowBbox ? `narrowBbox=[${narrowBbox.map(v => v.toFixed(3)).join(', ')}] source=${firstChunk.narrowBboxSource ?? 'unknown'}` : 'narrowBbox=none'}`,
       isLarge ? 'error' : 'ok'
     )
     scrollPageIntoView(firstChunk.page_num, 'center')
@@ -934,9 +1242,10 @@ const fileInputRef = useRef(null)
   const [editingNoteChunkKey, setEditingNoteChunkKey] = useState(null)
   const [noteChunkDraft, setNoteChunkDraft] = useState('')
   // Session-level per-doc caches — state restores instantly on doc switch (no async blank flash)
-  const chatByDocRef       = useRef({}) // docId → Message[]
-  const extractionByDocRef = useRef({}) // docId → extractedPages
-  const ragStatusByDocRef  = useRef({}) // docId → 'indexed' | 'failed'
+  const chatByDocRef           = useRef({}) // docId → Message[]
+  const extractionByDocRef     = useRef({}) // docId → extractedPages
+  const ragStatusByDocRef      = useRef({}) // docId → 'indexed' | 'failed'
+  const prevCachedExtDocIdRef  = useRef(null) // tracks which docId extractedPages was last written for
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -1386,7 +1695,7 @@ const fileInputRef = useRef(null)
       if (!rawChunks) {
         rawChunks = caseSearchActive && caseId
           ? await searchCaseChunks(caseId, text, 5)
-          : await searchDocChunks(activeDocumentId, text, 3, { caseId })
+          : await searchDocChunks(activeDocumentId, text, 3, { caseId, windowSize: CHUNKING_STRATEGIES[chunkingStrategy]?.windowSize ?? 0 })
         if (rawChunks?.length) ragQueryCacheRef.current.set(cacheKey, rawChunks)
       }
       // Build doc-name labels so the LLM prompt shows human-readable provenance
@@ -1482,7 +1791,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     try {
       // Step 1 — optionally clear existing chunks (re-index with new strategy)
       if (forceClear) {
-        setRagProgress('Clearing previous index…')
+        setRagProgress('Clearing previous chunks…')
         await clearDocChunks(activeDocumentId, { caseId })
       }
 
@@ -1505,26 +1814,48 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         pages = await extractPageChunksFromPDF(pdf, { onStatus: setRagProgress })
       }
 
-      // Step 4 — re-chunk from raw words if available (free re-grouping — no re-OCR needed),
-      //           otherwise fall back to the pre-grouped paragraph chunks.
-      const paragraphPages = pages.map(p =>
-        p.rawWords?.length
-          ? { pageNum: p.pageNum, chunks: groupIntoParagraphs(p.rawWords) }
-          : p
-      )
-      const mergedChunks = mergeChunksByTokens(paragraphPages, CHUNKING_STRATEGIES[chunkingStrategy].words)
-      const allChunks = mergedChunks.map((c, idx) => ({
+      // Step 4 — chunk using selected strategy (works from rawWords for free re-chunking)
+      let rawChunks
+      if (chunkingStrategy === 'clause') {
+        rawChunks = chunkByClauses(pages)
+      } else if (chunkingStrategy === 'sentence') {
+        rawChunks = chunkBySentences(pages)
+      } else {
+        // 'recursive' (default) — paragraph → sentence → word hierarchy
+        rawChunks = chunkRecursive(pages, CHUNKING_STRATEGIES[chunkingStrategy]?.targetWords ?? 300)
+      }
+      const allChunks = rawChunks.map((c, idx) => ({
         pageNum: c.pageNum,
         chunkIdx: idx,
         text: c.text,
         bbox: c.bbox,
       }))
 
+      // Update the chunk panel to reflect the new strategy chunks
+      const newChunksByPage = new Map()
+      for (const c of rawChunks) {
+        if (!newChunksByPage.has(c.pageNum)) newChunksByPage.set(c.pageNum, [])
+        newChunksByPage.get(c.pageNum).push(c)
+      }
+      setExtractedPages(prev =>
+        (prev ?? pages)?.map(p => ({ ...p, chunks: newChunksByPage.get(p.pageNum) ?? [] })) ?? null
+      )
+      // Keep lastExtractionPagesRef in sync so future re-chunks use the same page words
+      if (lastExtractionPagesRef.current?.pages) {
+        lastExtractionPagesRef.current = {
+          ...lastExtractionPagesRef.current,
+          pages: lastExtractionPagesRef.current.pages.map(p => ({
+            ...p,
+            chunks: newChunksByPage.get(p.pageNum) ?? [],
+          })),
+        }
+      }
+
       // Step 5 — embed + store in batches (server skips unchanged hashes)
       const BATCH = 10
       for (let i = 0; i < allChunks.length; i += BATCH) {
         const batch = allChunks.slice(i, i + BATCH)
-        setRagProgress(`Indexing chunks ${i + 1}–${Math.min(i + BATCH, allChunks.length)} / ${allChunks.length}…`)
+        setRagProgress(`Embedding chunks ${i + 1}–${Math.min(i + BATCH, allChunks.length)} / ${allChunks.length}…`)
         await indexDocPages(activeDocumentId, batch, { caseId })
       }
 
@@ -1540,7 +1871,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
 
     } catch (err) {
       console.error('[RAG] indexing failed:', err)
-      addLog(`Indexing failed: ${err.message}`, 'error')
+      addLog(`Chunking failed: ${err.message}`, 'error')
       setRagStatus('failed')
       setDocStatuses(prev => {
         const cur = prev[activeDocumentId]
@@ -1569,7 +1900,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     if (activeDocumentId && chatMessages.length) chatByDocRef.current[activeDocumentId] = chatMessages
   }, [chatMessages, activeDocumentId])
   useEffect(() => {
-    if (activeDocumentId && extractedPages) extractionByDocRef.current[activeDocumentId] = extractedPages
+    // Guard: only write cache when activeDocumentId is stable (same as previous effect run).
+    // Without this, switching A→B causes a transient render where activeDocumentId=B but
+    // extractedPages still holds A's data, poisoning B's cache slot with A's chunks.
+    if (activeDocumentId && extractedPages && prevCachedExtDocIdRef.current === activeDocumentId) {
+      extractionByDocRef.current[activeDocumentId] = extractedPages
+    }
+    prevCachedExtDocIdRef.current = activeDocumentId
   }, [extractedPages, activeDocumentId])
   useEffect(() => {
     if (activeDocumentId && ragStatus && ragStatus !== 'indexing') ragStatusByDocRef.current[activeDocumentId] = ragStatus
@@ -1579,8 +1916,8 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
   useEffect(() => { if (extractionStatus) addLog(extractionStatus) }, [extractionStatus, addLog])
   useEffect(() => { if (ragProgress)      addLog(ragProgress)      }, [ragProgress, addLog])
   useEffect(() => {
-    if (ragStatus === 'indexed')  addLog('RAG index complete — semantic search active', 'ok')
-    if (ragStatus === 'indexing') addLog('Starting RAG indexing…', 'info')
+    if (ragStatus === 'indexed')  addLog('Chunking complete — semantic search active', 'ok')
+    if (ragStatus === 'indexing') addLog('Chunking text…', 'info')
   }, [ragStatus, addLog])
   useEffect(() => {
     if (pdfLoading) addLog('Loading PDF…')
@@ -1632,6 +1969,15 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
     }
   }, []) // all used setters and extractAndSaveText are stable references
 
+  // Re-extract fresh from the PDF, then immediately clear the old index and rebuild it.
+  // Atomic "fix everything" action: handles garbled text, scanned→text upgrades, and
+  // algorithm changes. forceClear ensures stale bboxes are fully replaced, not just pruned.
+  const handleReextractAndReindex = useCallback(async (docId, file) => {
+    await runExtraction(docId, file)
+    // runExtraction updates lastExtractionPagesRef.current which handleIndexDocument reads.
+    await handleIndexDocument({ forceClear: true })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // On document change: load from cache if available (user manually starts extraction otherwise)
   useEffect(() => {
     if (!activeDocumentId) return
@@ -1645,8 +1991,23 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         setExtractionSource(saved.isOcr ? 'ocr' : 'text')
         setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'extracted' }))
         if (saved.pages) {
-          setExtractedPages(saved.pages)
-          lastExtractionPagesRef.current = { docId: activeDocumentId, pages: saved.pages }
+          // If getDocRagStatus already resolved (doc confirmed indexed), apply strategy chunks
+          // immediately for display — otherwise auto-index will apply them after embedding.
+          let pages = saved.pages
+          if (ragStatusByDocRef.current[activeDocumentId]) {
+            let rawChunks
+            if (chunkingStrategy === 'clause') rawChunks = chunkByClauses(saved.pages)
+            else if (chunkingStrategy === 'sentence') rawChunks = chunkBySentences(saved.pages)
+            else rawChunks = chunkRecursive(saved.pages, CHUNKING_STRATEGIES[chunkingStrategy]?.targetWords ?? 300)
+            const byPage = new Map()
+            for (const c of rawChunks) {
+              if (!byPage.has(c.pageNum)) byPage.set(c.pageNum, [])
+              byPage.get(c.pageNum).push(c)
+            }
+            pages = saved.pages.map(p => ({ ...p, chunks: byPage.get(p.pageNum) ?? [] }))
+          }
+          setExtractedPages(pages)
+          lastExtractionPagesRef.current = { docId: activeDocumentId, pages }
         }
       } else if (saved) {
         // Stale cache (0 chunks) — delete it so next manual run starts fresh
@@ -2016,7 +2377,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                         // icon-only status indicators
                                         if (st === 'extracting' || st === 'indexing') {
                                           return (
-                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--loading" title={st === 'extracting' ? 'Reading…' : 'Indexing…'}>
+                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--loading" title={st === 'extracting' ? 'Reading…' : 'Chunking…'}>
                                               <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
                                                 <circle cx="8" cy="8" r="6" strokeDasharray="28" strokeDashoffset="10" strokeLinecap="round"/>
                                               </svg>
@@ -2025,7 +2386,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                         }
                                         if (st === 'indexed') {
                                           return (
-                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--indexed" title={cc ? `Indexed — ${cc} chunks` : 'Indexed'}>
+                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--indexed" title={cc ? `Chunked — ${cc} chunks` : 'Chunked'}>
                                               <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
                                                 <circle cx="8" cy="8" r="6"/>
                                                 <path d="M5 8 L7 10.5 L11 6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -2035,12 +2396,20 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                         }
                                         if (st === 'error') {
                                           return (
-                                            <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--error" title="Indexing error">
-                                              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <circle cx="8" cy="8" r="6"/>
-                                                <path d="M8 5 L8 9" strokeLinecap="round"/>
-                                                <circle cx="8" cy="11.5" r="0.8" fill="currentColor"/>
-                                              </svg>
+                                            <span className="pdfapp-doc-card-retry">
+                                              <span className="pdfapp-doc-status-icon pdfapp-doc-status-icon--error" title="Processing failed">
+                                                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                                                  <circle cx="8" cy="8" r="6"/>
+                                                  <path d="M8 5 L8 9" strokeLinecap="round"/>
+                                                  <circle cx="8" cy="11.5" r="0.8" fill="currentColor"/>
+                                                </svg>
+                                              </span>
+                                              <button
+                                                type="button"
+                                                className="pdfapp-doc-retry-btn"
+                                                title="Retry — re-read and re-index this document"
+                                                onClick={e => { e.stopPropagation(); handleReextractAndReindex(doc.id, doc.file) }}
+                                              >Retry</button>
                                             </span>
                                           )
                                         }
@@ -2241,30 +2610,53 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                           {pageHighlights.length > 0 && (
                             <div className="pdfapp-highlight-overlay">
                               {pageHighlights.map((chunk, i) => {
+                                const handleHighlightClick = () => {
+                                  if (!extractedPages) return
+                                  const pg = extractedPages.find(p => p.pageNum === chunk.page_num)
+                                  if (!pg) return
+                                  const idx = chunk.chunk_idx ?? pg.chunks.findIndex(c =>
+                                    c.bbox && chunk.bbox &&
+                                    Math.abs(c.bbox[0] - chunk.bbox[0]) < 0.005 &&
+                                    Math.abs(c.bbox[1] - chunk.bbox[1]) < 0.005
+                                  )
+                                  if (idx >= 0) setActiveChunkKey(`${chunk.page_num}-${idx}`)
+                                }
+                                // Per-line highlight: one stripe per text row — no whitespace gaps,
+                                // no column spillover. Falls back to single-rect for LLM citations
+                                // that only carry a bbox (no sourceWords in search results).
+                                if (chunk.lineRects?.length) {
+                                  return chunk.lineRects.map((r, li) => (
+                                    <div
+                                      key={`${i}-${li}`}
+                                      className="pdfapp-highlight-rect pdfapp-highlight-rect--line"
+                                      style={{
+                                        left:          `${r[0] * 100}%`,
+                                        top:           `${r[1] * 100}%`,
+                                        width:         `${(r[2] - r[0]) * 100}%`,
+                                        height:        `${(r[3] - r[1]) * 100}%`,
+                                        pointerEvents: 'auto',
+                                        cursor:        'pointer',
+                                      }}
+                                      onClick={handleHighlightClick}
+                                    />
+                                  ))
+                                }
+                                // Fallback: single rect from bbox/narrowBbox (LLM citations)
                                 const b = chunk.narrowBbox || chunk.bbox
                                 return (
-                                <div
-                                  key={i}
-                                  className={`pdfapp-highlight-rect${chunk.narrowBbox ? ` pdfapp-highlight-rect--narrow pdfapp-highlight-rect--${chunk.narrowBboxSource ?? 'unknown'}` : ''}`}
-                                  style={{
-                                    left:   `${b[0] * 100}%`,
-                                    top:    `${b[1] * 100}%`,
-                                    width:  `${(b[2] - b[0]) * 100}%`,
-                                    height: `${(b[3] - b[1]) * 100}%`,
-                                  }}
-                                  onClick={() => {
-                                    // Reverse: clicking highlight scrolls chunk panel to matching card
-                                    if (!extractedPages) return
-                                    const pg = extractedPages.find(p => p.pageNum === chunk.page_num)
-                                    if (!pg) return
-                                    const idx = chunk.chunk_idx ?? pg.chunks.findIndex(c =>
-                                      c.bbox && chunk.bbox &&
-                                      Math.abs(c.bbox[0] - chunk.bbox[0]) < 0.005 &&
-                                      Math.abs(c.bbox[1] - chunk.bbox[1]) < 0.005
-                                    )
-                                    if (idx >= 0) setActiveChunkKey(`${chunk.page_num}-${idx}`)
-                                  }}
-                                />
+                                  <div
+                                    key={i}
+                                    className={`pdfapp-highlight-rect${chunk.narrowBbox ? ` pdfapp-highlight-rect--narrow pdfapp-highlight-rect--${chunk.narrowBboxSource ?? 'unknown'}` : ''}`}
+                                    style={{
+                                      left:          `${b[0] * 100}%`,
+                                      top:           `${b[1] * 100}%`,
+                                      width:         `${(b[2] - b[0]) * 100}%`,
+                                      height:        `${(b[3] - b[1]) * 100}%`,
+                                      pointerEvents: 'auto',
+                                      cursor:        'pointer',
+                                    }}
+                                    onClick={handleHighlightClick}
+                                  />
                                 )
                               })}
                             </div>
@@ -2488,11 +2880,13 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                                 // Don't trigger PDF scroll when clicking note button/textarea
                                 if (e.target.closest('.pdfapp-chunk-note-btn') || e.target.closest('.pdfapp-chunk-note-area')) return
                                 setActiveChunkKey(chunkKey)
+                                // lineRects gives per-line stripes directly from sourceWords —
+                                // single render, no async textlayer upgrade needed for chunk clicks.
                                 setActiveCitations(new Map([[1, {
                                   text: chunk.text,
                                   page_num: page.pageNum,
                                   bbox: chunk.bbox,
-                                  narrowBbox: chunk.narrowBbox ?? null,
+                                  lineRects: chunk.lineRects ?? null,
                                   chunk_idx: idx,
                                 }]]))
                               }}
@@ -2606,7 +3000,7 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
           const msg =
             pdfLoading      ? (ragProgress || 'Loading PDF…') :
             extractingText  ? (extractionStatus || 'Extracting text…') :
-            ragStatus === 'indexing' ? (ragProgress || 'Indexing document…') :
+            ragStatus === 'indexing' ? (ragProgress || 'Chunking document…') :
             null
           if (!msg) return null
           return (
@@ -3536,67 +3930,16 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
         <div className="pdfapp-guide-overlay" onClick={() => setChunkGuideOpen(false)}>
           <div className="pdfapp-guide-modal" onClick={e => e.stopPropagation()}>
             <div className="pdfapp-guide-header">
-              <span className="pdfapp-guide-title">Text Processing Guide</span>
+              <span className="pdfapp-guide-title">Search Strategy</span>
               <button className="pdfapp-guide-close" onClick={() => setChunkGuideOpen(false)}>✕</button>
             </div>
 
             <div className="pdfapp-guide-body">
 
-              {/* Extraction */}
-              <div className="pdfapp-guide-section">
-                <div className="pdfapp-guide-section-title">
-                  <span className="pdfapp-guide-icon">📄</span> Extraction
-                </div>
-                <p className="pdfapp-guide-text">
-                  The app reads your PDF's built-in text layer (fast, accurate). If the document has no text layer — e.g. a scanned page image — it falls back to <strong>OCR</strong> (optical character recognition), which reads text from the visual pixels. The extraction badge in the header shows <code>Text</code> or <code>OCR</code> to tell you which was used.
-                </p>
-                <p className="pdfapp-guide-text">
-                  Re-extract if the document text looks garbled, or if you replaced a scanned PDF with a text version.
-                </p>
-              </div>
-
-              {/* Chunking */}
-              <div className="pdfapp-guide-section">
-                <div className="pdfapp-guide-section-title">
-                  <span className="pdfapp-guide-icon">✂️</span> Chunking
-                </div>
-                <p className="pdfapp-guide-text">
-                  Extracted text is split into overlapping segments called <strong>chunks</strong>. Each chunk is a short passage (50–200 words). Smaller chunks return more precise matches; larger chunks give the AI more surrounding context per result.
-                </p>
-                <p className="pdfapp-guide-text">
-                  The chunk count shown in the header reflects the current index. Changing chunk size (below) only takes effect after re-indexing.
-                </p>
-              </div>
-
-              {/* Embedding & Indexing */}
-              <div className="pdfapp-guide-section">
-                <div className="pdfapp-guide-section-title">
-                  <span className="pdfapp-guide-icon">🔢</span> Embedding &amp; Indexing
-                </div>
-                <p className="pdfapp-guide-text">
-                  Each chunk is converted into a numeric vector by an embedding model (<code>nomic-embed-text</code>). These vectors are stored locally in SQLite. When you search or chat, the app finds the chunks whose vectors are closest to your query — this is semantic search, not just keyword matching.
-                </p>
-                <p className="pdfapp-guide-text">
-                  Re-index after changing the chunk size, or if search results seem off.
-                </p>
-              </div>
-
-              {/* OCR */}
-              <div className="pdfapp-guide-section">
-                <div className="pdfapp-guide-section-title">
-                  <span className="pdfapp-guide-icon">🔍</span> OCR
-                </div>
-                <p className="pdfapp-guide-text">
-                  OCR is triggered automatically for scanned pages. It runs in-browser via Tesseract.js — no data leaves your machine. OCR is slower than text extraction and may produce minor errors in complex layouts (tables, footnotes, multi-column text). For best results, use a PDF with an embedded text layer where possible.
-                </p>
-              </div>
-
-              {/* Search Precision */}
               <div className="pdfapp-guide-section pdfapp-guide-section--settings">
-                <div className="pdfapp-guide-section-title">
-                  <span className="pdfapp-guide-icon">🎯</span> Search Precision
-                </div>
-                <p className="pdfapp-guide-text">Controls chunk size for future indexing runs.</p>
+                <p className="pdfapp-guide-text">
+                  Controls how the document is split into searchable passages. Change strategy then click <strong>Chunk Text</strong> — no re-upload needed.
+                </p>
                 <div className="pdfapp-strategy-btns" style={{ margin: '8px 0 6px' }}>
                   {Object.entries(CHUNKING_STRATEGIES).map(([key, { label }]) => (
                     <button
@@ -3607,53 +3950,110 @@ Important: You assist with legal workflows but do not provide legal advice. Alwa
                   ))}
                 </div>
                 <div className="pdfapp-strategy-desc">
-                  {chunkingStrategy === 'fine'     && 'Fine (~50 words) — best for precise quotes and clause-level search'}
-                  {chunkingStrategy === 'balanced' && 'Balanced (~100 words) — best for Q&A and general search'}
-                  {chunkingStrategy === 'broad'    && 'Broad (~200 words) — best for summaries and topic-level search'}
+                  {chunkingStrategy === 'clause'    && 'Clause — splits at sentences, semicolons, and legal markers (ARTICLE, Section, (a)). Best for precise clause citation and quote lookup.'}
+                  {chunkingStrategy === 'sentence'  && 'Sentence — each sentence is one chunk; the AI receives ±2 surrounding sentences for context. Best for precise search with full-context answers.'}
+                  {chunkingStrategy === 'recursive' && 'Recursive — fills ~300 words by merging paragraphs, splitting oversized ones into sentences. Best for general Q&A and balanced retrieval.'}
                 </div>
               </div>
 
-              {/* Actions */}
               {activeDoc?.file && (
                 <div className="pdfapp-guide-actions">
-                  {/* First-time: nothing extracted yet */}
-                  {!extractedPages && ragStatus !== 'indexed' && (
-                    <button
-                      className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
-                      disabled={pdfLoading}
-                      onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
-                    >Extract &amp; Index</button>
-                  )}
-                  {/* Chunks extracted but not yet indexed */}
-                  {extractedPages && ragStatus !== 'indexed' && ragStatus !== 'indexing' && (
-                    <button
-                      className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
-                      onClick={() => { setChunkGuideOpen(false); handleIndexDocument() }}
-                    >Index for search</button>
-                  )}
-                  {/* Already indexed — offer re-extraction and re-index */}
-                  {ragStatus === 'indexed' && (
-                    <>
-                      <button
-                        className="pdfapp-guide-action-btn"
-                        onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
-                      >Re-extract text</button>
-                      <button
-                        className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
-                        onClick={() => { setChunkGuideOpen(false); handleIndexDocument({ forceClear: true }) }}
-                      >Re-index</button>
-                    </>
-                  )}
-                  {/* Extracted but not indexed — also allow re-extraction */}
-                  {extractedPages && ragStatus !== 'indexed' && (
-                    <button
-                      className="pdfapp-guide-action-btn"
-                      onClick={() => { setChunkGuideOpen(false); runExtraction(activeDocumentId, activeDoc.file) }}
-                    >Re-extract text</button>
-                  )}
+                  <button
+                    className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
+                    disabled={ragStatus === 'indexing'}
+                    onClick={() => { setChunkGuideOpen(false); handleIndexDocument({ forceClear: true }) }}
+                    title="Re-chunk and re-embed using the current strategy"
+                  >Chunk Text</button>
                 </div>
               )}
 
+            </div>
+          </div>
+        </div>
+      , document.body)}
+
+      {/* ── Connectivity Warning Banner ── */}
+      {!connectivityDismissed && (() => {
+        const llmDown   = connectivity.llm   && !connectivity.llm.ok
+        const embedDown = connectivity.embed && !connectivity.embed.ok
+        if (!llmDown && !embedDown) return null
+
+        const isLlamafile = LLM_BACKEND_NAME === 'llamafile'
+        const embedBackend = connectivity.embed?.backend ?? 'ollama'
+        const embedIsLlamafile = embedBackend === 'llamafile'
+
+        // Build one item per distinct issue, de-duplicating when both use Ollama
+        const items = []
+        if (llmDown) {
+          items.push({
+            label: 'AI chat is unavailable.',
+            fix: isLlamafile
+              ? `Start llamafile chat: ./llamafile/llamafiler -m ./llamafile/${LLM_MODEL_NAME} -l 0.0.0.0:8081`
+              : `Start Ollama: ollama serve   then:  ollama pull ${LLM_MODEL_NAME}`,
+          })
+        }
+        if (embedDown) {
+          // If both down and same Ollama backend, already covered above
+          const alreadyCovered = llmDown && !isLlamafile && !embedIsLlamafile
+          if (!alreadyCovered) {
+            items.push({
+              label: 'Document search (embedding) is unavailable.',
+              fix: embedIsLlamafile
+                ? `Start llamafile embed: ./llamafile/llamafiler -m ./llamafile/nomic-embed-text-v1.5.Q8_0.gguf --embedding`
+                : `Start Ollama: ollama serve   then:  ollama pull ${connectivity.embed?.model ?? 'nomic-embed-text'}`,
+            })
+          }
+        }
+
+        return createPortal(
+          <div className="pdfapp-conn-banner">
+            <div className="pdfapp-conn-banner-body">
+              <svg className="pdfapp-conn-banner-icon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>
+              </svg>
+              <div className="pdfapp-conn-banner-items">
+                {items.map((item, i) => (
+                  <div key={i} className="pdfapp-conn-banner-item">
+                    <span className="pdfapp-conn-banner-label">{item.label}</span>
+                    <code className="pdfapp-conn-banner-fix">{item.fix}</code>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="pdfapp-conn-banner-actions">
+              <button className="pdfapp-conn-banner-retry" onClick={checkConnectivity} title="Re-check connectivity">
+                ↻ Retry
+              </button>
+              <button className="pdfapp-conn-banner-dismiss" onClick={() => setConnectivityDismissed(true)} title="Dismiss">
+                ✕
+              </button>
+            </div>
+          </div>
+        , document.body)
+      })()}
+
+      {/* ── Delete Document Confirmation Modal ── */}
+      {deleteDocConfirm && createPortal(
+        <div className="pdfapp-guide-overlay" onClick={() => setDeleteDocConfirm(null)}>
+          <div className="pdfapp-guide-modal pdfapp-guide-modal--sm" onClick={e => e.stopPropagation()}>
+            <div className="pdfapp-guide-header">
+              <span className="pdfapp-guide-title">Delete Document</span>
+              <button className="pdfapp-guide-close" onClick={() => setDeleteDocConfirm(null)}>✕</button>
+            </div>
+            <div className="pdfapp-guide-body">
+              <p className="pdfapp-guide-text">
+                Permanently delete <strong>{deleteDocConfirm.docName}</strong>?
+              </p>
+              <ul className="pdfapp-delete-list">
+                <li>PDF file</li>
+                {deleteDocConfirm.noteCount > 0 && <li>{deleteDocConfirm.noteCount} note{deleteDocConfirm.noteCount !== 1 ? 's' : ''}</li>}
+                {deleteDocConfirm.isIndexed && <li>Search index &amp; embeddings</li>}
+                <li>Chat history, highlights, analysis</li>
+              </ul>
+            </div>
+            <div className="pdfapp-guide-actions pdfapp-guide-actions--footer">
+              <button className="pdfapp-guide-action-btn" onClick={() => setDeleteDocConfirm(null)}>Cancel</button>
+              <button className="pdfapp-guide-action-btn pdfapp-guide-action-btn--danger" onClick={confirmRemoveDocument}>Delete</button>
             </div>
           </div>
         </div>

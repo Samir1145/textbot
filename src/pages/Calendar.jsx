@@ -265,6 +265,7 @@ export default function Calendar({ onOpenCase }) {
   const [cases, setCases] = useState(loadCases)
   const [modal, setModal] = useState(null)
   const [highlightId, setHighlightId] = useState(null)
+  const [deleteCaseConfirm, setDeleteCaseConfirm] = useState(null) // { c, docCount }
 
   const firstDow = new Date(year, month, 1).getDay()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
@@ -286,14 +287,25 @@ export default function Calendar({ onOpenCase }) {
     setModal(null)
   }, [cases])
 
-  const handleDeleteCase = useCallback(async (c) => {
-    if (!window.confirm(`Delete "${c.name}"? This will permanently remove all documents, extractions, and analysis for this case.`)) return
+  const handleDeleteCase = useCallback((c) => {
+    let docCount = 0
+    try {
+      const parties = JSON.parse(localStorage.getItem(`pdf-parties-${c.id}`) || '[]')
+      docCount = parties.reduce((sum, p) => sum + (p.documents?.length ?? 0), 0)
+    } catch { /* ignore */ }
+    setDeleteCaseConfirm({ c, docCount })
+  }, [])
+
+  const confirmDeleteCase = useCallback(async () => {
+    if (!deleteCaseConfirm) return
+    const { c } = deleteCaseConfirm
+    setDeleteCaseConfirm(null)
     await deleteCase(c.id)
     const updated = cases.filter(x => x.id !== c.id)
     setCases(updated)
     saveCases(updated)
     localStorage.removeItem(`pdf-parties-${c.id}`)
-  }, [cases])
+  }, [deleteCaseConfirm, cases])
 
   // Jump to a case's month and briefly highlight it
   const handleJumpTo = useCallback((c) => {
@@ -381,6 +393,33 @@ export default function Calendar({ onOpenCase }) {
           onConfirm={handleAddCase}
           onCancel={() => setModal(null)}
         />
+      )}
+
+      {deleteCaseConfirm && (
+        <div className="cal-modal-overlay" onClick={() => setDeleteCaseConfirm(null)}>
+          <div className="cal-modal cal-modal--sm" onClick={e => e.stopPropagation()}>
+            <div className="cal-modal-header">
+              <span>Delete Case</span>
+              <button className="cal-modal-close" onClick={() => setDeleteCaseConfirm(null)}>✕</button>
+            </div>
+            <div className="cal-modal-body">
+              <p style={{ margin: '0 0 10px', fontSize: 14 }}>
+                Permanently delete <strong>{deleteCaseConfirm.c.name}</strong>?
+              </p>
+              <ul className="cal-delete-list">
+                {deleteCaseConfirm.docCount > 0 && (
+                  <li>{deleteCaseConfirm.docCount} document{deleteCaseConfirm.docCount !== 1 ? 's' : ''} &amp; PDFs</li>
+                )}
+                <li>All extractions, notes, and analysis</li>
+                <li>Search index &amp; embeddings</li>
+              </ul>
+            </div>
+            <div className="cal-modal-footer">
+              <button className="cal-btn cal-btn--ghost" onClick={() => setDeleteCaseConfirm(null)}>Cancel</button>
+              <button className="cal-btn cal-btn--danger" onClick={confirmDeleteCase}>Delete</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

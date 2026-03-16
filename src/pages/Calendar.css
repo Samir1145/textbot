@@ -551,3 +551,20 @@
   border-color: rgba(239, 68, 68, 0.3);
   color: #f87171;
 }
+
+/* ── Delete confirmation modal ── */
+.cal-modal--sm { max-width: 360px; }
+
+.cal-delete-list {
+  margin: 0;
+  padding: 0 0 0 18px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+.cal-btn--danger {
+  background: #ef4444;
+  color: #fff;
+}
+.cal-btn--danger:hover { background: #dc2626; }

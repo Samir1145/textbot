@@ -51,6 +51,26 @@ const BACKENDS = {
 
 const backend = BACKENDS[LLM_BACKEND] ?? BACKENDS.ollama
 
+/** Exported so the connectivity banner knows which backend/model is active. */
+export const LLM_BACKEND_NAME = LLM_BACKEND
+export const LLM_MODEL_NAME   = backend.model
+
+/**
+ * Lightweight ping — does NOT send a full chat request.
+ * Returns { ok: bool, error?: string }
+ */
+export async function checkLlmHealth() {
+  const pingUrl = LLM_BACKEND === 'llamafile'
+    ? '/api/llamafile/v1/models'
+    : '/api/ollama/api/tags'
+  try {
+    const res = await fetch(pingUrl, { signal: AbortSignal.timeout(3000) })
+    return { ok: res.status < 500 }
+  } catch (err) {
+    return { ok: false, error: err.message }
+  }
+}
+
 /**
  * Stream a chat response.
  * Calls onChunk(accumulatedText) on every token received.

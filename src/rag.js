@@ -26,7 +26,10 @@ export async function clearDocChunks(docId, { caseId } = {}) {
         ? `/api/rag/clear-doc/${encodeURIComponent(docId)}?caseId=${encodeURIComponent(caseId)}`
         : `/api/rag/clear-doc/${encodeURIComponent(docId)}`
     const res = await fetch(url, { method: 'DELETE' })
-    if (!res.ok) throw new Error(`Clear error ${res.status}`)
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(`Clear error ${res.status}: ${body.error ?? 'unknown'}`)
+    }
     return res.json()
 }
 
@@ -69,12 +72,12 @@ export async function indexDocPages(docId, chunks, { caseId } = {}) {
  * Semantic search within an indexed document.
  * Returns [{ page_num, text, distance }]
  */
-export async function searchDocChunks(docId, query, k = 3, { caseId } = {}) {
+export async function searchDocChunks(docId, query, k = 3, { caseId, windowSize = 0 } = {}) {
     try {
         const res = await fetch('/api/rag/search', {
             method: 'POST',
             headers: JSON_HEADERS,
-            body: JSON.stringify({ docId, query, k, caseId }),
+            body: JSON.stringify({ docId, query, k, caseId, windowSize }),
         })
         if (!res.ok) return []
         return res.json()

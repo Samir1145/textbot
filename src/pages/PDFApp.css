@@ -339,6 +339,27 @@
 .pdfapp-doc-status-icon--error {
   color: #ef4444;
 }
+.pdfapp-doc-card-retry {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pdfapp-doc-retry-btn {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  background: transparent;
+  cursor: pointer;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.pdfapp-doc-retry-btn:hover {
+  background: #ef4444;
+  color: #fff;
+}
 .pdfapp-doc-status-icon--ready {
   color: #60a5fa;
 }
@@ -1040,6 +1061,27 @@
   background: #1a4a2e; color: #4ade80; border-color: #2d6b42;
 }
 .pdfapp-guide-action-btn--index:hover { background: #225e39; }
+.pdfapp-guide-action-btn--danger {
+  background: #ef4444; color: #fff; border-color: #dc2626;
+}
+.pdfapp-guide-action-btn--danger:hover { background: #dc2626; }
+
+.pdfapp-guide-modal--sm { max-width: 360px; }
+
+.pdfapp-guide-actions--footer {
+  justify-content: flex-end;
+  padding: 12px 16px;
+  margin-top: 0;
+  border-top: 1px solid var(--border);
+}
+
+.pdfapp-delete-list {
+  margin: 4px 0 8px;
+  padding: 0 0 0 18px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
 
 /* ── Case Settings — Search Precision (Option D) ─────────────────────── */
 .pdfapp-case-settings {
@@ -2243,6 +2285,15 @@
   background: rgba(59, 130, 246, 0.12);
   border-color: #3b82f6;
   color: #3b82f6;
+}
+
+/* Per-line highlight — one stripe per text row, computed from sourceWords at chunk time.
+   No whitespace gaps, no column spillover. Primary highlight for chunk-panel clicks. */
+.pdfapp-highlight-rect--line {
+  background: rgba(74, 222, 128, 0.22);
+  border-color: rgba(34, 197, 94, 0.85);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
+  border-radius: 2px;
 }
 
 /* ── Narrow highlight (sentence-level) ──────────────────────────────────── */
@@ -4100,3 +4151,93 @@
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+
+/* ── Connectivity Warning Banner ─────────────────────────────────────────── */
+.pdfapp-conn-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: #78350f;
+  border-bottom: 1px solid #92400e;
+  color: #fef3c7;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+.pdfapp-conn-banner-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pdfapp-conn-banner-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #fcd34d;
+}
+
+.pdfapp-conn-banner-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pdfapp-conn-banner-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.pdfapp-conn-banner-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pdfapp-conn-banner-fix {
+  font-family: monospace;
+  font-size: 11.5px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 3px;
+  padding: 1px 6px;
+  color: #fde68a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+}
+
+.pdfapp-conn-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pdfapp-conn-banner-retry,
+.pdfapp-conn-banner-dismiss {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fef3c7;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+.pdfapp-conn-banner-retry:hover,
+.pdfapp-conn-banner-dismiss:hover {
+  background: rgba(255,255,255,0.22);
+}

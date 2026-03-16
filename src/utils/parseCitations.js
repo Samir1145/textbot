@@ -25,7 +25,8 @@ export function buildEvidenceBlock(chunks, { docLabels } = {}) {
       : c.doc_id
         ? `[${c.doc_id}] `
         : ''
-    return `[${i + 1}] ${provenance}Page ${c.page_num}:\n${c.text}`
+    // windowText: sentence-window expansion (±N neighbors). Falls back to raw chunk text.
+    return `[${i + 1}] ${provenance}Page ${c.page_num}:\n${c.windowText ?? c.text}`
   })
 
   const ragContext =
