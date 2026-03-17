@@ -1555,7 +1555,7 @@ const fileInputRef = useRef(null)
     let ragContext = ''
     let chunkMap = new Map()
     // For case-wide search, allow even if active doc isn't indexed (other docs in case may be)
-    if ((ragStatus === 'indexed' || (caseSearchActive && caseId)) && activeDocumentId) {
+    if ((ragStatus === 'indexed' || !!docChunkCountsById[activeDocumentId] || (caseSearchActive && caseId)) && activeDocumentId) {
       const cacheKey = `${caseSearchActive ? `case:${caseId}` : `doc:${activeDocumentId}`}::${text}`
       let rawChunks = ragQueryCacheRef.current.get(cacheKey)
       if (!rawChunks) {
@@ -1636,7 +1636,7 @@ const fileInputRef = useRef(null)
     } finally {
       setChatLoading(false)
     }
-  }, [chatInput, chatLoading, chatMessages, ragStatus, activeDocumentId, caseSearchActive, caseId, parties, addLog])
+  }, [chatInput, chatLoading, chatMessages, ragStatus, docChunkCountsById, activeDocumentId, caseSearchActive, caseId, parties, addLog])
   const handleIndexDocument = useCallback(async ({ forceClear = false } = {}) => {
     if (isIndexingRef.current) return   // ref guard: prevents concurrent/loop starts
     const cached = lastExtractionPagesRef.current

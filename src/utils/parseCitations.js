@@ -15,7 +15,7 @@
  */
 export function buildEvidenceBlock(chunks, { docLabels } = {}) {
   const chunkMap = new Map()
-  if (!chunks.length) return { ragContext: '', chunkMap }
+  if (!chunks?.length) return { ragContext: '', chunkMap }
 
   chunks.forEach((chunk, i) => chunkMap.set(i + 1, chunk))
 
