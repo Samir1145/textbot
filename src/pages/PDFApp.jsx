@@ -1733,20 +1733,31 @@ const fileInputRef = useRef(null)
   // Embeddings are NOT touched (they already exist in SQLite).
   const reloadChunksOnly = useCallback(async () => {
     if (!activeDocumentId) return
-    // Reload from server cache only — never re-extracts or re-embeds.
-    // If the cache is missing, the panel stays as-is; the user should press "Chunk Text"
-    // to run a full extraction + embed. Keeping this strictly cache-only prevents the
-    // auto-index effect from firing on the extractedPages update (it would otherwise
-    // treat the reload as a fresh extraction and trigger handleIndexDocument).
+    // Path 1: try server extraction cache → apply strategy → set extractedPages.
     try {
       const saved = await loadExtraction(activeDocumentId, { caseId })
       if (saved?.pages?.length) {
         const pages = applyChunkStrategy(saved.pages)
         setExtractedPages(pages)
         lastExtractionPagesRef.current = { docId: activeDocumentId, pages: saved.pages }
+        return
       }
-    } catch { /* cache unavailable — leave panel as-is */ }
-  }, [activeDocumentId, caseId]) // eslint-disable-line react-hooks/exhaustive-deps
+    } catch { /* fall through to Path 2 */ }
+    // Path 2: cache missing — re-extract from the main-thread PDF (display-only, no save,
+    // no re-embed). Gated on knownIndexed so this never triggers auto-index on unindexed docs
+    // (auto-index guards on ragStatus===null which is false for indexed docs).
+    const knownIndexed = ragStatus === 'indexed' || !!docChunkCountsById[activeDocumentId]
+    if (!knownIndexed || !pdfDocRef.current) return
+    try {
+      const rawPages = await extractPageChunksFromPDF(pdfDocRef.current)
+      // Only update if there's actual text — scanned PDFs return 0 words from native extraction
+      if (rawPages?.some(p => p.chunks?.length > 0)) {
+        const pages = applyChunkStrategy(rawPages)
+        setExtractedPages(pages)
+        lastExtractionPagesRef.current = { docId: activeDocumentId, pages: rawPages }
+      }
+    } catch { /* silently fail — PDF might be a scan or not yet loaded */ }
+  }, [activeDocumentId, caseId, ragStatus, docChunkCountsById]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Extracted text panel ──────────────────────
   const [extractedText, setExtractedText] = useState(null)
@@ -1776,6 +1787,18 @@ const fileInputRef = useRef(null)
   useEffect(() => {
     if (activeDocumentId && ragStatus && ragStatus !== 'indexing') ragStatusByDocRef.current[activeDocumentId] = ragStatus
   }, [ragStatus, activeDocumentId])
+  // Fix A: keep sidebar chunk count in sync with the display count whenever extractedPages
+  // changes. Without this, docChunkCountsById holds the SQLite count from the last indexing
+  // run (possibly with an old strategy), while the chunk panel shows the current display count.
+  useEffect(() => {
+    if (!activeDocumentId || !extractedPages || prevCachedExtDocIdRef.current !== activeDocumentId) return
+    const count = extractedPages.reduce((s, p) => s + (p.chunks?.length ?? 0), 0)
+    if (count > 0) {
+      setDocChunkCountsById(prev =>
+        prev[activeDocumentId] === count ? prev : { ...prev, [activeDocumentId]: count }
+      )
+    }
+  }, [extractedPages, activeDocumentId])
 
   // Watch key status strings and mirror them into the log automatically
   useEffect(() => { if (extractionStatus) addLog(extractionStatus) }, [extractionStatus, addLog])
@@ -1884,14 +1907,18 @@ const fileInputRef = useRef(null)
   //                     DB check returns would incorrectly trigger a full re-embed.
   //  !knownIndexed   — localStorage cache confirms doc was never indexed in any prior session.
   //  ragStatus===null — DB confirmed it is not already indexed this session.
+  //  !extractingText  — Fix B: extraction is complete. Partial pages from onPartialResult must
+  //                     not trigger indexing; only the full result (which sets extractingText=false)
+  //                     should start the embed. lastExtractionPagesRef is also only authoritative
+  //                     after extraction finishes.
   useEffect(() => {
     const cached = lastExtractionPagesRef.current
     const hasCachedPages = cached?.docId === activeDocumentId && cached?.pages
     const knownIndexed = !!docChunkCountsById[activeDocumentId]
-    if (extractedPages && ragStatusChecked && ragStatus === null && !knownIndexed && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
+    if (extractedPages && ragStatusChecked && ragStatus === null && !knownIndexed && !extractingText && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
       handleIndexDocument()
     }
-  }, [extractedPages, ragStatus, ragStatusChecked, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [extractedPages, ragStatus, ragStatusChecked, extractingText, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Recovery: doc is confirmed indexed in SQLite but extraction cache is missing (extractedPages
   // still null after loadExtraction returned nothing). Re-extract from the loaded PDF so the Text
