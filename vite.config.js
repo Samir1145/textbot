@@ -35,6 +35,7 @@ export default defineConfig({
       '/api/agent': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/caselaw': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/admin': { target: 'http://localhost:3001', changeOrigin: true },
+      '/api/settings': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/blobs': {
         target: 'http://localhost:3001',
         changeOrigin: true,

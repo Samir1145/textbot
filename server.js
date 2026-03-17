@@ -96,6 +96,20 @@ app.delete('/api/cases/:caseId/extractions/:docId', (req, res) => {
   res.json({ ok: true })
 })
 
+app.get('/api/extractions/:docId', (req, res) => {
+  const filePath = path.join(DATA_DIR, 'extractions', `${safeId(req.params.docId)}.json`)
+  if (!fs.existsSync(filePath)) return res.json(null)
+  try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
+  catch { res.json(null) }
+})
+
+app.post('/api/extractions/:docId', (req, res) => {
+  const dir = path.join(DATA_DIR, 'extractions')
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(path.join(dir, `${safeId(req.params.docId)}.json`), JSON.stringify(req.body))
+  res.json({ ok: true })
+})
+
 app.delete('/api/extractions/:docId', (req, res) => {
   const filePath = path.join(DATA_DIR, 'extractions', `${safeId(req.params.docId)}.json`)
   try { fs.unlinkSync(filePath) } catch { /* already gone */ }
@@ -275,7 +289,9 @@ app.get('/api/cases/:caseId/all-highlights', (req, res) => {
 
 const SOUL_DEFAULT = { soul: { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }, savedAt: null }
 app.get('/api/cases/:caseId/aide/soul', (req, res) => {
-  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'soul.json')
+  const { agentId } = req.query
+  const fileName = agentId ? `soul-${agentId}.json` : 'soul.json'
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), fileName)
   if (!fs.existsSync(filePath)) return res.json(SOUL_DEFAULT)
   try {
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'))
@@ -286,25 +302,69 @@ app.get('/api/cases/:caseId/aide/soul', (req, res) => {
 })
 
 app.post('/api/cases/:caseId/aide/soul', express.json(), (req, res) => {
+  const { agentId } = req.query
+  const fileName = agentId ? `soul-${agentId}.json` : 'soul.json'
   const savedAt = new Date().toISOString()
   fs.writeFileSync(
-    path.join(getCaseSubdir(req.params.caseId, 'aide'), 'soul.json'),
+    path.join(getCaseSubdir(req.params.caseId, 'aide'), fileName),
     JSON.stringify({ soul: req.body.soul || req.body, savedAt })
   )
   res.json({ ok: true, savedAt })
 })
 
 app.get('/api/cases/:caseId/aide/diary', (req, res) => {
-  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'diary.json')
+  const { agentId } = req.query
+  const fileName = agentId ? `diary-${agentId}.json` : 'diary.json'
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), fileName)
   if (!fs.existsSync(filePath)) return res.json([])
   try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
   catch { res.json([]) }
 })
 
 app.post('/api/cases/:caseId/aide/diary/entry', express.json(), (req, res) => {
-  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), 'diary.json')
+  const { agentId } = req.query
+  const fileName = agentId ? `diary-${agentId}.json` : 'diary.json'
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), fileName)
   const existing = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : []
   fs.writeFileSync(filePath, JSON.stringify([req.body, ...existing]))  // newest first
+  res.json({ ok: true })
+})
+
+// ── Global model settings ──────────────────────────────────────────────────────
+
+const SETTINGS_PATH = path.join(DATA_DIR, 'settings.json')
+
+function loadSettings() {
+  try {
+    if (fs.existsSync(SETTINGS_PATH)) return JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf8'))
+  } catch {}
+  return {}
+}
+
+function saveSettings(obj) {
+  fs.writeFileSync(SETTINGS_PATH, JSON.stringify(obj))
+}
+
+app.get('/api/settings', (req, res) => {
+  const saved = loadSettings()
+  res.json({
+    genModel:   saved.genModel   || (process.env.VITE_OLLAMA_MODEL || 'gemma3n:e2b'),
+    embedModel: saved.embedModel || _embedBackend.model,
+    embedBackend: EMBED_BACKEND,
+  })
+})
+
+app.post('/api/settings', express.json(), (req, res) => {
+  const saved = loadSettings()
+  const { genModel, embedModel } = req.body
+  if (genModel)   saved.genModel   = genModel
+  if (embedModel) saved.embedModel = embedModel
+  saveSettings(saved)
+  // Apply embed model change at runtime — resets dim cache so next embed re-detects dimensions
+  if (embedModel && embedModel !== _embedBackend.model) {
+    _embedBackend.model = embedModel
+    _embedDim = null
+  }
   res.json({ ok: true })
 })
 
@@ -476,6 +536,13 @@ const EMBED_CONFIG = {
 }
 
 const _embedBackend = EMBED_CONFIG[EMBED_BACKEND] ?? EMBED_CONFIG.ollama
+// Apply saved embed model override from settings.json (if present)
+try {
+    const _savedSettings = fs.existsSync(path.join(DATA_DIR, 'settings.json'))
+        ? JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'settings.json'), 'utf8'))
+        : {}
+    if (_savedSettings.embedModel) _embedBackend.model = _savedSettings.embedModel
+} catch {}
 const EMBED_MODEL   = _embedBackend.model
 
 console.log(`[RAG] embed backend: ${EMBED_BACKEND} — model: ${EMBED_MODEL}`)
@@ -703,6 +770,23 @@ app.post('/api/rag/prune-doc', (req, res) => {
         res.json({ ok: true, pruned: toDelete.length })
     } catch (err) {
         res.status(500).json({ error: err.message })
+    }
+})
+
+// GET /api/rag/case-status  — chunk counts for ALL docs in a case, one DB round-trip
+// Returns { [docId]: chunkCount, ... }
+app.get('/api/rag/case-status', async (req, res) => {
+    try {
+        const { caseId = 'default' } = req.query
+        const { db } = await getRagDb(caseId)
+        const rows = db.prepare(
+            'SELECT doc_id, COUNT(*) as n FROM doc_chunks WHERE case_id = ? GROUP BY doc_id'
+        ).all(caseId)
+        const result = {}
+        for (const row of rows) result[row.doc_id] = row.n
+        res.json(result)
+    } catch (err) {
+        res.json({})
     }
 })
 
@@ -1066,7 +1150,7 @@ async function agentExecuteTool(name, args, caseId) {
     return { error: `Unknown tool: ${name}` }
 }
 
-async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diary = [] }) {
+async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diary = [], agentId = null }) {
     const job = agentJobs.get(jobId)
 
     // Last 3 diary entries — most recent first, injected as compounding memory
@@ -1183,7 +1267,8 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
                     reflection,
                     notesAdded,
                 }
-                const diaryPath = path.join(getCaseSubdir(caseId, 'aide'), 'diary.json')
+                const diaryFileName = agentId ? `diary-${agentId}.json` : 'diary.json'
+                const diaryPath = path.join(getCaseSubdir(caseId, 'aide'), diaryFileName)
                 const existing = fs.existsSync(diaryPath) ? JSON.parse(fs.readFileSync(diaryPath, 'utf8')) : []
                 const updated = [entry, ...existing]   // newest first
                 fs.writeFileSync(diaryPath, JSON.stringify(updated))
@@ -1244,29 +1329,31 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
 
 // POST /api/agent/start
 app.post('/api/agent/start', express.json(), async (req, res) => {
-    const { task, intent, role, caseId } = req.body
+    const { task, intent, role, caseId, agentId } = req.body
     if (!task?.trim()) return res.status(400).json({ error: 'task is required' })
     if (!caseId)       return res.status(400).json({ error: 'caseId is required' })
 
-    // Load soul and recent diary entries from disk
+    // Load soul and recent diary entries from disk (per-agent files when agentId is provided)
+    const soulFileName  = agentId ? `soul-${agentId}.json`  : 'soul.json'
+    const diaryFileName = agentId ? `diary-${agentId}.json` : 'diary.json'
     let soul = { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }
     let diary = []
     try {
-        const soulPath = path.join(getCaseSubdir(caseId, 'aide'), 'soul.json')
+        const soulPath = path.join(getCaseSubdir(caseId, 'aide'), soulFileName)
         if (fs.existsSync(soulPath)) {
             const raw = JSON.parse(fs.readFileSync(soulPath, 'utf8'))
             soul = raw.soul || raw
         }
     } catch {}
     try {
-        const diaryPath = path.join(getCaseSubdir(caseId, 'aide'), 'diary.json')
+        const diaryPath = path.join(getCaseSubdir(caseId, 'aide'), diaryFileName)
         if (fs.existsSync(diaryPath)) diary = JSON.parse(fs.readFileSync(diaryPath, 'utf8'))
     } catch {}
 
     const jobId = randomUUID()
     agentJobs.set(jobId, { status: 'running', steps: [], clients: new Set(), result: null, error: null, cancelled: false })
 
-    runAgentLoop({ jobId, task, intent, role, caseId, soul, diary }).catch(err => {
+    runAgentLoop({ jobId, task, intent, role, caseId, soul, diary, agentId }).catch(err => {
         const job = agentJobs.get(jobId)
         if (job) { job.status = 'error'; job.error = err.message; agentBroadcast(job.clients, { type: 'error', content: err.message }) }
     })

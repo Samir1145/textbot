@@ -18,7 +18,9 @@ const BACKENDS = {
     model: import.meta.env.VITE_OLLAMA_MODEL || 'gemma3n:e2b',
     headers: {
       'Content-Type':  'application/json',
-      'Authorization': 'Bearer 68d73d3a870148f6818d364c549c2bc3._C2su8V3eWzsWN5F7Zk27DGt',
+      ...(import.meta.env.VITE_OLLAMA_API_KEY
+        ? { 'Authorization': `Bearer ${import.meta.env.VITE_OLLAMA_API_KEY}` }
+        : {}),
     },
     buildBody: (model, messages, stream) =>
       JSON.stringify({ model, messages, stream }),
@@ -55,6 +57,14 @@ const backend = BACKENDS[LLM_BACKEND] ?? BACKENDS.ollama
 export const LLM_BACKEND_NAME = LLM_BACKEND
 export const LLM_MODEL_NAME   = backend.model
 
+/** Returns the active generative model — localStorage override takes priority. */
+function getActiveGenModel() {
+  try {
+    const s = JSON.parse(localStorage.getItem('textbot-model-settings') || '{}')
+    return s.genModel || backend.model
+  } catch { return backend.model }
+}
+
 /**
  * Lightweight ping — does NOT send a full chat request.
  * Returns { ok: bool, error?: string }
@@ -76,7 +86,7 @@ export async function checkLlmHealth() {
  * Calls onChunk(accumulatedText) on every token received.
  * Returns the final accumulated string.
  */
-export async function streamOllamaChat({ messages, model = backend.model, signal, onChunk }) {
+export async function streamOllamaChat({ messages, model = getActiveGenModel(), signal, onChunk }) {
   const res = await fetch(backend.url, {
     method: 'POST',
     headers: backend.headers,
@@ -107,7 +117,7 @@ export async function streamOllamaChat({ messages, model = backend.model, signal
  * Single-shot (non-streaming) call.
  * Returns the response content string, or null on failure.
  */
-export async function callOllama({ messages, model = backend.model, signal } = {}) {
+export async function callOllama({ messages, model = getActiveGenModel(), signal } = {}) {
   try {
     const res = await fetch(backend.url, {
       method: 'POST',

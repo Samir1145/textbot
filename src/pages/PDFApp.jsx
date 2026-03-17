@@ -5,13 +5,22 @@ import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { uploadCaseBlob, loadCaseBlob, deleteCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes, loadAllNotes, deleteNotes, deleteSummary } from '../db.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
-import { getDocRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
+import { getDocRagStatus, getCaseRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupIntoParagraphs } from '../utils/pdfExtract.js'
 import { getCachedThumb, setCachedThumb } from '../utils/thumbnailCache.js'
 import { buildEvidenceBlock, parseCitations, tokeniseMessage, narrowCitations, distanceToScore } from '../utils/parseCitations.js'
 import { findTextInTextLayer } from '../utils/textLayerSearch.js'
 import { streamOllamaChat, callOllama, checkLlmHealth, LLM_BACKEND_NAME, LLM_MODEL_NAME } from '../utils/ollamaStream.js'
 import './PDFApp.css'
+
+// ── Agent definitions ────────────────────────────────────────────────────────
+const AGENTS = [
+  { id: 'case-summarizer',   icon: '📋', color: '#2563eb', name: 'Case Summarizer',      tagline: 'Structured brief from all case documents',    defaultTask: 'Summarise all documents in this case into a structured legal brief with key facts, issues, and arguments.' },
+  { id: 'contract-reviewer', icon: '📝', color: '#059669', name: 'Contract Reviewer',    tagline: 'Red flags and liability clause scanner',      defaultTask: 'Review all contracts for liability clauses, red flags, unusual terms, and missing standard provisions.' },
+  { id: 'evidence-analyzer', icon: '🔍', color: '#d97706', name: 'Evidence Analyzer',    tagline: 'Timeline builder from exhibits and statements', defaultTask: 'Build a chronological timeline of events from exhibits, witness statements, and supporting documents.' },
+  { id: 'due-diligence',     icon: '✅', color: '#7c3aed', name: 'Due Diligence Agent',  tagline: 'Comprehensive cross-document risk review',     defaultTask: 'Conduct a comprehensive due diligence review across all case documents and flag material risks.' },
+  { id: 'legal-research',    icon: '⚖️', color: '#dc2626', name: 'Legal Research',       tagline: 'Statutes, precedents, and citations',          defaultTask: 'Identify all statutory references, case citations, and legal precedents mentioned in the documents.' },
+]
 
 // ── Follow-up suggestion generator ─────────────────────────────────────────
 async function _fetchSuggestions(question, answer) {
@@ -56,7 +65,10 @@ function enrichCitationsWithLiveData(citations, extractedPages) {
 
 // ── Word-count-based chunk merging ──────────────────────────────────────────
 // Merges paragraph chunks so each resulting chunk is ≤ targetWords words.
-function estimateTokens(text) {
+// Named countWords (not estimateTokens) because it counts whitespace-delimited
+// words, not sub-word tokens. Legal text typically runs ~1.3 tokens/word so a
+// 300-word chunk ≈ 390 tokens — safely within nomic-embed-text-v1.5's 8192 limit.
+function countWords(text) {
   return text.trim().split(/\s+/).length
 }
 
@@ -97,94 +109,11 @@ function _lineRectsFromWords(words) {
   ])
 }
 
-// Split a single chunk that exceeds targetTokens into smaller pieces.
-// Uses sourceWords for word-level splits with precise per-piece bboxes.
-// Falls back to sentence-level splits with the paragraph bbox when sourceWords absent.
-function splitChunk(chunk, targetTokens) {
-  const t = estimateTokens(chunk.text)
-  if (t <= targetTokens) return [chunk]
 
-  const words = chunk.sourceWords
-  if (words?.length >= 2) {
-    // Word-level split — each piece gets a tight bbox from its own words
-    const pieces = []
-    let wBuf = []
-    for (const word of words) {
-      if (wBuf.length >= targetTokens) {
-        pieces.push({ text: wBuf.map(w => w.text).join(' '), bbox: _bboxFromWords(wBuf), sourceWords: wBuf })
-        wBuf = []
-      }
-      wBuf.push(word)
-    }
-    if (wBuf.length) pieces.push({ text: wBuf.map(w => w.text).join(' '), bbox: _bboxFromWords(wBuf), sourceWords: wBuf })
-    return pieces
-  }
-
-  // Fallback: sentence split — pieces share the paragraph bbox (no sourceWords)
-  const sentences = chunk.text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 5)
-  if (sentences.length <= 1) return [chunk]
-  const pieces = []
-  let sBuf = []
-  let sBufTokens = 0
-  for (const sent of sentences) {
-    const st = estimateTokens(sent)
-    if (sBuf.length > 0 && sBufTokens + st > targetTokens) {
-      pieces.push({ text: sBuf.join(' '), bbox: chunk.bbox })
-      sBuf = []
-      sBufTokens = 0
-    }
-    sBuf.push(sent)
-    sBufTokens += st
-  }
-  if (sBuf.length) pieces.push({ text: sBuf.join(' '), bbox: chunk.bbox })
-  return pieces.length ? pieces : [chunk]
-}
-
-function mergeChunksByTokens(pages, targetTokens) {
-  const merged = []
-  for (const page of pages) {
-    let buf = []         // accumulates chunk pieces to merge
-    let bufWords = []    // sourceWords from all pieces in buf (for tight bbox)
-    let bufTokens = 0
-    const flush = () => {
-      if (!buf.length) return
-      const text = buf.map(c => c.text).join(' ')
-      // Prefer tight word-level bbox; fall back to envelope union of paragraph bboxes
-      const bbox = bufWords.length >= 2
-        ? _bboxFromWords(bufWords)
-        : buf.every(c => c.bbox)
-          ? [
-              Math.min(...buf.map(c => c.bbox[0])),
-              Math.min(...buf.map(c => c.bbox[1])),
-              Math.max(...buf.map(c => c.bbox[2])),
-              Math.max(...buf.map(c => c.bbox[3])),
-            ]
-          : null
-      merged.push({ pageNum: page.pageNum, text, bbox })
-      buf = []
-      bufWords = []
-      bufTokens = 0
-    }
-    for (const rawChunk of page.chunks) {
-      if (!rawChunk.text?.trim() || rawChunk.text.length < 15) continue
-      // Split oversized chunks before merging — this is what makes precision actually work
-      const pieces = splitChunk(rawChunk, targetTokens)
-      for (const chunk of pieces) {
-        if (!chunk.text?.trim()) continue
-        const t = estimateTokens(chunk.text)
-        if (buf.length > 0 && bufTokens + t > targetTokens) flush()
-        buf.push(chunk)
-        if (chunk.sourceWords?.length) bufWords.push(...chunk.sourceWords)
-        bufTokens += t
-      }
-    }
-    flush()
-  }
-  return merged
-}
-
-// ── Shared abbreviation guard (prevents splitting on "Dr.", "Inc.", etc.) ──
-const _ABBREVS = /^(Mr|Mrs|Ms|Dr|Prof|Inc|Ltd|Co|Corp|vs|cf|et|al|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec|No|Art|Sec|cl|para)\.$/
+// ── Shared abbreviation guard (prevents splitting on "Dr.", "s.", "v.", etc.) ──
+// Covers general English + common Indian/UK legal citations.
+// Add entries here when a false sentence-split is observed in practice.
+const _ABBREVS = /^(Mr|Mrs|Ms|Dr|Prof|Hon|Inc|Ltd|Co|Corp|vs|v|cf|et|al|ibid|viz|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec|No|Art|Sec|Sch|Reg|Vol|Ch|Pt|Div|Ord|cl|para|s|r|O|p|pp)\.$/
 
 // Split a paragraph (with sourceWords) into sentence objects [{text, words}].
 // Shared by all three chunkers below.
@@ -203,13 +132,29 @@ function _splitParaIntoSentences(para) {
     const raw = words[i].text.trimEnd()
     const next = words[i + 1]
     const isBoundary = /[.?!]$/.test(raw) && !_ABBREVS.test(raw)
-      && (!next || /^[A-Z("]/.test(next.text.trim()))
+      // Next word starts a new sentence: capital letter, opening paren/quote, or a
+      // digit (handles numbered clauses "1.", "2." and roman numerals common in legal docs)
+      && (!next || /^[A-Z("0-9]/.test(next.text.trim()))
+    // >= 5 words: prevents flushing ultra-short clauses as their own sentence chunk,
+    // which would produce orphan fragments too small for useful semantic search.
     if (isBoundary && cur.length >= 5) {
       sentences.push({ text: cur.map(w => w.text).join(' '), words: [...cur] })
       cur = []
     }
   }
-  if (cur.length >= 3) sentences.push({ text: cur.map(w => w.text).join(' '), words: cur })
+  if (cur.length > 0) {
+    // Append tiny trailing fragments (< 3 words) to the last sentence rather than
+    // dropping them — avoids silent data loss for short clause-endings.
+    if (sentences.length > 0 && cur.length < 3) {
+      const last = sentences[sentences.length - 1]
+      sentences[sentences.length - 1] = {
+        text: last.text + ' ' + cur.map(w => w.text).join(' '),
+        words: [...last.words, ...cur],
+      }
+    } else {
+      sentences.push({ text: cur.map(w => w.text).join(' '), words: cur })
+    }
+  }
   return sentences.length > 0 ? sentences : [{ text: para.text, words }]
 }
 
@@ -234,15 +179,23 @@ function chunkRecursive(pages, targetWords = 300) {
 
     for (const para of paragraphs) {
       const paraWords = para.sourceWords ?? []
-      const t = estimateTokens(para.text)
+      const t = countWords(para.text)
 
       if (t <= targetWords) {
         if (accT > 0 && accT + t > targetWords) flushAcc()
-        acc.push(...paraWords); accT += t
+        if (paraWords.length) {
+          acc.push(...paraWords)
+        } else {
+          // No sourceWords (old extraction format) — synthesize word objects so text
+          // is preserved in the chunk. Coords are zero so bbox will be null, but the
+          // text content is not lost.
+          acc.push(...para.text.trim().split(/\s+/).map(w => ({ text: w, x1_pct: 0, y1_pct: 0, x2_pct: 0, y2_pct: 0 })))
+        }
+        accT += t
       } else {
         flushAcc()
         for (const sent of _splitParaIntoSentences(para)) {
-          const st = estimateTokens(sent.text)
+          const st = countWords(sent.text)
           if (st > targetWords) {
             flushAcc()
             const sw = sent.words.length ? sent.words
@@ -264,6 +217,32 @@ function chunkRecursive(pages, targetWords = 300) {
     flushAcc()
   }
   return result
+}
+
+// ── Chunking constants + shared helpers ─────────────────────────────────────
+// Defined at module scope so buildChunkedPages / applyChunkStrategy can
+// reference CHUNK_TARGET_WORDS without being inside the React component.
+const CHUNK_TARGET_WORDS = 300
+
+// Map rawChunks (output of chunkRecursive) back onto rawPages, producing pages
+// where each page.chunks is the array of semantic chunks for that page.
+// Keeping this separate from applyChunkStrategy lets handleIndexDocument reuse
+// the same rawChunks array for both the display update and the embed payload
+// without running chunkRecursive twice.
+function buildChunkedPages(rawPages, rawChunks) {
+  const byPage = new Map()
+  for (const c of rawChunks) {
+    if (!byPage.has(c.pageNum)) byPage.set(c.pageNum, [])
+    byPage.get(c.pageNum).push(c)
+  }
+  return rawPages.map(p => ({ ...p, chunks: byPage.get(p.pageNum) ?? [] }))
+}
+
+// Convenience wrapper: chunk raw pages and return display-ready pages in one call.
+// Used by reloadChunksOnly and the doc-change effect where rawChunks are not needed
+// separately. Do NOT call this from handleIndexDocument — it needs rawChunks separately.
+function applyChunkStrategy(rawPages) {
+  return buildChunkedPages(rawPages, chunkRecursive(rawPages, CHUNK_TARGET_WORDS))
 }
 
 // Configure pdfjs worker for bundlers like Vite
@@ -1034,11 +1013,10 @@ const fileInputRef = useRef(null)
 
   // ── RAG state ──
   const [ragStatus, setRagStatus] = useState(null)   // null | 'indexing' | 'indexed' | 'failed'
+  const [ragStatusChecked, setRagStatusChecked] = useState(false) // true once getDocRagStatus resolves for activeDoc
   const [ragProgress, setRagProgress] = useState('')
 
-  // ── Chunking strategy (Option D — case-level setting) ──────────────────
-  const CHUNK_TARGET_WORDS = 300
-  const [chunkGuideOpen, setChunkGuideOpen] = useState(false)
+  // CHUNK_TARGET_WORDS is defined at module scope (above the component).
   const [deleteDocConfirm, setDeleteDocConfirm] = useState(null) // { docId, docName, noteCount, isIndexed }
   // ── Connectivity warnings ──────────────────────────────────────────────
   const [connectivity, setConnectivity] = useState({ llm: null, embed: null }) // null=checking, {ok,error}=result
@@ -1067,16 +1045,27 @@ const fileInputRef = useRef(null)
     if (caseId) localStorage.setItem(`pdf-chunkcounts-${caseId}`, JSON.stringify(docChunkCountsById))
   }, [docChunkCountsById, caseId])
 
+  // Batch-fetch chunk counts for ALL docs in the case on case load — single DB round-trip.
+  // Merges into docChunkCountsById (localStorage values stay for docs not yet in DB).
+  useEffect(() => {
+    if (!caseId) return
+    getCaseRagStatus(caseId).then(counts => {
+      if (!counts || !Object.keys(counts).length) return
+      setDocChunkCountsById(prev => ({ ...prev, ...counts }))
+    }).catch(() => {})
+  }, [caseId])
+
   // ── Evidence (starred sources + notes → report) ──
   const [starredSources, setStarredSources] = useState(() => {
     try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
   })
   const [allCaseNotes, setAllCaseNotes] = useState({}) // { [docId]: NoteObject[] }
-  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'aide' | 'law'
+  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'aide'
   const [notesCollapsed, setNotesCollapsed] = useState({}) // { 'section:starred'|'party:id'|'doc:id'|'note-exp:id': bool }
   const [editingNoteId, setEditingNoteId] = useState(null)
   const [editingNoteDraft, setEditingNoteDraft] = useState('')
   // ── Aide state ──
+  const [activeAgentId, setActiveAgentId] = useState(null) // null = agent list, string = modal open
   const [aideTask,   setAideTask]   = useState('')
   const [aideIntent, setAideIntent] = useState('')
   const [aideRole,   setAideRole]   = useState('')
@@ -1098,19 +1087,6 @@ const fileInputRef = useRef(null)
   const [aideSkillFileName, setAideSkillFileName] = useState('')
   const isIndexingRef = useRef(false)   // ref guard — prevents concurrent / loop-triggered indexing
 
-  // ── Law tab state ─────────────────────────────────────────────────────────
-  const [lawSubTab,      setLawSubTab]      = useState('search') // 'search' | 'import'
-  const [lawQuery,       setLawQuery]       = useState('')
-  const [lawResults,     setLawResults]     = useState([])
-  const [lawSearching,   setLawSearching]   = useState(false)
-  const [lawFilters,     setLawFilters]     = useState({ court: '', jurisdiction: '', yearFrom: '', yearTo: '' })
-  const [lawStatus,      setLawStatus]      = useState(null)   // corpus status from /api/caselaw/status
-  const [lawUploadFile,  setLawUploadFile]  = useState(null)   // staged .db file for import
-  const [lawUploading,   setLawUploading]   = useState(false)
-  const [lawVersions,    setLawVersions]    = useState([])
-  const [lawImportMsg,   setLawImportMsg]   = useState(null)   // { type: 'ok'|'err', text }
-  const [lawDragOver,    setLawDragOver]    = useState(false)
-  const lawFileInputRef = useRef(null)
 
   // ── Activity log ──
   const [logs, setLogs] = useState([])
@@ -1253,6 +1229,7 @@ const fileInputRef = useRef(null)
       }).catch(() => {})
     }
 
+    setRagStatusChecked(false)  // reset on every doc switch — must re-confirm before auto-index
     getDocRagStatus(activeDocumentId, { caseId }).then(({ indexed, chunks }) => {
       if (indexed) {
         ragStatusByDocRef.current[activeDocumentId] = 'indexed'
@@ -1260,7 +1237,8 @@ const fileInputRef = useRef(null)
         setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'indexed' }))
         if (chunks) setDocChunkCountsById(prev => ({ ...prev, [activeDocumentId]: chunks }))
       }
-    }).catch(() => {})
+      setRagStatusChecked(true)  // DB has responded — auto-index may now fire if needed
+    }).catch(() => { setRagStatusChecked(true) })  // on error, unblock anyway
   }, [activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load notes when active doc changes — also sync allCaseNotes so the badge is always fresh
@@ -1406,7 +1384,7 @@ const fileInputRef = useRef(null)
     const res = await fetch('/api/agent/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task: aideTask, intent: aideIntent, role: aideRole, caseId }),
+      body: JSON.stringify({ task: aideTask, intent: aideIntent, role: aideRole, caseId, agentId: activeAgentId }),
     })
     const { jobId, error } = await res.json()
     if (error) { setAideStatus('error'); return }
@@ -1433,7 +1411,7 @@ const fileInputRef = useRef(null)
       }
     }
     es.onerror = () => { setAideStatus('error'); es.close(); aideEsRef.current = null }
-  }, [aideTask, aideIntent, aideRole, caseId, setAllCaseNotes])
+  }, [aideTask, aideIntent, aideRole, caseId, activeAgentId, setAllCaseNotes])
 
   const handleAideStop = useCallback(async () => {
     aideEsRef.current?.close()
@@ -1444,24 +1422,37 @@ const fileInputRef = useRef(null)
     setAideStatus('cancelled')
   }, [aideJobId])
 
-  // Load soul + diary whenever the case changes
+  // Reset run state and pre-fill task when agent modal opens
   useEffect(() => {
-    if (!caseId) return
-    fetch(`/api/cases/${caseId}/aide/soul`).then(r => r.json()).then(d => {
+    if (!activeAgentId) return
+    const agent = AGENTS.find(a => a.id === activeAgentId)
+    setAideTask(agent?.defaultTask ?? '')
+    setAideSteps([])
+    setAideStatus('idle')
+    setAideResult(null)
+    setAideSoulTab('run')
+  }, [activeAgentId])
+
+  // Load soul + diary whenever the case or active agent changes
+  useEffect(() => {
+    if (!caseId || !activeAgentId) return
+    const agentParam = `?agentId=${encodeURIComponent(activeAgentId)}`
+    fetch(`/api/cases/${caseId}/aide/soul${agentParam}`).then(r => r.json()).then(d => {
       setAideSoul(d.soul || { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] })
       setAideSoulDirty(false)
       setAideSoulSavedAt(d.savedAt || null)
     }).catch(() => {})
-    fetch(`/api/cases/${caseId}/aide/diary`).then(r => r.json()).then(d => {
+    fetch(`/api/cases/${caseId}/aide/diary${agentParam}`).then(r => r.json()).then(d => {
       setAideDiary(Array.isArray(d) ? d : [])
     }).catch(() => {})
-  }, [caseId])
+  }, [caseId, activeAgentId])
 
   const handleAideSoulSave = useCallback(async () => {
     if (!caseId || aideSoulSaving) return
     setAideSoulSaving(true)
     try {
-      const res = await fetch(`/api/cases/${caseId}/aide/soul`, {
+      const agentParam = activeAgentId ? `?agentId=${encodeURIComponent(activeAgentId)}` : ''
+      const res = await fetch(`/api/cases/${caseId}/aide/soul${agentParam}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ soul: aideSoul }),
@@ -1472,7 +1463,7 @@ const fileInputRef = useRef(null)
     } finally {
       setAideSoulSaving(false)
     }
-  }, [caseId, aideSoul, aideSoulSaving])
+  }, [caseId, activeAgentId, aideSoul, aideSoulSaving])
 
   const patchSoul = useCallback((key, value) => {
     setAideSoul(prev => ({ ...prev, [key]: value }))
@@ -1513,93 +1504,7 @@ const fileInputRef = useRef(null)
     return Math.round(texts.reduce((sum, t) => sum + (t?.length || 0), 0) / 4)
   }, [aideSoul])
 
-  // ── Law tab handlers ───────────────────────────────────────────────────────
 
-  // Load caselaw status + versions when Law tab is first opened
-  const _refreshLawStatus = useCallback(async () => {
-    try {
-      const d = await fetch('/api/caselaw/status').then(r => r.json())
-      setLawStatus(d)
-      // Build ordered version list: active first, then backups
-      const versions = []
-      if (d.activeFile) versions.push(d.activeFile)
-      if (Array.isArray(d.backups)) versions.push(...d.backups)
-      setLawVersions(versions)
-    } catch {
-      setLawStatus({ available: false, message: 'Server unreachable' })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (rightTab !== 'law') return
-    _refreshLawStatus()
-  }, [rightTab, _refreshLawStatus])
-
-  const handleLawSearch = useCallback(async () => {
-    if (!lawQuery.trim() || lawSearching) return
-    setLawSearching(true)
-    setLawResults([])
-    try {
-      const body = { query: lawQuery, k: 8, filters: {} }
-      if (lawFilters.court)        body.filters.court        = lawFilters.court
-      if (lawFilters.jurisdiction) body.filters.jurisdiction = lawFilters.jurisdiction
-      if (lawFilters.yearFrom)     body.filters.yearFrom     = Number(lawFilters.yearFrom)
-      if (lawFilters.yearTo)       body.filters.yearTo       = Number(lawFilters.yearTo)
-      const r = await fetch('/api/caselaw/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      const d = await r.json()
-      if (!r.ok) throw new Error(d.error || 'Search failed')
-      setLawResults(d.results || [])
-    } catch (err) {
-      setLawResults([])
-      setLawImportMsg({ type: 'err', text: err.message })
-    } finally {
-      setLawSearching(false)
-    }
-  }, [lawQuery, lawSearching, lawFilters])
-
-  const handleLawDbDrop = useCallback((e) => {
-    e.preventDefault()
-    setLawDragOver(false)
-    const file = e.dataTransfer?.files?.[0] || e.target?.files?.[0]
-    if (!file) return
-    if (!file.name.endsWith('.db')) {
-      setLawImportMsg({ type: 'err', text: 'Only .db files are accepted' })
-      return
-    }
-    setLawUploadFile(file)
-    setLawImportMsg(null)
-  }, [])
-
-  const handleLawSwap = useCallback(async () => {
-    if (!lawUploadFile || lawUploading) return
-    setLawUploading(true)
-    setLawImportMsg(null)
-    try {
-      // Send as raw binary; server reads req.body via express.raw
-      const safeName = lawUploadFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-      const arrayBuf = await lawUploadFile.arrayBuffer()
-      const r = await fetch(`/api/admin/caselaw/upload?filename=${encodeURIComponent(safeName)}&autoSwap=true`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/octet-stream' },
-        body: arrayBuf,
-      })
-      const d = await r.json()
-      if (!r.ok) throw new Error(d.error || 'Upload failed')
-      const swapResult = d.swap || d
-      if (swapResult.ok === false) throw new Error(swapResult.message || 'Swap failed')
-      setLawImportMsg({ type: 'ok', text: swapResult.message || `Activated ${safeName}` })
-      setLawUploadFile(null)
-      await _refreshLawStatus()
-    } catch (err) {
-      setLawImportMsg({ type: 'err', text: err.message })
-    } finally {
-      setLawUploading(false)
-    }
-  }, [lawUploadFile, lawUploading, _refreshLawStatus])
 
   const handlePageClick = useCallback((e, pageNum) => {
     if (!noteMode) return
@@ -1747,6 +1652,7 @@ const fileInputRef = useRef(null)
       if (forceClear) {
         setRagProgress('Clearing previous chunks…')
         await clearDocChunks(activeDocumentId, { caseId })
+        setDocChunkCountsById(prev => ({ ...prev, [activeDocumentId]: 0 }))
       }
 
       // Step 2 — index format categories (non-fatal — skips if embed model not ready yet)
@@ -1777,32 +1683,21 @@ const fileInputRef = useRef(null)
         bbox: c.bbox,
       }))
 
-      // Update the chunk panel to reflect the new strategy chunks
-      const newChunksByPage = new Map()
-      for (const c of rawChunks) {
-        if (!newChunksByPage.has(c.pageNum)) newChunksByPage.set(c.pageNum, [])
-        newChunksByPage.get(c.pageNum).push(c)
-      }
-      setExtractedPages(prev =>
-        (prev ?? pages)?.map(p => ({ ...p, chunks: newChunksByPage.get(p.pageNum) ?? [] })) ?? null
-      )
-      // Keep lastExtractionPagesRef in sync so future re-chunks use the same page words
-      if (lastExtractionPagesRef.current?.pages) {
-        lastExtractionPagesRef.current = {
-          ...lastExtractionPagesRef.current,
-          pages: lastExtractionPagesRef.current.pages.map(p => ({
-            ...p,
-            chunks: newChunksByPage.get(p.pageNum) ?? [],
-          })),
-        }
-      }
+      // Update the chunk panel to reflect the new strategy chunks.
+      // buildChunkedPages reuses rawChunks already in hand — no second chunkRecursive call.
+      // lastExtractionPagesRef is intentionally NOT updated here: it must hold raw page data
+      // (paragraphs/words) so future calls to chunkRecursive get clean input. Writing semantic
+      // chunks into the ref would cause double-chunking on the next reloadChunksOnly call.
+      setExtractedPages(prev => buildChunkedPages(prev ?? pages, rawChunks))
 
       // Step 5 — embed + store in batches (server skips unchanged hashes)
+      // Update sidebar chunk count after each batch so the user sees real-time progress.
       const BATCH = 10
       for (let i = 0; i < allChunks.length; i += BATCH) {
         const batch = allChunks.slice(i, i + BATCH)
         setRagProgress(`Embedding chunks ${i + 1}–${Math.min(i + BATCH, allChunks.length)} / ${allChunks.length}…`)
         await indexDocPages(activeDocumentId, batch, { caseId })
+        setDocChunkCountsById(prev => ({ ...prev, [activeDocumentId]: i + batch.length }))
       }
 
       // Prune stale chunks (from previous versions with different chunk count/layout)
@@ -1838,42 +1733,19 @@ const fileInputRef = useRef(null)
   // Embeddings are NOT touched (they already exist in SQLite).
   const reloadChunksOnly = useCallback(async () => {
     if (!activeDocumentId) return
-    const applyStrategy = (rawPages) => {
-      const rawChunks = chunkRecursive(rawPages, CHUNK_TARGET_WORDS)
-      const byPage = new Map()
-      for (const c of rawChunks) {
-        if (!byPage.has(c.pageNum)) byPage.set(c.pageNum, [])
-        byPage.get(c.pageNum).push(c)
-      }
-      return rawPages.map(p => ({ ...p, chunks: byPage.get(p.pageNum) ?? [] }))
-    }
-
-    // Path 1 — server cache
+    // Reload from server cache only — never re-extracts or re-embeds.
+    // If the cache is missing, the panel stays as-is; the user should press "Chunk Text"
+    // to run a full extraction + embed. Keeping this strictly cache-only prevents the
+    // auto-index effect from firing on the extractedPages update (it would otherwise
+    // treat the reload as a fresh extraction and trigger handleIndexDocument).
     try {
       const saved = await loadExtraction(activeDocumentId, { caseId })
-      const totalCached = saved?.pages?.reduce((s, p) => s + (p.chunks?.length ?? 0), 0) ?? 0
-      if (saved?.pages?.length && totalCached > 0) {
-        const pages = applyStrategy(saved.pages)
+      if (saved?.pages?.length) {
+        const pages = applyChunkStrategy(saved.pages)
         setExtractedPages(pages)
-        lastExtractionPagesRef.current = { docId: activeDocumentId, pages }
-        return
+        lastExtractionPagesRef.current = { docId: activeDocumentId, pages: saved.pages }
       }
-    } catch { /* fall through to path 2 */ }
-
-    // Path 2 — re-extract from loaded PDF (no embedding)
-    if (!pdfDocRef.current) return
-    setExtractionStatus('Re-extracting text…')
-    setExtractingText(true)
-    try {
-      const rawPages = await extractPageChunksFromPDF(pdfDocRef.current, { onStatus: setExtractionStatus })
-      if (!rawPages) return
-      const pages = applyStrategy(rawPages)
-      setExtractedPages(pages)
-      lastExtractionPagesRef.current = { docId: activeDocumentId, pages }
-    } finally {
-      setExtractingText(false)
-      setExtractionStatus('')
-    }
+    } catch { /* cache unavailable — leave panel as-is */ }
   }, [activeDocumentId, caseId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Extracted text panel ──────────────────────
@@ -1977,30 +1849,24 @@ const fileInputRef = useRef(null)
     let cancelled = false
     loadExtraction(activeDocumentId, { caseId }).then(saved => {
       if (cancelled) return
-      const totalCachedChunks = saved?.pages?.reduce((s, p) => s + (p.chunks?.length ?? 0), 0) ?? 0
-      if (saved?.text && totalCachedChunks > 0) {
+      if (saved?.text && saved?.pages?.length) {
         setExtractedText(saved.text)
         extractedTextRef.current = saved.text
         setExtractionSource(saved.isOcr ? 'ocr' : 'text')
         setDocStatuses(prev => ({ ...prev, [activeDocumentId]: 'extracted' }))
         if (saved.pages) {
-          // If getDocRagStatus already resolved (doc confirmed indexed), apply chunking
-          // immediately for display — otherwise auto-index will apply them after embedding.
-          let pages = saved.pages
-          if (ragStatusByDocRef.current[activeDocumentId]) {
-            const rawChunks = chunkRecursive(saved.pages, CHUNK_TARGET_WORDS)
-            const byPage = new Map()
-            for (const c of rawChunks) {
-              if (!byPage.has(c.pageNum)) byPage.set(c.pageNum, [])
-              byPage.get(c.pageNum).push(c)
-            }
-            pages = saved.pages.map(p => ({ ...p, chunks: byPage.get(p.pageNum) ?? [] }))
-          }
+          // Always apply semantic chunking for display — this is pure presentation and must
+          // NOT be gated on ragStatusByDocRef. Gating caused a race where loadExtraction
+          // resolved before getDocRagStatus, leaving raw paragraphs in extractedPages and
+          // blocking the recovery effect (which checks !extractedPages).
+          // lastExtractionPagesRef always stores raw saved.pages so chunkRecursive gets
+          // clean paragraph input on future calls.
+          const pages = applyChunkStrategy(saved.pages)
           setExtractedPages(pages)
-          lastExtractionPagesRef.current = { docId: activeDocumentId, pages }
+          lastExtractionPagesRef.current = { docId: activeDocumentId, pages: saved.pages }
         }
       } else if (saved) {
-        // Stale cache (0 chunks) — delete it so next manual run starts fresh
+        // Stale cache (no text or no pages) — delete it so next manual run starts fresh
         const url = caseId
           ? `/api/cases/${encodeURIComponent(caseId)}/extractions/${activeDocumentId}`
           : `/api/extractions/${activeDocumentId}`
@@ -2012,15 +1878,20 @@ const fileInputRef = useRef(null)
   }, [activeDocumentId, caseId])
 
   // Auto-index for RAG after extraction completes.
-  // Fires only when ragStatus===null (new doc or first extraction this session).
-  // Returning to an already-indexed doc sets ragStatus from ragStatusByDocRef, so this won't re-trigger.
+  // Guards:
+  //  ragStatusChecked — getDocRagStatus has resolved for this doc, so ragStatus is authoritative.
+  //                     Without this, a reloadChunksOnly call that sets extractedPages before the
+  //                     DB check returns would incorrectly trigger a full re-embed.
+  //  !knownIndexed   — localStorage cache confirms doc was never indexed in any prior session.
+  //  ragStatus===null — DB confirmed it is not already indexed this session.
   useEffect(() => {
     const cached = lastExtractionPagesRef.current
     const hasCachedPages = cached?.docId === activeDocumentId && cached?.pages
-    if (extractedPages && (ragStatus === null) && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
+    const knownIndexed = !!docChunkCountsById[activeDocumentId]
+    if (extractedPages && ragStatusChecked && ragStatus === null && !knownIndexed && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
       handleIndexDocument()
     }
-  }, [extractedPages, ragStatus, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [extractedPages, ragStatus, ragStatusChecked, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Recovery: doc is confirmed indexed in SQLite but extraction cache is missing (extractedPages
   // still null after loadExtraction returned nothing). Re-extract from the loaded PDF so the Text
@@ -2029,9 +1900,16 @@ const fileInputRef = useRef(null)
   // worker sends 'ready' before the main-thread pdfjsLib.getDocument() promise resolves.
   // forceClear:false keeps existing embeddings; server re-upserts unchanged chunks harmlessly.
   useEffect(() => {
-    if (ragStatus !== 'indexed' || extractedPages || !activeDocumentId || !pdfMainThreadReady) return
+    // Fire when: doc is known to be indexed but no chunks are displayed yet.
+    // "Known indexed" = ragStatus confirmed from DB OR docChunkCountsById has a cached count
+    // (localStorage-persisted from a prior session — available immediately on doc select).
+    // pdfMainThreadReady is NOT a gate — Path 1 (server cache) works without the PDF loaded.
+    // It IS a dep so the effect re-fires when the PDF loads, allowing Path 2 fallback if needed.
+    const chunkCount = extractedPages?.reduce((s, p) => s + (p.chunks?.length ?? 0), 0) ?? 0
+    const knownIndexed = ragStatus === 'indexed' || !!docChunkCountsById[activeDocumentId]
+    if (!knownIndexed || chunkCount > 0 || !activeDocumentId) return
     reloadChunksOnly()
-  }, [ragStatus, extractedPages, activeDocumentId, pdfMainThreadReady]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ragStatus, extractedPages, activeDocumentId, pdfMainThreadReady, docChunkCountsById]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const textPanelDragging = useRef(false)
   const textPanelDragStartY = useRef(0)
@@ -2740,15 +2618,25 @@ const fileInputRef = useRef(null)
                     onClick={() => setExtractedTextOpen(o => !o)}
                     style={{ cursor: 'pointer', flex: 1, display: 'flex', alignItems: 'center', gap: 6 }}
                   >
-                    <span>Text Chunks</span>
+                    <span
+                      className="pdfapp-chunks-reload-link"
+                      onClick={e => { e.stopPropagation(); reloadChunksOnly() }}
+                      title="Click to reload chunks from database"
+                    >
+                      Text Chunks — {
+                        extractedPages
+                          ? extractedPages.reduce((s, p) => s + p.chunks.length, 0)
+                          : (docChunkCountsById[activeDocumentId] ?? 0)
+                      } chunks
+                    </span>
+                    <button
+                      className="pdfapp-chunks-refresh-btn"
+                      onClick={e => { e.stopPropagation(); reloadChunksOnly() }}
+                      title="Force reload chunks from database"
+                    >↺</button>
                     {extractionSource && (
                       <span className={`pdfapp-extraction-badge pdfapp-extraction-badge--${extractionSource}`}>
                         {extractionSource === 'ocr' ? 'OCR' : 'Text'}
-                      </span>
-                    )}
-                    {extractedPages && (
-                      <span className="pdfapp-chunk-count">
-                        {extractedPages.reduce((s, p) => s + p.chunks.length, 0)} chunks
                       </span>
                     )}
                     {extractingText && (
@@ -2796,11 +2684,17 @@ const fileInputRef = useRef(null)
                         </span>
                       )
                     })()}
-                    <button
-                      className="pdfapp-action-btn pdfapp-action-btn--menu"
-                      title="Text processing guide & settings"
-                      onClick={() => setChunkGuideOpen(true)}
-                    >···</button>
+                    {activeDoc?.file && (
+                      <button
+                        className="pdfapp-action-btn pdfapp-action-btn--chunk"
+                        disabled={ragStatus === 'indexed' || ragStatus === 'indexing' || extractingText
+                          || (extractedPages?.some(p => p.chunks?.length > 0))
+                          || (!!docChunkCountsById[activeDocumentId])}
+                        onClick={() => handleIndexDocument({ forceClear: true })}
+                        title={ragStatus === 'indexed' || extractedPages?.some(p => p.chunks?.length > 0) || docChunkCountsById[activeDocumentId]
+                          ? 'Text already chunked' : 'Chunk and index the document text'}
+                      >Chunk Text</button>
+                    )}
                   </div>
 
                   <span
@@ -2920,11 +2814,6 @@ const fileInputRef = useRef(null)
                                 <span className="pdfapp-chunk-tag pdfapp-chunk-tag--idx">#{idx}</span>
                                 {score != null && (
                                   <span className="pdfapp-chunk-tag pdfapp-chunk-tag--score">{Math.round(score * 100)}%</span>
-                                )}
-                                {chunk.bbox && !score && (
-                                  <span className="pdfapp-chunk-bbox">
-                                    [{chunk.bbox.map(v => (v * 100).toFixed(1) + '%').join(', ')}]
-                                  </span>
                                 )}
                                 <button
                                   className={`pdfapp-chunk-note-btn${chunkNotes.length > 0 ? ' pdfapp-chunk-note-btn--has-notes' : ''}`}
@@ -3050,31 +2939,91 @@ const fileInputRef = useRef(null)
       <div className="pdfapp-right" style={{ flex: rightFlex }}>
         {/* Tab bar */}
         <div className="pdfapp-right-tabs">
-          <button className={`pdfapp-right-tab${rightTab === 'chat' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('chat')}>Chat</button>
+          <button className={`pdfapp-right-tab${rightTab === 'chat' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('chat')}>Query Docs</button>
           <button className={`pdfapp-right-tab${rightTab === 'notes' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('notes')}>
             {(() => {
               const merged = { ...allCaseNotes, ...(activeDocumentId ? { [activeDocumentId]: notes } : {}) }
               const t = Object.values(merged).flat().filter(n => n.text?.trim()).length
-              return `Notes (${t})`
+              return `Review Notes (${t})`
             })()}
           </button>
           <button className={`pdfapp-right-tab${rightTab === 'aide' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('aide')}>
-            Aide{aideStatus === 'running' ? ' ⟳' : aideStatus === 'done' ? ' ✓' : ''}
-          </button>
-          <button className={`pdfapp-right-tab${rightTab === 'law' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('law')}>
-            Law{lawStatus?.available ? ' ✓' : ''}
+            Run Agents{aideStatus === 'running' ? ' ⟳' : ''}
           </button>
         </div>
 
         {/* ── Chat tab ── */}
         {rightTab === 'chat' && <div className="pdfapp-chat">
+          <div className="pdfapp-chat-toolbar">
+            {caseId && (
+              <button
+                className={`pdfapp-chat-scope-btn${caseSearchActive ? ' pdfapp-chat-scope-btn--active' : ''}`}
+                onClick={() => setCaseSearchActive(v => !v)}
+                title={caseSearchActive ? 'Searching entire case — click to limit to active document' : 'Click to search all documents in this case'}
+              >
+                {caseSearchActive ? 'Searching: entire case' : 'Searching: active doc'}
+              </button>
+            )}
+            {chatMessages.length > 0 && (
+              <button
+                className="pdfapp-chat-download-btn"
+                title="Download chat as .txt"
+                onClick={() => {
+                  const docName = documents.find(d => d.id === activeDocumentId)?.name || ''
+                  const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+                  const lines = []
+                  lines.push(`Chat Export${docName ? ` — ${docName}` : ''}${caseName ? ` (${caseName})` : ''} — ${dateStr}`)
+                  lines.push('='.repeat(60))
+                  lines.push('')
+                  for (const msg of chatMessages) {
+                    if (msg.role === 'user') {
+                      lines.push('[You]')
+                      lines.push(msg.content)
+                    } else {
+                      lines.push('[LexChat]')
+                      lines.push(msg.content)
+                      if (msg.citations?.size > 0) {
+                        const srcParts = [...msg.citations.entries()].map(([n, c]) => `[${n}] p.${c.page_num}`)
+                        lines.push(`Sources: ${srcParts.join(', ')}`)
+                      }
+                    }
+                    lines.push('')
+                    lines.push('—'.repeat(40))
+                    lines.push('')
+                  }
+                  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = `chat${docName ? `-${docName.replace(/\.[^.]+$/, '').replace(/[^a-z0-9]/gi, '_').toLowerCase()}` : ''}.txt`
+                  a.click()
+                  URL.revokeObjectURL(url)
+                }}
+              >
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export
+              </button>
+            )}
+          </div>
           <div className="pdfapp-chat-messages" ref={chatMessagesRef}>
               {chatMessages.length === 0 && (
-                <div className="pdfapp-chat-empty">
-                  <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#4b5563" strokeWidth="1.2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                  <p>Ask LexChat anything about this document</p>
+                <div className="pdfapp-chat-welcome">
+                  <div className="pdfapp-chat-welcome-icon">
+                    <svg viewBox="0 0 100 100" width="56" height="56" fill="none">
+                      {[0,30,60,90,120,150].map(deg => {
+                        const r = deg * Math.PI / 180
+                        const x1 = 50 + 14 * Math.cos(r), y1 = 50 + 14 * Math.sin(r)
+                        const x2 = 50 + 44 * Math.cos(r), y2 = 50 + 44 * Math.sin(r)
+                        return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#d4846a" strokeWidth="9" strokeLinecap="round"/>
+                      })}
+                    </svg>
+                  </div>
+                  <h2 className="pdfapp-chat-welcome-title">LexChat</h2>
+                  <p className="pdfapp-chat-welcome-sub">Ask anything about the active document</p>
                 </div>
               )}
               {chatMessages.map((msg, i) => (
@@ -3144,40 +3093,31 @@ const fileInputRef = useRef(null)
                 </div>
               ))}
             </div>
-            {caseId && (
-              <div className="pdfapp-chat-scope-row">
+            <div className="pdfapp-chat-input-row">
+              <div className="pdfapp-chat-input-wrap">
+                <textarea
+                  className="pdfapp-chat-input"
+                  placeholder="Ask a legal question…"
+                  value={chatInput}
+                  rows={1}
+                  onChange={e => setChatInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend() }
+                  }}
+                  disabled={chatLoading || !activeDocumentId}
+                />
                 <button
-                  className={`pdfapp-chat-scope-btn${caseSearchActive ? ' pdfapp-chat-scope-btn--active' : ''}`}
-                  onClick={() => setCaseSearchActive(v => !v)}
-                  title={caseSearchActive ? 'Searching entire case — click to limit to active document' : 'Click to search all documents in this case'}
+                  className={`pdfapp-chat-send${chatLoading ? ' pdfapp-chat-send--stop' : ''}`}
+                  onClick={chatLoading ? () => chatAbortRef.current?.abort() : handleChatSend}
+                  disabled={!chatLoading && (!chatInput.trim() || !activeDocumentId)}
+                  title={chatLoading ? 'Stop generation' : 'Send'}
                 >
-                  {caseSearchActive ? 'Searching: entire case' : 'Searching: active doc'}
+                  {chatLoading
+                    ? <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/><rect x="8" y="8" width="8" height="8" rx="1.5"/></svg>
+                    : <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><polygon points="6,3 21,12 6,21"/></svg>
+                  }
                 </button>
               </div>
-            )}
-            <div className="pdfapp-chat-input-row">
-              <textarea
-                className="pdfapp-chat-input"
-                placeholder="Ask a legal question…"
-                value={chatInput}
-                rows={1}
-                onChange={e => setChatInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend() }
-                }}
-                disabled={chatLoading || !activeDocumentId}
-              />
-              <button
-                className={`pdfapp-chat-send${chatLoading ? ' pdfapp-chat-send--stop' : ''}`}
-                onClick={chatLoading ? () => chatAbortRef.current?.abort() : handleChatSend}
-                disabled={!chatLoading && (!chatInput.trim() || !activeDocumentId)}
-                title={chatLoading ? 'Stop generation' : 'Send'}
-              >
-                {chatLoading
-                  ? <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
-                  : <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                }
-              </button>
             </div>
           </div>}
 
@@ -3210,6 +3150,65 @@ const fileInputRef = useRef(null)
 
           const toggle = (key) => setNotesCollapsed(prev => ({ ...prev, [key]: !prev[key] }))
           const isCol = (key) => !!notesCollapsed[key]
+
+          const downloadNotesMarkdown = () => {
+            const lines = []
+            const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+            lines.push(`# Notes Export${caseName ? ` — ${caseName}` : ''} — ${dateStr}`)
+            lines.push('')
+
+            if (starGroups.length > 0 || unassigned.length > 0) {
+              lines.push('## ⭐ Starred Sources')
+              lines.push('')
+              for (const { party, sources } of starGroups) {
+                lines.push(`### ${party.name}`)
+                lines.push('')
+                for (const s of sources) {
+                  lines.push(`**Page ${s.pageNum}** — ${s.docName || ''}${s.score != null ? ` · ${s.score}%` : ''}`)
+                  if (s.chunkText) lines.push(`> ${s.chunkText.replace(/\n/g, '\n> ')}`)
+                  lines.push('')
+                }
+              }
+              if (unassigned.length > 0) {
+                for (const s of unassigned) {
+                  lines.push(`**Page ${s.pageNum}**${s.score != null ? ` · ${s.score}%` : ''}`)
+                  if (s.chunkText) lines.push(`> ${s.chunkText.replace(/\n/g, '\n> ')}`)
+                  lines.push('')
+                }
+              }
+            }
+
+            if (noteGroups.length > 0) {
+              lines.push('## 📝 Notes')
+              lines.push('')
+              for (const { party, docNotes } of noteGroups) {
+                lines.push(`### ${party.name}`)
+                lines.push('')
+                for (const { doc, notes: docNoteList } of docNotes) {
+                  lines.push(`#### ${doc.name}`)
+                  lines.push('')
+                  for (const n of docNoteList) {
+                    const noteDateStr = n.createdAt ? new Date(n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''
+                    const metaParts = [`Page ${n.pageNum}`]
+                    if (n.chunkIdx != null) metaParts.push(`Chunk ${n.chunkIdx}`)
+                    lines.push(`**${metaParts.join(' · ')}**${noteDateStr ? ` — ${noteDateStr}` : ''}`)
+                    if (n.chunkText) lines.push(`> ${n.chunkText.replace(/\n/g, '\n> ')}`)
+                    lines.push('')
+                    lines.push(n.text)
+                    lines.push('')
+                  }
+                }
+              }
+            }
+
+            const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `notes${caseName ? `-${caseName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}` : ''}.txt`
+            a.click()
+            URL.revokeObjectURL(url)
+          }
 
           const goToSource = (s) => {
             if (s.docId !== activeDocumentId) {
@@ -3299,6 +3298,18 @@ const fileInputRef = useRef(null)
 
           return (
             <div className="nt-root" ref={notesPanelRef}>
+              {!isEmpty && (
+                <div className="nt-toolbar">
+                  <button className="nt-download-btn" title="Download notes as Markdown" onClick={downloadNotesMarkdown}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Export
+                  </button>
+                </div>
+              )}
               {isEmpty && (
                 <div className="pdfapp-evidence-empty">
                   Star sources (★) from chat responses, or add notes from text chunks (✏), to build your evidence collection.
@@ -3435,22 +3446,62 @@ const fileInputRef = useRef(null)
           )
         })()}
 
-        {/* ── Aide tab ── */}
+        {/* ── Run Agents tab ── */}
         {rightTab === 'aide' && (
           <div className="pdfapp-aide-panel">
 
-            {/* Sub-tab bar */}
-            <div className="pdfapp-aide-subtabs">
-              <button className={`pdfapp-aide-subtab${aideSoulTab === 'run' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('run')}>Run</button>
-              <button className={`pdfapp-aide-subtab${aideSoulTab === 'soul' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('soul')}>Soul</button>
-              <button className={`pdfapp-aide-subtab${aideSoulTab === 'memory' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('memory')}>
-                Memory
-                {aideDiary.length > 0 && <span className="pdfapp-aide-subtab-badge">{aideDiary.length}</span>}
-              </button>
+          {/* ── Agent list (marketplace) ── */}
+          {!activeAgentId && (
+            <div className="pdfapp-agents-list">
+              <div className="pdfapp-agents-list-header">
+                <span className="pdfapp-agents-list-title">Agents</span>
+                <span className="pdfapp-agents-list-hint">Select an agent to run</span>
+              </div>
+              {AGENTS.map(agent => (
+                <button key={agent.id} className="pdfapp-agent-card" onClick={() => setActiveAgentId(agent.id)}>
+                  <div className="pdfapp-agent-card-icon" style={{ background: agent.color }}>{agent.icon}</div>
+                  <div className="pdfapp-agent-card-info">
+                    <span className="pdfapp-agent-card-name">{agent.name}</span>
+                    <span className="pdfapp-agent-card-tagline">{agent.tagline}</span>
+                    <span className="pdfapp-agent-badge">Active</span>
+                  </div>
+                  <div className="pdfapp-agent-card-meta">
+                    <span className="pdfapp-agent-card-meta-arrow">›</span>
+                  </div>
+                </button>
+              ))}
             </div>
+          )}
 
-            {/* ── Run sub-tab ── */}
-            {aideSoulTab === 'run' && (<>
+          {/* ── Agent modal (run / soul / memory) ── */}
+          {activeAgentId && (() => {
+            const agent = AGENTS.find(a => a.id === activeAgentId)
+            return (
+              <>
+                {/* Modal header */}
+                <div className="pdfapp-agent-modal-header">
+                  <button className="pdfapp-agent-modal-back" onClick={() => { aideEsRef.current?.close(); setActiveAgentId(null) }}>‹ Agents</button>
+                  <div className="pdfapp-agent-modal-title-row">
+                    <span className="pdfapp-agent-modal-icon" style={{ background: agent.color }}>{agent.icon}</span>
+                    <span className="pdfapp-agent-modal-name">{agent.name}</span>
+                  </div>
+                </div>
+
+                {/* Sub-tab bar */}
+                <div className="pdfapp-aide-subtabs">
+                  <button className={`pdfapp-aide-subtab${aideSoulTab === 'run' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('run')}>Run</button>
+                  <button className={`pdfapp-aide-subtab${aideSoulTab === 'soul' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('soul')}>Soul</button>
+                  <button className={`pdfapp-aide-subtab${aideSoulTab === 'memory' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('memory')}>
+                    Memory
+                    {aideDiary.length > 0 && <span className="pdfapp-aide-subtab-badge">{aideDiary.length}</span>}
+                  </button>
+                </div>
+              </>
+            )
+          })()}
+
+            {/* ── Run / Soul / Memory subtabs — only shown when an agent is selected ── */}
+            {activeAgentId && aideSoulTab === 'run' && (<>
               <div className="pdfapp-aide-form">
                 <div className="pdfapp-aide-form-field">
                   <label className="pdfapp-aide-label">Task</label>
@@ -3497,7 +3548,7 @@ const fileInputRef = useRef(null)
                         onClick={handleAideStart}
                         disabled={!aideTask.trim() || !caseId}
                       >
-                        {aideStatus === 'idle' ? 'Run Aide →' : 'Run Again →'}
+                        {aideStatus === 'idle' ? 'Run →' : 'Run Again →'}
                       </button>
                   }
                 </div>
@@ -3574,10 +3625,10 @@ const fileInputRef = useRef(null)
             </>)}
 
             {/* ── Soul sub-tab ── */}
-            {aideSoulTab === 'soul' && (
+            {activeAgentId && aideSoulTab === 'soul' && (
               <div className="pdfapp-aide-soul-panel">
                 <div className="pdfapp-aide-soul-header">
-                  <span className="pdfapp-aide-soul-title">Your Aide's Identity</span>
+                  <span className="pdfapp-aide-soul-title">{AGENTS.find(a => a.id === activeAgentId)?.name ?? 'Agent'} — Identity</span>
                   <div className="pdfapp-aide-soul-actions">
                     {aideSoulSavedAt && !aideSoulDirty && (
                       <span className="pdfapp-aide-soul-saved">Saved {new Date(aideSoulSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -3700,7 +3751,7 @@ const fileInputRef = useRef(null)
             )}
 
             {/* ── Memory sub-tab ── */}
-            {aideSoulTab === 'memory' && (
+            {activeAgentId && aideSoulTab === 'memory' && (
               <div className="pdfapp-aide-memory-panel">
                 {/* Token audit */}
                 <div className="pdfapp-aide-audit">
@@ -3752,238 +3803,9 @@ const fileInputRef = useRef(null)
           </div>
         )}
 
-        {/* ── Law tab ── */}
-        {rightTab === 'law' && (
-          <div className="pdfapp-law-panel">
-
-            {/* Sub-tab bar */}
-            <div className="pdfapp-law-subtabs">
-              <button className={`pdfapp-law-subtab${lawSubTab === 'search' ? ' pdfapp-law-subtab--active' : ''}`} onClick={() => setLawSubTab('search')}>Search</button>
-              <button className={`pdfapp-law-subtab${lawSubTab === 'import' ? ' pdfapp-law-subtab--active' : ''}`} onClick={() => setLawSubTab('import')}>Import</button>
-            </div>
-
-            {/* ── Search sub-tab ── */}
-            {lawSubTab === 'search' && (
-              <div className="pdfapp-law-search-panel">
-
-                {/* Status banner when no corpus */}
-                {lawStatus && !lawStatus.available && (
-                  <div className="pdfapp-law-no-corpus">
-                    <span className="pdfapp-law-no-corpus-icon">⚖</span>
-                    <span>No caselaw corpus loaded. Go to <button className="pdfapp-law-link-btn" onClick={() => setLawSubTab('import')}>Import</button> to add one.</span>
-                  </div>
-                )}
-
-                {/* Search bar */}
-                <div className="pdfapp-law-search-bar">
-                  <input
-                    className="pdfapp-law-search-input"
-                    placeholder="Search caselaw… e.g. 'duty of care in negligence'"
-                    value={lawQuery}
-                    onChange={e => setLawQuery(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') handleLawSearch() }}
-                    disabled={!lawStatus?.available || lawSearching}
-                  />
-                  <button
-                    className="pdfapp-law-search-btn"
-                    onClick={handleLawSearch}
-                    disabled={!lawStatus?.available || !lawQuery.trim() || lawSearching}
-                  >
-                    {lawSearching ? '…' : 'Search'}
-                  </button>
-                </div>
-
-                {/* Filters */}
-                <div className="pdfapp-law-filters">
-                  <input
-                    className="pdfapp-law-filter-input"
-                    placeholder="Court (e.g. UKSC)"
-                    value={lawFilters.court}
-                    onChange={e => setLawFilters(f => ({ ...f, court: e.target.value }))}
-                  />
-                  <input
-                    className="pdfapp-law-filter-input"
-                    placeholder="Jurisdiction"
-                    value={lawFilters.jurisdiction}
-                    onChange={e => setLawFilters(f => ({ ...f, jurisdiction: e.target.value }))}
-                  />
-                  <input
-                    className="pdfapp-law-filter-input pdfapp-law-filter-year"
-                    placeholder="From year"
-                    type="number"
-                    min="1800" max="2099"
-                    value={lawFilters.yearFrom}
-                    onChange={e => setLawFilters(f => ({ ...f, yearFrom: e.target.value }))}
-                  />
-                  <input
-                    className="pdfapp-law-filter-input pdfapp-law-filter-year"
-                    placeholder="To year"
-                    type="number"
-                    min="1800" max="2099"
-                    value={lawFilters.yearTo}
-                    onChange={e => setLawFilters(f => ({ ...f, yearTo: e.target.value }))}
-                  />
-                </div>
-
-                {/* Results */}
-                <div className="pdfapp-law-results">
-                  {lawSearching && (
-                    <div className="pdfapp-law-searching">Searching corpus…</div>
-                  )}
-                  {!lawSearching && lawResults.length === 0 && lawQuery && !lawImportMsg && (
-                    <div className="pdfapp-law-no-results">No results. Try different keywords or broaden filters.</div>
-                  )}
-                  {lawResults.map((r, i) => (
-                    <div key={r.id || i} className="pdfapp-law-result">
-                      <div className="pdfapp-law-result-header">
-                        <span className="pdfapp-law-citation">{r.citation}</span>
-                        <div className="pdfapp-law-result-meta">
-                          {r.court && <span className="pdfapp-law-badge">{r.court}</span>}
-                          {r.year  && <span className="pdfapp-law-year">{r.year}</span>}
-                          <span className="pdfapp-law-score">{(r.score * 100).toFixed(0)}%</span>
-                        </div>
-                      </div>
-                      {r.jurisdiction && <div className="pdfapp-law-jurisdiction">{r.jurisdiction}</div>}
-                      <div className="pdfapp-law-snippet">{r.text}</div>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            )}
-
-            {/* ── Import sub-tab ── */}
-            {lawSubTab === 'import' && (
-              <div className="pdfapp-law-import-panel">
-
-                {/* Corpus status */}
-                <div className="pdfapp-law-corpus-status">
-                  <div className="pdfapp-law-corpus-header">
-                    <span className="pdfapp-law-corpus-title">Corpus Status</span>
-                    {lawStatus?.available
-                      ? <span className="pdfapp-law-corpus-badge pdfapp-law-corpus-badge--ok">Active</span>
-                      : <span className="pdfapp-law-corpus-badge pdfapp-law-corpus-badge--none">No corpus</span>
-                    }
-                  </div>
-                  {lawStatus?.available ? (
-                    <div className="pdfapp-law-corpus-meta">
-                      <span>{lawStatus.rows?.toLocaleString()} entries</span>
-                      <span className="pdfapp-law-corpus-dot">·</span>
-                      <span>{lawStatus.model}</span>
-                      <span className="pdfapp-law-corpus-dot">·</span>
-                      <span>dim {lawStatus.embeddingDim}</span>
-                      {lawStatus.lastSwapped && <>
-                        <span className="pdfapp-law-corpus-dot">·</span>
-                        <span>Updated {new Date(lawStatus.lastSwapped).toLocaleDateString()}</span>
-                      </>}
-                    </div>
-                  ) : (
-                    <div className="pdfapp-law-corpus-empty">{lawStatus?.message || 'No database loaded.'}</div>
-                  )}
-                </div>
-
-                {/* Drop zone */}
-                <div
-                  className={`pdfapp-law-drop-zone${lawDragOver ? ' pdfapp-law-drop-zone--over' : ''}${lawUploadFile ? ' pdfapp-law-drop-zone--staged' : ''}`}
-                  onDragOver={e => { e.preventDefault(); setLawDragOver(true) }}
-                  onDragLeave={() => setLawDragOver(false)}
-                  onDrop={handleLawDbDrop}
-                  onClick={() => !lawUploadFile && lawFileInputRef.current?.click()}
-                >
-                  <input
-                    ref={lawFileInputRef}
-                    type="file"
-                    accept=".db"
-                    style={{ display: 'none' }}
-                    onChange={e => handleLawDbDrop({ target: e.target, preventDefault: () => {}, dataTransfer: null })}
-                  />
-                  {lawUploadFile ? (
-                    <>
-                      <span className="pdfapp-law-drop-icon">📦</span>
-                      <span className="pdfapp-law-drop-file">{lawUploadFile.name}</span>
-                      <span className="pdfapp-law-drop-size">({(lawUploadFile.size / 1024 / 1024).toFixed(1)} MB)</span>
-                      <button className="pdfapp-law-drop-clear" onClick={e => { e.stopPropagation(); setLawUploadFile(null); setLawImportMsg(null) }}>× Clear</button>
-                    </>
-                  ) : (
-                    <>
-                      <span className="pdfapp-law-drop-icon">⚖</span>
-                      <span>Drop a caselaw <strong>.db</strong> file here or click to browse</span>
-                      <span className="pdfapp-law-drop-hint">Generated by import-caselaw.mjs or a 3rd party provider</span>
-                    </>
-                  )}
-                </div>
-
-                {/* Import message */}
-                {lawImportMsg && (
-                  <div className={`pdfapp-law-import-msg pdfapp-law-import-msg--${lawImportMsg.type}`}>
-                    {lawImportMsg.type === 'ok' ? '✓ ' : '✗ '}{lawImportMsg.text}
-                  </div>
-                )}
-
-                {/* Activate button */}
-                {lawUploadFile && (
-                  <button
-                    className="pdfapp-law-swap-btn"
-                    onClick={handleLawSwap}
-                    disabled={lawUploading}
-                  >
-                    {lawUploading ? 'Uploading & validating…' : 'Validate & activate corpus'}
-                  </button>
-                )}
-
-                {/* Version history */}
-                {lawVersions.length > 0 && (
-                  <div className="pdfapp-law-versions">
-                    <div className="pdfapp-law-versions-title">Backup versions</div>
-                    {lawVersions.map((v, i) => (
-                      <div key={v} className={`pdfapp-law-version-row${i === 0 ? ' pdfapp-law-version-row--active' : ''}`}>
-                        <span className="pdfapp-law-version-name">{v}</span>
-                        {i === 0 && <span className="pdfapp-law-version-active-badge">active</span>}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-              </div>
-            )}
-
-          </div>
-        )}
 
       </div>
 
-      {/* ── Text Processing Guide Modal ── */}
-      {chunkGuideOpen && createPortal(
-        <div className="pdfapp-guide-overlay" onClick={() => setChunkGuideOpen(false)}>
-          <div className="pdfapp-guide-modal" onClick={e => e.stopPropagation()}>
-            <div className="pdfapp-guide-header">
-              <span className="pdfapp-guide-title">Search Strategy</span>
-              <button className="pdfapp-guide-close" onClick={() => setChunkGuideOpen(false)}>✕</button>
-            </div>
-
-            <div className="pdfapp-guide-body">
-
-              <div className="pdfapp-guide-section pdfapp-guide-section--settings">
-                <p className="pdfapp-guide-text">
-                  Splits the document into ~300-word passages for semantic search. Click <strong>Chunk Text</strong> to re-index with the latest extraction.
-                </p>
-              </div>
-
-              {activeDoc?.file && (
-                <div className="pdfapp-guide-actions">
-                  <button
-                    className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index"
-                    disabled={ragStatus === 'indexing'}
-                    onClick={() => { setChunkGuideOpen(false); handleIndexDocument({ forceClear: true }) }}
-                    title="Re-chunk and re-embed using the current strategy"
-                  >Chunk Text</button>
-                </div>
-              )}
-
-            </div>
-          </div>
-        </div>
-      , document.body)}
 
 
       {/* ── Delete Document Confirmation Modal ── */}

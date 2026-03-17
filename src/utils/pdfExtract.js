@@ -255,9 +255,11 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
       const chunks = words.length ? groupIntoParagraphs(words) : []
       ocrResults.push({ pageNum: i, text: data.text.trim(), chunks, rawWords: words })
 
-      // Emit partial results progressively so LexChat can answer as OCR completes
+      // Emit partial results progressively so LexChat can answer as OCR completes.
+      // Include rawWords so chunkRecursive gets clean paragraph input if handleIndexDocument
+      // is triggered before OCR finishes (avoids chunking from incomplete paragraph groups).
       if (onPartialResult) {
-        const partialPgs = ocrResults.map(p => ({ pageNum: p.pageNum, chunks: p.chunks }))
+        const partialPgs = ocrResults.map(p => ({ pageNum: p.pageNum, chunks: p.chunks, rawWords: p.rawWords || [] }))
         const partialTxt = ocrResults.map(p => `--- Page ${p.pageNum} ---\n${p.text}`).join('\n\n')
         onPartialResult({ text: partialTxt, pages: partialPgs })
       }

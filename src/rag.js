@@ -4,6 +4,17 @@
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' }
 
+/** Returns { [docId]: chunkCount } for all indexed docs in a case — single DB round-trip. */
+export async function getCaseRagStatus(caseId) {
+    try {
+        const res = await fetch(`/api/rag/case-status?caseId=${encodeURIComponent(caseId)}`)
+        if (!res.ok) return {}
+        return res.json()
+    } catch {
+        return {}
+    }
+}
+
 /** Returns { indexed: bool, chunks: number } for a document. */
 export async function getDocRagStatus(docId, { caseId } = {}) {
     try {
