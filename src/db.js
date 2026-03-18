@@ -143,33 +143,65 @@ export async function saveChatHistory(docId, messages, { caseId } = {}) {
 
 // ── PDF Notes ──
 
-export async function loadNotes(docId, { caseId } = {}) {
+function colParam(collectionId) {
+    return collectionId ? `?col=${encodeURIComponent(collectionId)}` : ''
+}
+
+export async function loadNotes(docId, { caseId, collectionId } = {}) {
     if (!caseId) return []
     try {
-        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}`)
+        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}${colParam(collectionId)}`)
         if (!res.ok) return []
         return res.json()
     } catch { return [] }
 }
 
-export async function saveNotes(docId, notes, { caseId } = {}) {
+export async function saveNotes(docId, notes, { caseId, collectionId } = {}) {
     if (!caseId) return
-    await postJSON(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}`, notes)
+    await postJSON(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}${colParam(collectionId)}`, notes)
 }
 
 // Returns all notes across every document in a case: { [docId]: NoteObject[] }
-export async function loadAllNotes(caseId) {
+export async function loadAllNotes(caseId, collectionId) {
     if (!caseId) return {}
     try {
-        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/all-notes`)
+        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/all-notes${colParam(collectionId)}`)
         if (!res.ok) return {}
         return res.json()
     } catch { return {} }
 }
 
-export async function deleteNotes(docId, { caseId } = {}) {
+export async function deleteNotes(docId, { caseId, collectionId } = {}) {
     if (!caseId) return
-    await fetch(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}`, { method: 'DELETE' })
+    await fetch(`/api/cases/${encodeURIComponent(caseId)}/notes/${encodeURIComponent(docId)}${colParam(collectionId)}`, { method: 'DELETE' })
+}
+
+// ── Note Collections ──
+
+export async function loadCollections(caseId) {
+    if (!caseId) return []
+    try {
+        const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/collections`)
+        if (!res.ok) return []
+        return res.json()
+    } catch { return [] }
+}
+
+export async function createCollection(caseId, name) {
+    return postJSON(`/api/cases/${encodeURIComponent(caseId)}/collections`, { name })
+}
+
+export async function renameCollection(caseId, colId, name) {
+    const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/collections/${encodeURIComponent(colId)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+    })
+    return res.json()
+}
+
+export async function deleteCollection(caseId, colId) {
+    await fetch(`/api/cases/${encodeURIComponent(caseId)}/collections/${encodeURIComponent(colId)}`, { method: 'DELETE' })
 }
 
 export async function deleteCaseBlob(caseId, docId) {

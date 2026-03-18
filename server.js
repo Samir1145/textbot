@@ -22,6 +22,26 @@ function getCaseSubdir(caseId, subdir) {
   return dir
 }
 
+// Notes directory: default = 'notes', collection-scoped = 'notes-{collectionId}'
+function getNotesDir(caseId, collectionId) {
+  const subdir = collectionId ? `notes-${safeId(collectionId)}` : 'notes'
+  return getCaseSubdir(caseId, subdir)
+}
+
+// Collections metadata helpers
+function getCollectionsPath(caseId) {
+  return path.join(CASES_DIR, safeId(caseId), 'collections.json')
+}
+function loadCollections(caseId) {
+  const p = getCollectionsPath(caseId)
+  if (!fs.existsSync(p)) return []
+  try { return JSON.parse(fs.readFileSync(p, 'utf8')) } catch { return [] }
+}
+function saveCollections(caseId, collections) {
+  fs.mkdirSync(path.join(CASES_DIR, safeId(caseId)), { recursive: true })
+  fs.writeFileSync(getCollectionsPath(caseId), JSON.stringify(collections))
+}
+
 const app = express()
 app.use(express.json({ limit: '10mb' }))
 
@@ -212,7 +232,7 @@ app.delete('/api/cases/:caseId/blobs/:docId', (req, res) => {
 // ── Case-scoped PDF Notes ──
 
 app.get('/api/cases/:caseId/notes/:docId', (req, res) => {
-  const filePath = path.join(getCaseSubdir(req.params.caseId, 'notes'), `${safeId(req.params.docId)}.json`)
+  const filePath = path.join(getNotesDir(req.params.caseId, req.query.col), `${safeId(req.params.docId)}.json`)
   if (!fs.existsSync(filePath)) return res.json([])
   try { res.json(JSON.parse(fs.readFileSync(filePath, 'utf8'))) }
   catch { res.json([]) }
@@ -220,21 +240,21 @@ app.get('/api/cases/:caseId/notes/:docId', (req, res) => {
 
 app.post('/api/cases/:caseId/notes/:docId', (req, res) => {
   fs.writeFileSync(
-    path.join(getCaseSubdir(req.params.caseId, 'notes'), `${safeId(req.params.docId)}.json`),
+    path.join(getNotesDir(req.params.caseId, req.query.col), `${safeId(req.params.docId)}.json`),
     JSON.stringify(req.body)
   )
   res.json({ ok: true })
 })
 
 app.delete('/api/cases/:caseId/notes/:docId', (req, res) => {
-  const filePath = path.join(getCaseSubdir(req.params.caseId, 'notes'), `${safeId(req.params.docId)}.json`)
+  const filePath = path.join(getNotesDir(req.params.caseId, req.query.col), `${safeId(req.params.docId)}.json`)
   if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
   res.json({ ok: true })
 })
 
 // Aggregate all notes for every document in a case — { [docId]: NoteObject[] }
 app.get('/api/cases/:caseId/all-notes', (req, res) => {
-  const notesDir = getCaseSubdir(req.params.caseId, 'notes')
+  const notesDir = getNotesDir(req.params.caseId, req.query.col)
   const files = fs.existsSync(notesDir)
     ? fs.readdirSync(notesDir).filter(f => f.endsWith('.json'))
     : []
@@ -245,6 +265,43 @@ app.get('/api/cases/:caseId/all-notes', (req, res) => {
     catch { result[docId] = [] }
   }
   res.json(result)
+})
+
+// ── Note Collections CRUD ──
+
+app.get('/api/cases/:caseId/collections', (req, res) => {
+  res.json(loadCollections(req.params.caseId))
+})
+
+app.post('/api/cases/:caseId/collections', express.json(), (req, res) => {
+  const { name } = req.body
+  if (!name) return res.status(400).json({ error: 'name required' })
+  const collections = loadCollections(req.params.caseId)
+  const id = randomUUID()
+  const col = { id, name, createdAt: new Date().toISOString() }
+  collections.push(col)
+  saveCollections(req.params.caseId, collections)
+  res.json(col)
+})
+
+app.patch('/api/cases/:caseId/collections/:colId', express.json(), (req, res) => {
+  const { name } = req.body
+  const collections = loadCollections(req.params.caseId)
+  const col = collections.find(c => c.id === req.params.colId)
+  if (!col) return res.status(404).json({ error: 'not found' })
+  if (name) col.name = name
+  saveCollections(req.params.caseId, collections)
+  res.json(col)
+})
+
+app.delete('/api/cases/:caseId/collections/:colId', (req, res) => {
+  const collections = loadCollections(req.params.caseId)
+  const updated = collections.filter(c => c.id !== req.params.colId)
+  saveCollections(req.params.caseId, updated)
+  // Optionally remove the notes directory for this collection
+  const dir = path.join(CASES_DIR, safeId(req.params.caseId), `notes-${safeId(req.params.colId)}`)
+  if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true })
+  res.json({ ok: true })
 })
 
 // ── Case-scoped Highlights ──
@@ -1146,6 +1203,140 @@ function agentBroadcast(clients, data) {
     for (const res of clients) { try { res.write(msg) } catch {} }
 }
 
+// ── Reports CRUD ──────────────────────────────────────────────────────────────
+
+app.get('/api/reports', (req, res) => {
+    const { caseId } = req.query
+    if (!caseId) return res.status(400).json({ error: 'caseId required' })
+    try {
+        const dir = getCaseSubdir(caseId, 'reports')
+        if (!fs.existsSync(dir)) return res.json([])
+        const reports = fs.readdirSync(dir)
+            .filter(f => f.endsWith('.json'))
+            .map(f => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')) } catch { return null } })
+            .filter(Boolean)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        res.json(reports)
+    } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+app.post('/api/reports', express.json(), (req, res) => {
+    const { caseId, title, content, formatDesc } = req.body
+    if (!caseId) return res.status(400).json({ error: 'caseId required' })
+    try {
+        const dir = getCaseSubdir(caseId, 'reports')
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+        const id = randomUUID()
+        const report = { id, title: title || 'Untitled Report', content, formatDesc, createdAt: new Date().toISOString() }
+        fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify(report))
+        res.json(report)
+    } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+app.delete('/api/reports/:id', (req, res) => {
+    const { caseId } = req.query
+    if (!caseId) return res.status(400).json({ error: 'caseId required' })
+    try {
+        const filePath = path.join(getCaseSubdir(caseId, 'reports'), `${req.params.id}.json`)
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+        res.json({ ok: true })
+    } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// POST /api/reports/generate — SSE streaming report generation from case notes
+app.post('/api/reports/generate', express.json(), async (req, res) => {
+    const { caseId, title, formatDesc, samples = [], collectionId } = req.body
+    if (!caseId) return res.status(400).json({ error: 'caseId required' })
+
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Connection', 'keep-alive')
+    res.flushHeaders()
+
+    const send = (data) => { try { res.write(`data: ${JSON.stringify(data)}\n\n`) } catch {} }
+
+    try {
+        const notesDir = getNotesDir(caseId, collectionId)
+        const allNotes = []
+        if (fs.existsSync(notesDir)) {
+            for (const f of fs.readdirSync(notesDir).filter(f => f.endsWith('.json'))) {
+                try {
+                    const docId = f.replace('.json', '')
+                    const docNotes = JSON.parse(fs.readFileSync(path.join(notesDir, f), 'utf8'))
+                    allNotes.push(...docNotes.map(n => ({ ...n, docId })))
+                } catch {}
+            }
+        }
+
+        if (!allNotes.length) {
+            send({ type: 'error', content: 'No notes found. Build notes first using the Notes tab.' })
+            return res.end()
+        }
+
+        const byDoc = {}
+        for (const n of allNotes) {
+            if (!byDoc[n.docId]) byDoc[n.docId] = []
+            byDoc[n.docId].push(n)
+        }
+        const notesContext = Object.entries(byDoc).map(([docId, notes]) =>
+            `## Document: ${docId.slice(0, 8)}…\n` +
+            notes.sort((a, b) => (a.pageNum || 0) - (b.pageNum || 0))
+                 .map(n => `[Page ${n.pageNum || '?'}] ${n.text}`).join('\n')
+        ).join('\n\n')
+
+        let formatInstructions = formatDesc?.trim() || ''
+        if (samples.length) {
+            formatInstructions += `\n\nExample outputs to match in style:\n${samples.map((s, i) => `--- Example ${i + 1} ---\n${s.text}`).join('\n')}`
+        }
+
+        const { genModel } = loadSettings()
+        const model = genModel || 'qwen2.5:7b'
+        send({ type: 'status', status: 'generating' })
+
+        const systemPrompt = [
+            'You are a professional report writer. Generate a structured, well-written report from the provided case notes.',
+            formatInstructions ? `\n## Report Format Instructions\n${formatInstructions}` : '',
+            '\nWrite clearly and concisely. Cite page numbers in brackets [Page X] where relevant. Do not invent facts not present in the notes.',
+        ].filter(Boolean).join('\n')
+
+        const llmRes = await fetch('http://localhost:11434/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `Title: ${title || 'Case Report'}\n\nCase Notes:\n\n${notesContext}\n\nGenerate the report now.` },
+                ],
+                stream: true,
+            }),
+        })
+
+        if (!llmRes.ok) throw new Error(`LLM error ${llmRes.status}`)
+
+        let fullContent = ''
+        const reader = llmRes.body.getReader()
+        const decoder = new TextDecoder()
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            const text = decoder.decode(value)
+            for (const line of text.split('\n').filter(Boolean)) {
+                try {
+                    const data = JSON.parse(line)
+                    const token = data.message?.content || ''
+                    if (token) { fullContent += token; send({ type: 'token', content: token }) }
+                    if (data.done) send({ type: 'done', content: fullContent })
+                } catch {}
+            }
+        }
+    } catch (err) {
+        console.error('[Reports] generate error:', err.message)
+        send({ type: 'error', content: err.message })
+    }
+    res.end()
+})
+
 const AGENT_TOOLS = [
     {
         type: 'function',
@@ -1217,41 +1408,84 @@ const AGENT_TOOLS = [
 async function agentExecuteTool(name, args, caseId, docScope = []) {
     if (name === 'search_case') {
         const { query, k = 5 } = args
+        console.log(`[Agent] search_case  query="${query}" k=${k} caseId=${caseId}`)
         const { db } = await getRagDb(caseId)
-        const emb = await embed(query)
         const topK = Math.min(k * 20, 200)
-        const knnRows = db.prepare(
+
+        const emb = await hydeEmbed(query)
+        const vecRows = db.prepare(
             'SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ? ORDER BY distance'
-        ).all(toBlob(emb), topK)
-        if (!knnRows.length) return []
-        const distMap = new Map(knnRows.map(r => [Number(r.id), r.distance]))
-        const ids = knnRows.map(r => Number(r.id))
-        const placeholders = ids.map(() => '?').join(',')
-        const chunks = db.prepare(
+        ).all(toBlob(emb), topK).map(r => ({ id: Number(r.id), distance: r.distance }))
+        console.log(`[Agent] search_case  vecRows=${vecRows.length}`)
+
+        const ftsQuery = buildFtsQuery(query)
+        let bm25Rows = []
+        if (ftsQuery) {
+            try {
+                bm25Rows = db.prepare(
+                    `SELECT rowid, bm25(fts_chunks) as bm25_score FROM fts_chunks WHERE fts_chunks MATCH ? ORDER BY bm25_score LIMIT ?`
+                ).all(ftsQuery, topK).map(r => ({ rowid: Number(r.rowid), bm25_score: r.bm25_score }))
+            } catch (e) { console.warn('[Agent] BM25 search_case error:', e.message) }
+        }
+        console.log(`[Agent] search_case  bm25Rows=${bm25Rows.length} ftsQuery="${ftsQuery}"`)
+
+        if (!vecRows.length && !bm25Rows.length) {
+            console.log(`[Agent] search_case  NO RESULTS — DB may be empty or doc not indexed`)
+            return []
+        }
+        const allIds = [...new Set([...vecRows.map(r => r.id), ...bm25Rows.map(r => r.rowid)])]
+        const placeholders = allIds.map(() => '?').join(',')
+        const fetched = db.prepare(
             `SELECT id, doc_id, page_num, chunk_idx, text FROM doc_chunks WHERE id IN (${placeholders})`
-        ).all(...ids)
-        return rerank(chunks, distMap, query, k).map(c => ({
-            docId: c.doc_id, pageNum: c.page_num, text: c.text.slice(0, 400),
+        ).all(...allIds)
+        const chunkMap = new Map(fetched.map(c => [c.id, c]))
+
+        const fused = rrfFuse(vecRows, bm25Rows, chunkMap, k)
+        console.log(`[Agent] search_case  fused=${fused.length} results returned`)
+        return fused.map(c => ({
+            docId: c.doc_id, pageNum: c.page_num, text: c.text.slice(0, 500),
         }))
     }
 
     if (name === 'search_doc') {
         const { query, docId, k = 5 } = args
+        console.log(`[Agent] search_doc  query="${query}" docId=${docId} k=${k}`)
         const { db } = await getRagDb(caseId)
-        const emb = await embed(query)
         const topK = Math.min(k * 20, 200)
-        const knnRows = db.prepare(
+        const safeDocId = safeId(docId)
+
+        const emb = await hydeEmbed(query)
+        const vecRows = db.prepare(
             'SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ? ORDER BY distance'
-        ).all(toBlob(emb), topK)
-        if (!knnRows.length) return []
-        const distMap = new Map(knnRows.map(r => [Number(r.id), r.distance]))
-        const ids = knnRows.map(r => Number(r.id))
-        const placeholders = ids.map(() => '?').join(',')
-        const chunks = db.prepare(
-            `SELECT id, page_num, chunk_idx, text FROM doc_chunks WHERE doc_id = ? AND id IN (${placeholders})`
-        ).all(safeId(docId), ...ids)
-        return rerank(chunks, distMap, query, k).map(c => ({
-            docId, pageNum: c.page_num, text: c.text.slice(0, 400),
+        ).all(toBlob(emb), topK).map(r => ({ id: Number(r.id), distance: r.distance }))
+        console.log(`[Agent] search_doc  vecRows=${vecRows.length}`)
+
+        const ftsQuery = buildFtsQuery(query)
+        let bm25Rows = []
+        if (ftsQuery) {
+            try {
+                bm25Rows = db.prepare(
+                    `SELECT rowid, bm25(fts_chunks) as bm25_score FROM fts_chunks WHERE fts_chunks MATCH ? ORDER BY bm25_score LIMIT ?`
+                ).all(ftsQuery, topK).map(r => ({ rowid: Number(r.rowid), bm25_score: r.bm25_score }))
+            } catch (e) { console.warn('[Agent] BM25 search_doc error:', e.message) }
+        }
+        console.log(`[Agent] search_doc  bm25Rows=${bm25Rows.length} ftsQuery="${ftsQuery}"`)
+
+        if (!vecRows.length && !bm25Rows.length) {
+            console.log(`[Agent] search_doc  NO RESULTS — doc "${docId}" may not be indexed`)
+            return []
+        }
+        const allIds = [...new Set([...vecRows.map(r => r.id), ...bm25Rows.map(r => r.rowid)])]
+        const placeholders = allIds.map(() => '?').join(',')
+        const fetched = db.prepare(
+            `SELECT id, doc_id, page_num, chunk_idx, text FROM doc_chunks WHERE doc_id = ? AND id IN (${placeholders})`
+        ).all(safeDocId, ...allIds)
+        const chunkMap = new Map(fetched.map(c => [c.id, c]))
+
+        const fused = rrfFuse(vecRows, bm25Rows, chunkMap, k)
+        console.log(`[Agent] search_doc  fused=${fused.length} results returned`)
+        return fused.map(c => ({
+            docId, pageNum: c.page_num, text: c.text.slice(0, 500),
         }))
     }
 
@@ -1282,7 +1516,7 @@ async function agentExecuteTool(name, args, caseId, docScope = []) {
 
     if (name === 'add_note') {
         const { docId, pageNum = 1, text } = args
-        const notesDir = getCaseSubdir(caseId, 'notes')
+        const notesDir = getNotesDir(caseId, args.collectionId)
         const filePath = path.join(notesDir, `${safeId(docId)}.json`)
         const existing = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : []
         const note = { id: `agent-${Date.now()}`, pageNum, text, createdAt: new Date().toISOString(), source: 'agent' }
@@ -1294,7 +1528,7 @@ async function agentExecuteTool(name, args, caseId, docScope = []) {
     return { error: `Unknown tool: ${name}` }
 }
 
-async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diary = [], agentId = null }) {
+async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diary = [], agentId = null, collectionId = null }) {
     const job = agentJobs.get(jobId)
 
     // Extract toolConfig settings
@@ -1337,12 +1571,17 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
         enabledTools.search_case    !== false ? '- Use search_case to search broadly across all case documents.' : '',
         enabledTools.search_doc     !== false ? '- Use search_doc to search a specific document by ID.' : '',
         enabledTools.search_caselaw !== false ? '- Use search_caselaw to verify a case citation or find legal precedent — always verify citations mentioned in documents.' : '',
-        enabledTools.add_note       !== false ? '- Use add_note to save important findings as you discover them.' : '',
+        enabledTools.add_note !== false ? [
+            '- IMPORTANT: Use add_note to save each finding AS SOON AS you discover it — do NOT wait until the end.',
+            '- After every 1-2 searches that return relevant results, call add_note to record what you found.',
+            '- Each note should state: what was found, which page it is on, and why it is significant.',
+            '- If you have done 3 or more searches without saving any notes, stop searching and save your findings immediately.',
+        ].join('\n') : '',
         '- Only cite text you have directly retrieved via tools.',
-        '- When search results are weak, rephrase and search again.',
+        '- When search results are weak, rephrase and try one different query — then move on.',
         '- Apply everything you have learned from previous sessions.',
-        '- After gathering evidence, give a clear final answer with citations (doc ID, page number, and case citation where relevant).',
-        `- Stop after ${MAX_STEPS} tool calls maximum.`,
+        '- After saving notes, give a short final summary of what you found.',
+        `- You have ${MAX_STEPS} steps total. Budget: ~40% searching, ~50% note-saving, ~10% final summary.`,
     ].filter(Boolean).join('\n')
 
     const messages = [
@@ -1350,10 +1589,19 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
         { role: 'user',   content: task },
     ]
 
+    const emit = (data) => { job.steps.push(data); agentBroadcast(job.clients, data) }
+    const log  = (msg)  => { console.log(`[Agent:${jobId.slice(0,8)}] ${msg}`); emit({ type: 'log', content: msg }) }
+
+    const { genModel: settingsGenModel } = loadSettings()
+    const localModel = tc.localModel || settingsGenModel || 'qwen2.5:7b'
+    log(`START  mode=${executionMode} model=${localModel} maxSteps=${MAX_STEPS} caseId=${caseId}`)
+
     let stepCount = 0
 
     while (stepCount < MAX_STEPS) {
         if (job.cancelled) return
+
+        log(`LLM call  step=${stepCount + 1}/${MAX_STEPS} messages=${messages.length}`)
 
         let response
         if (executionMode === 'internet') {
@@ -1416,7 +1664,7 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
                 const res = await fetch('http://localhost:11434/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: tc.localModel || 'qwen2.5:7b', messages, tools: activeTools, stream: false, options: { temperature } }),
+                    body: JSON.stringify({ model: localModel, messages, tools: activeTools, stream: false, options: { temperature } }),
                 })
                 if (!res.ok) throw new Error(`Ollama ${res.status}`)
                 response = await res.json()
@@ -1431,6 +1679,8 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
         }
 
         const msg = response.message
+        const toolCallNames = msg.tool_calls?.map(c => c.function?.name).join(', ') || 'none'
+        log(`LLM response  tool_calls=[${toolCallNames}] has_text=${!!msg.content?.trim()}`)
 
         // No tool calls → LLM is done
         if (!msg.tool_calls?.length) {
@@ -1449,7 +1699,7 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            model: 'qwen2.5:7b',
+                            model: localModel,
                             messages: [
                                 { role: 'system', content: 'Review your work briefly and honestly.' },
                                 { role: 'user', content: `Task: ${task}\n\nYour analysis:\n${msg.content}\n\nIn 3 concise bullets:\n• What was most valuable in this analysis?\n• What might you have missed or could improve?\n• What would you do differently next time?` },
@@ -1492,6 +1742,14 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
         // Add assistant turn to message history
         messages.push({ role: 'assistant', content: msg.content || '', tool_calls: msg.tool_calls })
 
+        // ── Nudge: if 3+ steps done with no add_note, inject a reminder ──
+        const notesSaved = job.steps.filter(s => s.type === 'tool_call' && s.tool === 'add_note').length
+        if (stepCount >= 2 && notesSaved === 0) {
+            const nudge = 'You have done several searches but saved no notes yet. Please call add_note now to record your most important findings before searching more.'
+            log(`NUDGE: ${stepCount} steps, 0 notes saved — injecting reminder`)
+            messages.push({ role: 'user', content: nudge })
+        }
+
         // Execute each tool call
         for (const call of msg.tool_calls) {
             if (job.cancelled) return
@@ -1509,12 +1767,19 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
             const callStep = { type: 'tool_call', tool: toolName, args: toolArgs }
             job.steps.push(callStep)
             agentBroadcast(job.clients, callStep)
+            log(`Tool call  ${toolName}  args=${JSON.stringify(toolArgs).slice(0, 120)}`)
 
             let result
             try {
+                if (collectionId && toolName === 'add_note') toolArgs.collectionId = collectionId
                 result = await agentExecuteTool(toolName, toolArgs, caseId, docScope)
+                const resultSummary = Array.isArray(result)
+                    ? `${result.length} chunks`
+                    : (result?.ok ? 'ok' : JSON.stringify(result).slice(0, 80))
+                log(`Tool result  ${toolName}  → ${resultSummary}`)
             } catch (toolErr) {
                 result = { error: toolErr.message }
+                log(`Tool ERROR  ${toolName}  → ${toolErr.message}`)
                 const errStep = { type: 'error', content: `Tool "${toolName}" failed: ${toolErr.message}` }
                 job.steps.push(errStep)
                 agentBroadcast(job.clients, errStep)
@@ -1540,7 +1805,7 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
 
 // POST /api/agent/start
 app.post('/api/agent/start', express.json(), async (req, res) => {
-    const { task, intent, role, caseId, agentId, toolConfig: clientToolConfig } = req.body
+    const { task, intent, role, caseId, agentId, toolConfig: clientToolConfig, collectionId } = req.body
     if (!task?.trim()) return res.status(400).json({ error: 'task is required' })
     if (!caseId)       return res.status(400).json({ error: 'caseId is required' })
 
@@ -1568,7 +1833,7 @@ app.post('/api/agent/start', express.json(), async (req, res) => {
     const jobId = randomUUID()
     agentJobs.set(jobId, { status: 'running', steps: [], clients: new Set(), result: null, error: null, cancelled: false })
 
-    runAgentLoop({ jobId, task, intent, role, caseId, soul, diary, agentId }).catch(err => {
+    runAgentLoop({ jobId, task, intent, role, caseId, soul, diary, agentId, collectionId }).catch(err => {
         const job = agentJobs.get(jobId)
         if (job) { job.status = 'error'; job.error = err.message; agentBroadcast(job.clients, { type: 'error', content: err.message }) }
     })

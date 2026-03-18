@@ -3,7 +3,7 @@ import { flushSync, createPortal } from 'react-dom'
 import { useTheme } from '../useTheme.js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-import { uploadCaseBlob, loadCaseBlob, deleteCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes, loadAllNotes, deleteNotes, deleteSummary } from '../db.js'
+import { uploadCaseBlob, loadCaseBlob, deleteCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes, loadAllNotes, deleteNotes, deleteSummary, loadCollections, createCollection, renameCollection, deleteCollection } from '../db.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
 import { getDocRagStatus, getCaseRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories, embedManualNote } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupIntoParagraphs } from '../utils/pdfExtract.js'
@@ -279,6 +279,79 @@ function _loadWsSettings() {
 }
 function _saveWsSettings(obj) {
   localStorage.setItem(WS_SETTINGS_KEY, JSON.stringify(obj))
+}
+
+function NotesAgentModal({ onClose, onStart, hasDoc }) {
+  const [scope, setScope] = useState('doc')
+  const [intent, setIntent] = useState('')
+  const [desc, setDesc] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!intent.trim()) return
+    onStart({ scope, intent, desc })
+  }
+
+  return (
+    <div className="pdfapp-guide-overlay" onClick={onClose}>
+      <div className="pdfapp-guide-modal" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
+        <div className="pdfapp-guide-header">
+          <span className="pdfapp-guide-title">Notes Builder Agent</span>
+          <button className="pdfapp-guide-close" onClick={onClose}>✕</button>
+        </div>
+        <form onSubmit={handleSubmit} style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Scope</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[
+                { value: 'doc', label: 'This Document', disabled: !hasDoc },
+                { value: 'all', label: 'All Documents' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  disabled={opt.disabled}
+                  onClick={() => setScope(opt.value)}
+                  style={{
+                    flex: 1, padding: '7px 0', borderRadius: 6, cursor: opt.disabled ? 'not-allowed' : 'pointer',
+                    fontSize: '0.82rem', fontWeight: 500,
+                    background: scope === opt.value ? '#2563eb' : 'var(--bg-3)',
+                    color: scope === opt.value ? '#fff' : 'var(--text-2)',
+                    border: `1px solid ${scope === opt.value ? '#2563eb' : 'var(--border)'}`,
+                    opacity: opt.disabled ? 0.4 : 1,
+                  }}
+                >{opt.label}</button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Intent *</label>
+            <input
+              autoFocus
+              value={intent}
+              onChange={e => setIntent(e.target.value)}
+              placeholder="e.g. Extract all deadlines and obligations"
+              style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-3)', color: 'var(--text)', fontSize: '0.85rem' }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Extra context <span style={{ opacity: 0.6 }}>(optional)</span></label>
+            <textarea
+              value={desc}
+              onChange={e => setDesc(e.target.value)}
+              placeholder="e.g. Focus on clauses that impose obligations on the tenant"
+              rows={3}
+              style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-3)', color: 'var(--text)', fontSize: '0.85rem', resize: 'vertical' }}
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>
+            <button type="button" onClick={onClose} className="pdfapp-guide-action-btn">Cancel</button>
+            <button type="submit" disabled={!intent.trim()} className="pdfapp-guide-action-btn pdfapp-guide-action-btn--index" style={{ opacity: intent.trim() ? 1 : 0.5, cursor: intent.trim() ? 'pointer' : 'not-allowed' }}>Run Agent</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
 }
 
 function WorkspaceModal({ onClose }) {
@@ -688,6 +761,16 @@ const fileInputRef = useRef(null)
   const [notes, setNotes] = useState([])          // [{id, pageNum, x, y, text, createdAt}]
   const [noteMode, setNoteMode] = useState(false)        // true = click-to-place mode
   const [openNoteId, setOpenNoteId] = useState(null)
+
+  // ── Notes Builder Agent ──
+  const [notesAgentModal, setNotesAgentModal] = useState(false)
+  const [notesAgentScope, setNotesAgentScope] = useState('doc')   // 'doc' | 'all'
+  const [notesAgentIntent, setNotesAgentIntent] = useState('')
+  const [notesAgentDesc, setNotesAgentDesc] = useState('')
+  const [notesAgentStatus, setNotesAgentStatus] = useState('idle') // idle|running|done|error|cancelled
+  const [notesAgentJobId, setNotesAgentJobId] = useState(null)
+  const [notesAgentLog, setNotesAgentLog] = useState([])          // activity feed entries
+  const notesAgentEsRef = useRef(null)
 
   const thumbsContainerRef = useRef(null)
   const pdfDocRef = useRef(null)         // main-thread pdf instance for text extraction
@@ -1294,7 +1377,24 @@ const fileInputRef = useRef(null)
     try { return JSON.parse(localStorage.getItem(`starred-${caseId || 'solo'}`) || '[]') } catch { return [] }
   })
   const [allCaseNotes, setAllCaseNotes] = useState({}) // { [docId]: NoteObject[] }
-  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'aide'
+  const [rightTab, setRightTab] = useState('chat') // 'chat' | 'notes' | 'reports'
+
+  // ── Reports tab ──
+  const [savedReports, setSavedReports] = useState([])
+  const [reportTitle, setReportTitle] = useState('')
+  const [reportFormatMode, setReportFormatMode] = useState('describe') // 'describe' | 'examples'
+  const [reportFormatDesc, setReportFormatDesc] = useState('')
+  const [reportSamples, setReportSamples] = useState([]) // [{ id, text }]
+  const [reportOutput, setReportOutput] = useState('')
+  const [reportStatus, setReportStatus] = useState('idle') // idle|running|done|error
+  const [reportViewId, setReportViewId] = useState(null)  // id of saved report being viewed
+  const reportEsRef = useRef(null)
+
+  // ── Note Collections ──
+  const [collections, setCollections] = useState([])         // [{ id, name, createdAt }]
+  const [activeCollectionId, setActiveCollectionId] = useState(null) // null = default "Note 1"
+  const [renamingColId, setRenamingColId] = useState(null)   // id of collection being renamed inline
+  const [renamingColDraft, setRenamingColDraft] = useState('')
   const [notesCollapsed, setNotesCollapsed] = useState({}) // { 'section:starred'|'party:id'|'doc:id'|'note-exp:id': bool }
   const [editingNoteId, setEditingNoteId] = useState(null)
   const [editingNoteDraft, setEditingNoteDraft] = useState('')
@@ -1477,23 +1577,23 @@ const fileInputRef = useRef(null)
     }).catch(() => { setRagStatusChecked(true) })  // on error, unblock anyway
   }, [activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load notes when active doc changes — also sync allCaseNotes so the badge is always fresh
+  // Load notes when active doc or collection changes — also sync allCaseNotes
   useEffect(() => {
     if (!activeDocumentId || !caseId) { setNotes([]); return }
-    loadNotes(activeDocumentId, { caseId }).then(loaded => {
+    loadNotes(activeDocumentId, { caseId, collectionId: activeCollectionId }).then(loaded => {
       setNotes(loaded)
       setAllCaseNotes(prev => ({ ...prev, [activeDocumentId]: loaded }))
     }).catch(() => setNotes([]))
     setOpenNoteId(null)
-  }, [activeDocumentId, caseId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeDocumentId, caseId, activeCollectionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const persistNotes = useCallback((next, docId) => {
     // A: optimistic update — evidence tab reflects changes instantly
     if (caseId) {
       setAllCaseNotes(prev => ({ ...prev, [docId]: next }))
     }
-    saveNotes(docId, next, { caseId }).catch(() => {})
-  }, [caseId])
+    saveNotes(docId, next, { caseId, collectionId: activeCollectionId }).catch(() => {})
+  }, [caseId, activeCollectionId])
 
   const deleteNoteFromTab = useCallback((docId, noteId) => {
     const current = allCaseNotes[docId] || []
@@ -1511,10 +1611,16 @@ const fileInputRef = useRef(null)
     persistNotes(next, docId)
   }, [allCaseNotes, activeDocumentId, deleteNoteFromTab, persistNotes])
 
-  // Load all notes for the whole case whenever the case changes
+  // Load all notes for the whole case whenever the case changes (or active collection changes)
   useEffect(() => {
     if (!caseId) return
-    loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {})
+    loadAllNotes(caseId, activeCollectionId).then(setAllCaseNotes).catch(() => {})
+  }, [caseId, activeCollectionId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load collections for this case
+  useEffect(() => {
+    if (!caseId) return
+    loadCollections(caseId).then(setCollections).catch(() => {})
   }, [caseId])
 
   // ── Chunk search handlers ──
@@ -1643,11 +1749,11 @@ const fileInputRef = useRef(null)
       }
       setAideSteps(prev => [...prev, step])
       if (step.type === 'tool_result' && step.tool === 'add_note' && step.result?.ok) {
-        loadAllNotes(caseId).then(setAllCaseNotes).catch(() => {})
+        loadAllNotes(caseId, activeCollectionId).then(setAllCaseNotes).catch(() => {})
       }
     }
     es.onerror = () => { setAideStatus('error'); es.close(); aideEsRef.current = null }
-  }, [aideTask, aideIntent, aideRole, caseId, activeAgentId, aideSoul, setAllCaseNotes])
+  }, [aideTask, aideIntent, aideRole, caseId, activeAgentId, aideSoul, activeCollectionId, setAllCaseNotes])
 
   const handleAideStop = useCallback(async () => {
     aideEsRef.current?.close()
@@ -1657,6 +1763,231 @@ const fileInputRef = useRef(null)
     }
     setAideStatus('cancelled')
   }, [aideJobId])
+
+  // ── Notes Builder Agent handlers ──────────────────────────────────────────
+  const handleNotesAgentStart = useCallback(async ({ scope, intent, desc }) => {
+    if (!intent.trim() || !caseId) return
+    notesAgentEsRef.current?.close()
+    setNotesAgentStatus('running')
+    setNotesAgentLog([])
+    setNotesAgentScope(scope)
+    setNotesAgentIntent(intent)
+    setNotesAgentDesc(desc)
+    setRightTab('notes')   // auto-switch so user sees notes land in real time
+    setLogOpen(true)       // open Activity Log so user sees agent output
+
+    const activeDoc = parties.flatMap(p => p.documents || []).find(d => d.id === activeDocumentId)
+    const docLabel = activeDoc ? `${activeDoc.name} (ID: ${activeDocumentId})` : activeDocumentId
+
+    const builtIntent = scope === 'doc'
+      ? `You are a Notes Builder Agent. Your ONLY goal is to find relevant information and save it as notes.\n\nFocus ONLY on document ID: ${activeDocumentId} (${docLabel}).\nUse search_doc with docId="${activeDocumentId}" to search this document.\nFor each finding, call add_note with docId="${activeDocumentId}".\n\nExtra context from user: ${desc.trim() || '(none)'}`
+      : `You are a Notes Builder Agent. Your ONLY goal is to find relevant information across ALL case documents and save findings as notes.\n\nUse search_case to search broadly. For each finding, call add_note with the correct docId from the search result.\n\nExtra context from user: ${desc.trim() || '(none)'}`
+
+    const toolConfig = {
+      executionMode: 'local',
+      enabledTools: {
+        search_case: scope === 'all',
+        search_doc:  scope === 'doc',
+        search_caselaw: false,
+        add_note: true,
+      },
+      maxSteps: 15,
+      temperature: 0.3,
+    }
+
+    try {
+      const res = await fetch('/api/agent/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task: intent.trim(), intent: builtIntent, caseId, toolConfig, collectionId: activeCollectionId }),
+      })
+      const { jobId, error } = await res.json()
+      if (error) { setNotesAgentStatus('error'); return }
+      setNotesAgentJobId(jobId)
+
+      const es = new EventSource(`/api/agent/${jobId}/stream`)
+      notesAgentEsRef.current = es
+
+      es.onmessage = (e) => {
+        const step = JSON.parse(e.data)
+
+        // ── Route agent steps to Activity Log ───────────────────────────
+        if (step.type === 'tool_call') {
+          if (step.tool === 'search_doc' || step.tool === 'search_case') {
+            addLog(`[Agent] 🔍 Searching: "${step.args?.query || ''}"`, 'info')
+          } else if (step.tool === 'add_note') {
+            addLog(`[Agent] 📝 Saving note — page ${step.args?.pageNum ?? '?'}`, 'ok')
+
+            // ── Optimistic update — note appears immediately ─────────────
+            const { docId, pageNum = 1, text } = step.args || {}
+            if (docId && text) {
+              const optimisticNote = {
+                id: `agent-optimistic-${Date.now()}`,
+                pageNum,
+                text,
+                createdAt: new Date().toISOString(),
+                source: 'agent',
+              }
+              setAllCaseNotes(prev => ({ ...prev, [docId]: [...(prev[docId] || []), optimisticNote] }))
+            }
+          }
+        }
+
+        if (step.type === 'tool_result') {
+          if (step.tool === 'add_note' && step.result?.ok) {
+            loadAllNotes(caseId, activeCollectionId).then(setAllCaseNotes).catch(() => {})
+          } else if (step.tool === 'search_doc' || step.tool === 'search_case') {
+            const count = Array.isArray(step.result) ? step.result.length : 0
+            addLog(count > 0 ? `[Agent]   ↳ Found ${count} chunk${count !== 1 ? 's' : ''}` : `[Agent]   ↳ No results`, count > 0 ? 'info' : 'warn')
+          }
+        }
+
+        if (step.type === 'log') {
+          addLog(`[Agent] ${step.content}`, 'info')
+        }
+
+        if (step.type === 'error') {
+          addLog(`[Agent] ❌ ${step.content}`, 'error')
+        }
+
+        if (step.type === 'done') {
+          addLog('[Agent] ✓ Agent finished', 'ok')
+        }
+
+        if (step.type === 'status') {
+          setNotesAgentStatus(step.status)
+          if (step.status !== 'running') { es.close(); notesAgentEsRef.current = null }
+        }
+      }
+      es.onerror = () => { setNotesAgentStatus('error'); es.close(); notesAgentEsRef.current = null }
+    } catch {
+      setNotesAgentStatus('error')
+    }
+  }, [caseId, activeDocumentId, parties, activeCollectionId, setAllCaseNotes])
+
+  const handleNotesAgentStop = useCallback(async () => {
+    notesAgentEsRef.current?.close()
+    notesAgentEsRef.current = null
+    if (notesAgentJobId) {
+      await fetch(`/api/agent/${notesAgentJobId}`, { method: 'DELETE' }).catch(() => {})
+    }
+    setNotesAgentStatus('cancelled')
+    setNotesAgentLog(prev => [...prev, { type: 'done', text: 'Agent cancelled.' }])
+  }, [notesAgentJobId])
+
+  // ── Note Collection handlers ──────────────────────────────────────────────
+  const handleAddCollection = useCallback(async () => {
+    if (!caseId) return
+    try {
+      const n = collections.length + 2
+      const col = await createCollection(caseId, `Note ${n}`)
+      if (!col?.id) return
+      setCollections(prev => [...prev, col])
+      setActiveCollectionId(col.id)
+    } catch {}
+  }, [caseId, collections])
+
+  const handleRenameCol = useCallback(async (id, name) => {
+    const trimmed = name.trim()
+    if (!trimmed) { setRenamingColId(null); return }
+    try {
+      const updated = await renameCollection(caseId, id, trimmed)
+      if (updated?.id) setCollections(prev => prev.map(c => c.id === id ? updated : c))
+    } catch {}
+    setRenamingColId(null)
+  }, [caseId])
+
+  const handleDeleteCol = useCallback(async (id) => {
+    try {
+      await deleteCollection(caseId, id)
+    } catch {}
+    setCollections(prev => prev.filter(c => c.id !== id))
+    if (activeCollectionId === id) setActiveCollectionId(null)
+  }, [caseId, activeCollectionId])
+
+  const handleClearAgentNotes = useCallback(() => {
+    // Remove all notes with source='agent' across all docs in the case
+    const updated = {}
+    for (const [docId, docNotes] of Object.entries(allCaseNotes)) {
+      const filtered = (docNotes || []).filter(n => n.source !== 'agent')
+      updated[docId] = filtered
+      if (filtered.length !== (docNotes || []).length) {
+        saveNotes(docId, filtered, { caseId, collectionId: activeCollectionId }).catch(() => {})
+      }
+    }
+    setAllCaseNotes(updated)
+    if (activeDocumentId) setNotes(updated[activeDocumentId] || [])
+    setNotesAgentStatus('idle')
+  }, [allCaseNotes, activeDocumentId, caseId, activeCollectionId])
+
+  // ── Reports: load saved reports when case changes ──────────────────────────
+  useEffect(() => {
+    if (!caseId) return
+    fetch(`/api/reports?caseId=${encodeURIComponent(caseId)}`)
+      .then(r => r.json()).then(setSavedReports).catch(() => {})
+  }, [caseId])
+
+  const handleGenerateReport = useCallback(async () => {
+    if (!caseId) return
+    reportEsRef.current?.close()
+    setReportStatus('running')
+    setReportOutput('')
+    const es = new EventSource(`/api/reports/generate?_=${Date.now()}`)
+    // EventSource is GET-only; use fetch+ReadableStream instead
+    es.close()
+    try {
+      const res = await fetch('/api/reports/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          caseId,
+          title: reportTitle || 'Case Report',
+          formatDesc: reportFormatDesc,
+          samples: reportFormatMode === 'examples' ? reportSamples : [],
+          collectionId: activeCollectionId,
+        }),
+      })
+      if (!res.ok) { setReportStatus('error'); return }
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let buf = ''
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buf += decoder.decode(value, { stream: true })
+        const lines = buf.split('\n')
+        buf = lines.pop()
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue
+          try {
+            const step = JSON.parse(line.slice(6))
+            if (step.type === 'token') setReportOutput(prev => prev + step.content)
+            if (step.type === 'done')  setReportStatus('done')
+            if (step.type === 'error') { setReportStatus('error'); setReportOutput(`Error: ${step.content}`) }
+          } catch {}
+        }
+      }
+    } catch { setReportStatus('error') }
+  }, [caseId, reportTitle, reportFormatDesc, reportFormatMode, reportSamples, activeCollectionId])
+
+  const handleSaveReport = useCallback(async () => {
+    if (!caseId || !reportOutput.trim()) return
+    try {
+      const saved = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ caseId, title: reportTitle || 'Case Report', content: reportOutput, formatDesc: reportFormatDesc }),
+      }).then(r => r.json())
+      setSavedReports(prev => [saved, ...prev])
+    } catch {}
+  }, [caseId, reportTitle, reportOutput, reportFormatDesc])
+
+  const handleDeleteReport = useCallback(async (id) => {
+    if (!caseId) return
+    await fetch(`/api/reports/${id}?caseId=${encodeURIComponent(caseId)}`, { method: 'DELETE' }).catch(() => {})
+    setSavedReports(prev => prev.filter(r => r.id !== id))
+    if (reportViewId === id) setReportViewId(null)
+  }, [caseId, reportViewId])
 
   // Reset run state and pre-fill task when agent modal opens
   useEffect(() => {
@@ -3315,16 +3646,16 @@ const fileInputRef = useRef(null)
       <div className="pdfapp-right" style={{ flex: rightFlex }}>
         {/* Tab bar */}
         <div className="pdfapp-right-tabs">
-          <button className={`pdfapp-right-tab${rightTab === 'chat' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('chat')}>Query Docs</button>
+          <button className={`pdfapp-right-tab${rightTab === 'chat' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('chat')}>Chats</button>
           <button className={`pdfapp-right-tab${rightTab === 'notes' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('notes')}>
             {(() => {
               const merged = { ...allCaseNotes, ...(activeDocumentId ? { [activeDocumentId]: notes } : {}) }
               const t = Object.values(merged).flat().filter(n => n.text?.trim()).length
-              return `Review Notes (${t})`
+              return `Notes${t > 0 ? ` (${t})` : ''}`
             })()}
           </button>
-          <button className={`pdfapp-right-tab${rightTab === 'aide' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('aide')}>
-            Run Agents{aideStatus === 'running' ? ' ⟳' : ''}
+          <button className={`pdfapp-right-tab${rightTab === 'reports' ? ' pdfapp-right-tab--active' : ''}`} onClick={() => setRightTab('reports')}>
+            Reports{savedReports.length > 0 ? ` (${savedReports.length})` : ''}
           </button>
         </div>
 
@@ -3621,45 +3952,64 @@ const fileInputRef = useRef(null)
           }
 
           // ── Note row renderer ──
-          const renderNoteRow = (n, doc) => {
+          // isNoteCollapsed: respects explicit toggle; defaults to collapsed when doc has >3 notes
+          const isNoteCollapsed = (n, defaultCol) => {
+            const key = `note-exp:${n.id}`
+            return key in notesCollapsed ? notesCollapsed[key] : defaultCol
+          }
+
+          const renderNoteRow = (n, doc, defaultCollapsed = false) => {
+            const noteKey = `note-exp:${n.id}`
+            const collapsed = isNoteCollapsed(n, defaultCollapsed)
             const isEditing = editingNoteId === n.id
             const dateStr = n.createdAt ? new Date(n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''
             const navigate = () => n.chunkIdx != null ? goToChunk(doc.id, n) : goToNote(doc.id, n.pageNum)
             const noteChunkKey = n.chunkIdx != null ? `${n.pageNum}-${n.chunkIdx}` : null
             const isActiveChunk = noteChunkKey && activeNoteChunkKey === noteChunkKey && doc.id === activeDocumentId
+            const preview = n.text?.slice(0, 90) + (n.text?.length > 90 ? '…' : '')
+
             return (
               <div key={n.id}
                 data-note-chunk-key={noteChunkKey ?? undefined}
                 className={`nt-note-row${doc.id !== activeDocumentId ? ' nt-note-row--other' : ''}${isActiveChunk ? ' nt-note-row--active' : ''}`}>
-                <div className="nt-note-meta">
-                  <span className="nt-page-badge">page {n.pageNum}</span>
-                  {n.chunkIdx != null && <span className="nt-chunk-badge">chunk {n.chunkIdx}</span>}
-                  {dateStr && <span className="nt-date">{dateStr}</span>}
-                  <div className="nt-row-actions">
-                    <button className="nt-action-btn" title="Navigate" onClick={navigate}>→</button>
-                    <button className="nt-action-btn" title="Edit note" onClick={e => { e.stopPropagation(); setEditingNoteId(n.id); setEditingNoteDraft(n.text) }}>✏</button>
-                    <button className="nt-action-btn nt-action-btn--danger" title="Delete note" onClick={e => { e.stopPropagation(); deleteNoteFromTab(doc.id, n.id) }}>✕</button>
+                {/* ── Collapsible header row (level 4) ── */}
+                <div className="nt-note-header" onClick={() => toggle(noteKey)}>
+                  <ChevronSvg collapsed={collapsed} />
+                  <div className="nt-note-meta-inline">
+                    <span className="nt-page-badge">p.{n.pageNum}</span>
+                    {n.chunkIdx != null && <span className="nt-chunk-badge">ch.{n.chunkIdx}</span>}
+                    {n.source === 'agent' && <span className="nt-agent-badge">Agent</span>}
+                    {dateStr && <span className="nt-date">{dateStr}</span>}
                   </div>
+                  {collapsed && <span className="nt-note-preview">{preview}</span>}
+                  {!collapsed && (
+                    <div className="nt-row-actions" onClick={e => e.stopPropagation()}>
+                      <button className="nt-action-btn" title="Navigate" onClick={navigate}>→</button>
+                      <button className="nt-action-btn" title="Edit note" onClick={e => { e.stopPropagation(); setEditingNoteId(n.id); setEditingNoteDraft(n.text) }}>✏</button>
+                      <button className="nt-action-btn nt-action-btn--danger" title="Delete note" onClick={e => { e.stopPropagation(); deleteNoteFromTab(doc.id, n.id) }}>✕</button>
+                    </div>
+                  )}
                 </div>
-                {isEditing ? (
-                  <textarea
-                    className="nt-note-edit-input"
-                    value={editingNoteDraft}
-                    autoFocus
-                    onChange={e => setEditingNoteDraft(e.target.value)}
-                    onBlur={() => { saveNoteEditFromTab(doc.id, n.id, editingNoteDraft); setEditingNoteId(null) }}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { saveNoteEditFromTab(doc.id, n.id, editingNoteDraft); setEditingNoteId(null) }
-                      if (e.key === 'Escape') setEditingNoteId(null)
-                    }}
-                  />
-                ) : (
-                  <>
-                    {n.chunkText && (
-                      <div className="nt-chunk-quote">{n.chunkText}</div>
-                    )}
-                    <div className="nt-note-text">{n.text}</div>
-                  </>
+                {/* ── Expanded body ── */}
+                {!collapsed && (
+                  isEditing ? (
+                    <textarea
+                      className="nt-note-edit-input"
+                      value={editingNoteDraft}
+                      autoFocus
+                      onChange={e => setEditingNoteDraft(e.target.value)}
+                      onBlur={() => { saveNoteEditFromTab(doc.id, n.id, editingNoteDraft); setEditingNoteId(null) }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { saveNoteEditFromTab(doc.id, n.id, editingNoteDraft); setEditingNoteId(null) }
+                        if (e.key === 'Escape') setEditingNoteId(null)
+                      }}
+                    />
+                  ) : (
+                    <div className="nt-note-body">
+                      {n.chunkText && <div className="nt-chunk-quote">{n.chunkText}</div>}
+                      <div className="nt-note-text">{n.text}</div>
+                    </div>
+                  )
                 )}
               </div>
             )
@@ -3672,20 +4022,99 @@ const fileInputRef = useRef(null)
             </svg>
           )
 
+          const agentNoteCount = Object.values(allCaseNotes).flat().filter(n => n.source === 'agent').length
+
           return (
             <div className="nt-root" ref={notesPanelRef}>
-              {!isEmpty && (
-                <div className="nt-toolbar">
+
+              {/* ── Note Collection pills ── */}
+              <div className="nt-collections">
+                {/* Default "Note 1" pill */}
+                <div
+                  className={`nt-col-pill${!activeCollectionId ? ' nt-col-pill--active' : ''}`}
+                  onClick={() => setActiveCollectionId(null)}
+                  onDoubleClick={() => {/* can't rename default */}}
+                >
+                  Note 1
+                </div>
+                {collections.map(col => (
+                  <div
+                    key={col.id}
+                    className={`nt-col-pill${activeCollectionId === col.id ? ' nt-col-pill--active' : ''}`}
+                    onClick={() => setActiveCollectionId(col.id)}
+                    onDoubleClick={() => { setRenamingColId(col.id); setRenamingColDraft(col.name) }}
+                  >
+                    {renamingColId === col.id ? (
+                      <input
+                        className="nt-col-rename-input"
+                        value={renamingColDraft}
+                        autoFocus
+                        onClick={e => e.stopPropagation()}
+                        onChange={e => setRenamingColDraft(e.target.value)}
+                        onBlur={() => handleRenameCol(col.id, renamingColDraft)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleRenameCol(col.id, renamingColDraft)
+                          if (e.key === 'Escape') setRenamingColId(null)
+                        }}
+                      />
+                    ) : (
+                      <>
+                        {col.name}
+                        <button
+                          className="nt-col-del-btn"
+                          title="Delete collection"
+                          onClick={e => { e.stopPropagation(); handleDeleteCol(col.id) }}
+                        >✕</button>
+                      </>
+                    )}
+                  </div>
+                ))}
+                <button className="nt-col-add-btn" onClick={handleAddCollection} title="New note collection">+</button>
+              </div>
+
+              <div className="nt-toolbar">
+                {!isEmpty && (
                   <button className="nt-download-btn" title="Download notes as Markdown" onClick={downloadNotesMarkdown}>
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                       <polyline points="7 10 12 15 17 10"/>
                       <line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
-                    Export
+                    Export Notes
                   </button>
+                )}
+                {notesAgentStatus === 'running' ? (
+                  <button className="nt-agent-btn nt-agent-btn--running" onClick={handleNotesAgentStop} title="Cancel agent">
+                    <span className="nt-agent-spinner" />
+                    Cancel Agent
+                  </button>
+                ) : (
+                  <button className="nt-agent-btn" onClick={() => setNotesAgentModal(true)} title="Run Notes Builder Agent" disabled={!caseId}>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+                    </svg>
+                    Notes Builder Agent
+                  </button>
+                )}
+                {agentNoteCount > 0 && notesAgentStatus !== 'running' && (
+                  <button className="nt-clear-agent-btn" onClick={handleClearAgentNotes} title="Remove all agent-generated notes">
+                    Clear Agent Notes ({agentNoteCount})
+                  </button>
+                )}
+              </div>
+
+              {/* ── Agent status strip (logs go to Activity Log in sidebar) ── */}
+              {(notesAgentStatus === 'running' || notesAgentStatus === 'done') && (
+                <div className="nt-agent-status-strip">
+                  {notesAgentStatus === 'running' && <span className="nt-agent-spinner" style={{ width: 8, height: 8, marginRight: 6 }} />}
+                  {notesAgentStatus === 'done' && <span style={{ marginRight: 6 }}>✓</span>}
+                  <span>{notesAgentStatus === 'running'
+                    ? `Agent running — ${notesAgentIntent.slice(0, 60)}${notesAgentIntent.length > 60 ? '…' : ''}`
+                    : 'Agent done — see Activity Log for details'
+                  }</span>
                 </div>
               )}
+
               {isEmpty && (
                 <div className="pdfapp-evidence-empty">
                   Star sources (★) from chat responses, or add notes from text chunks (✏), to build your evidence collection.
@@ -3802,8 +4231,8 @@ const fileInputRef = useRef(null)
                                       </div>
                                       {!isCol(dk) && (
                                         <div className="nt-children">
-                                          {chunkGroups.flatMap(group => group.notes.map(n => renderNoteRow(n, doc)))}
-                                          {pageOnly.map(n => renderNoteRow(n, doc))}
+                                          {chunkGroups.flatMap(group => group.notes.map(n => renderNoteRow(n, doc, docNoteList.length > 3)))}
+                                          {pageOnly.map(n => renderNoteRow(n, doc, docNoteList.length > 3))}
                                         </div>
                                       )}
                                     </div>
@@ -3822,7 +4251,166 @@ const fileInputRef = useRef(null)
           )
         })()}
 
-        {/* ── Run Agents tab ── */}
+        {/* ── Reports tab ── */}
+        {rightTab === 'reports' && (
+          <div className="rpt-panel">
+
+            {/* ── Saved reports list (sidebar strip) ── */}
+            {savedReports.length > 0 && !reportViewId && (
+              <div className="rpt-saved-list">
+                <div className="rpt-saved-header">Saved Reports</div>
+                {savedReports.map(r => (
+                  <div key={r.id} className="rpt-saved-row">
+                    <button className="rpt-saved-title" onClick={() => setReportViewId(r.id)}>
+                      {r.title}
+                      <span className="rpt-saved-date">{new Date(r.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                    </button>
+                    <button className="rpt-saved-del" onClick={() => handleDeleteReport(r.id)} title="Delete">×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ── Saved report viewer ── */}
+            {reportViewId && (() => {
+              const report = savedReports.find(r => r.id === reportViewId)
+              if (!report) { setReportViewId(null); return null }
+              return (
+                <div className="rpt-viewer">
+                  <div className="rpt-viewer-header">
+                    <button className="rpt-back-btn" onClick={() => setReportViewId(null)}>‹ Reports</button>
+                    <span className="rpt-viewer-title">{report.title}</span>
+                    <button className="rpt-copy-btn" onClick={() => navigator.clipboard.writeText(report.content).catch(() => {})}>Copy</button>
+                    <button className="rpt-saved-del" onClick={() => handleDeleteReport(report.id)} title="Delete">×</button>
+                  </div>
+                  <pre className="rpt-output rpt-output--saved">{report.content}</pre>
+                </div>
+              )
+            })()}
+
+            {/* ── New report form ── */}
+            {!reportViewId && (
+              <div className="rpt-form">
+                {/* Notes source collection selector */}
+                <div className="rpt-form-field">
+                  <label className="rpt-label">Notes source</label>
+                  <div className="rpt-col-pills">
+                    <button
+                      className={`rpt-col-pill${!activeCollectionId ? ' rpt-col-pill--active' : ''}`}
+                      onClick={() => setActiveCollectionId(null)}
+                    >Note 1</button>
+                    {collections.map(col => (
+                      <button
+                        key={col.id}
+                        className={`rpt-col-pill${activeCollectionId === col.id ? ' rpt-col-pill--active' : ''}`}
+                        onClick={() => setActiveCollectionId(col.id)}
+                      >{col.name}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rpt-form-field">
+                  <label className="rpt-label">Report title</label>
+                  <input
+                    className="rpt-input"
+                    placeholder="e.g. Case Summary, Risk Analysis, Due Diligence Report…"
+                    value={reportTitle}
+                    onChange={e => setReportTitle(e.target.value)}
+                    disabled={reportStatus === 'running'}
+                  />
+                </div>
+
+                {/* Format mode tabs */}
+                <div className="rpt-form-field">
+                  <label className="rpt-label">Report format</label>
+                  <div className="rpt-mode-tabs">
+                    <button className={`rpt-mode-tab${reportFormatMode === 'describe' ? ' rpt-mode-tab--active' : ''}`} onClick={() => setReportFormatMode('describe')}>Describe</button>
+                    <button className={`rpt-mode-tab${reportFormatMode === 'examples' ? ' rpt-mode-tab--active' : ''}`} onClick={() => setReportFormatMode('examples')}>Examples</button>
+                  </div>
+
+                  {reportFormatMode === 'describe' && (
+                    <textarea
+                      className="rpt-textarea"
+                      rows={4}
+                      placeholder="Describe the format you want. e.g.:&#10;• Executive summary (3-5 sentences)&#10;• Key findings in bullet points with page citations&#10;• Risk flags in a separate section&#10;• Conclusion with recommendations"
+                      value={reportFormatDesc}
+                      onChange={e => setReportFormatDesc(e.target.value)}
+                      disabled={reportStatus === 'running'}
+                    />
+                  )}
+
+                  {reportFormatMode === 'examples' && (
+                    <div className="rpt-examples">
+                      <div className="rpt-examples-hint">Paste 1–3 example reports to define the style. The agent will match this format.</div>
+                      {reportSamples.map((s, i) => (
+                        <div key={s.id} className="rpt-sample-row">
+                          <div className="rpt-sample-label">Example {i + 1}</div>
+                          <textarea
+                            className="rpt-textarea rpt-textarea--sample"
+                            rows={5}
+                            placeholder="Paste example report text here…"
+                            value={s.text}
+                            onChange={e => setReportSamples(prev => prev.map(x => x.id === s.id ? { ...x, text: e.target.value } : x))}
+                          />
+                          <button className="rpt-sample-remove" onClick={() => setReportSamples(prev => prev.filter(x => x.id !== s.id))}>× Remove</button>
+                        </div>
+                      ))}
+                      {reportSamples.length < 3 && (
+                        <button className="rpt-add-sample-btn" onClick={() => setReportSamples(prev => [...prev, { id: crypto.randomUUID(), text: '' }])}>
+                          + Add example
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="rpt-actions">
+                  {reportStatus === 'running'
+                    ? <button className="rpt-generate-btn rpt-generate-btn--running" disabled>
+                        <span className="nt-agent-spinner" style={{ width: 10, height: 10, marginRight: 6 }} />Generating…
+                      </button>
+                    : <button
+                        className="rpt-generate-btn"
+                        onClick={handleGenerateReport}
+                        disabled={!caseId}
+                        title={!caseId ? 'Open a case first' : ''}
+                      >
+                        Generate Report →
+                      </button>
+                  }
+                </div>
+
+                {!caseId && <div className="rpt-no-case">Open a case to generate reports.</div>}
+
+                {/* Output */}
+                {(reportOutput || reportStatus === 'running') && (
+                  <div className="rpt-output-section">
+                    <div className="rpt-output-header">
+                      <span>Output</span>
+                      <div className="rpt-output-actions">
+                        {reportStatus === 'done' && (
+                          <>
+                            <button className="rpt-copy-btn" onClick={() => navigator.clipboard.writeText(reportOutput).catch(() => {})}>Copy</button>
+                            <button className="rpt-save-btn" onClick={handleSaveReport}>Save</button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <pre className="rpt-output">{reportOutput}{reportStatus === 'running' && <span className="rpt-cursor">▌</span>}</pre>
+                  </div>
+                )}
+
+                {savedReports.length === 0 && !reportOutput && reportStatus === 'idle' && (
+                  <div className="pdfapp-evidence-empty">
+                    Build notes first using the Notes tab, then generate a structured report here. Define the format by describing it or pasting examples.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Run Agents tab (hidden — kept for internal aide state, accessed via aide) ── */}
         {rightTab === 'aide' && (
           <div className="pdfapp-aide-panel">
 
@@ -4498,6 +5086,18 @@ const fileInputRef = useRef(null)
       </div>
 
 
+
+      {/* ── Notes Builder Agent Modal ── */}
+      {notesAgentModal && (
+        <NotesAgentModal
+          hasDoc={!!activeDocumentId}
+          onClose={() => setNotesAgentModal(false)}
+          onStart={({ scope, intent, desc }) => {
+            setNotesAgentModal(false)
+            handleNotesAgentStart({ scope, intent, desc })
+          }}
+        />
+      )}
 
       {/* ── Workspace Modal ── */}
       {workspaceOpen && <WorkspaceModal onClose={() => setWorkspaceOpen(false)} />}

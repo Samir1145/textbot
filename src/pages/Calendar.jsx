@@ -1,63 +1,47 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { deleteCase } from '../db.js'
 import './Calendar.css'
 
-const CASE_COLORS = [
-  '#3b82f6',
-  '#8b5cf6',
-  '#ec4899',
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#06b6d4',
-]
+const CASE_COLORS = ['#3b82f6','#8b5cf6','#ec4899','#ef4444','#f97316','#eab308','#22c55e','#06b6d4']
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-]
-const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+function loadCases() { try { return JSON.parse(localStorage.getItem('pdf-app-cases')||'[]') } catch { return [] } }
+function saveCases(cases) { localStorage.setItem('pdf-app-cases', JSON.stringify(cases)) }
+function toDateStr(year,month,day) { return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}` }
+function parseDateStr(dateStr) { const [y,m,d]=dateStr.split('-').map(Number); return {year:y,month:m-1,day:d} }
 
-function loadCases() {
+function getDocCount(caseId) {
   try {
-    return JSON.parse(localStorage.getItem('pdf-app-cases') || '[]')
-  } catch {
-    return []
-  }
+    const parties = JSON.parse(localStorage.getItem(`pdf-parties-${caseId}`) || '[]')
+    return parties.reduce((s,p) => s + (p.documents?.length||0), 0)
+  } catch { return 0 }
 }
 
-function saveCases(cases) {
-  localStorage.setItem('pdf-app-cases', JSON.stringify(cases))
-}
-
-function toDateStr(year, month, day) {
-  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-}
-
-function parseDateStr(dateStr) {
-  // Returns { year, month (0-based), day }
-  const [y, m, d] = dateStr.split('-').map(Number)
-  return { year: y, month: m - 1, day: d }
-}
-
-function formatDate(dateStr) {
-  const { year, month, day } = parseDateStr(dateStr)
+function relativeDate(dateStr) {
+  if (!dateStr) return ''
+  const {year,month,day} = parseDateStr(dateStr)
   const today = new Date()
-  const caseDate = new Date(year, month, day)
-  const diffMs = caseDate - new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  const diffDays = Math.round(diffMs / 86400000)
-
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Tomorrow'
-  if (diffDays === -1) return 'Yesterday'
-  if (diffDays > 0 && diffDays <= 6) return `In ${diffDays} days`
-
+  const d = new Date(year, month, day)
+  const diff = Math.round((d - new Date(today.getFullYear(),today.getMonth(),today.getDate())) / 86400000)
+  if (diff === 0) return 'Today'
+  if (diff === 1) return 'Tomorrow'
+  if (diff === -1) return 'Yesterday'
+  if (diff > 1 && diff <= 6) return `In ${diff} days`
+  if (diff < 0 && diff >= -6) return `${Math.abs(diff)} days ago`
   const sameYear = year === today.getFullYear()
-  return sameYear
-    ? `${MONTHS_SHORT[month]} ${day}`
-    : `${MONTHS_SHORT[month]} ${day}, ${year}`
+  return sameYear ? `${MONTHS_SHORT[month]} ${day}` : `${MONTHS_SHORT[month]} ${day}, ${year}`
+}
+
+function relativeTime(isoStr) {
+  if (!isoStr) return ''
+  const diff = Math.floor((Date.now() - new Date(isoStr)) / 1000)
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`
+  if (diff < 86400*7) return `${Math.floor(diff/86400)}d ago`
+  return new Date(isoStr).toLocaleDateString([], {month:'short', day:'numeric'})
 }
 
 // ── Add Case Modal ─────────────────────────────────────────────────
@@ -122,177 +106,127 @@ function AddCaseModal({ initialDate, onConfirm, onCancel }) {
   )
 }
 
-// ── Sidebar case row ───────────────────────────────────────────────
-function CaseRow({ c, onOpen, onJump, onDelete }) {
-  return (
-    <div className="cal-sb-case" onClick={() => onJump(c)}>
-      <span className="cal-sb-dot" style={{ background: c.color }} />
-      <div className="cal-sb-case-info">
-        <span className="cal-sb-case-name">{c.name}</span>
-        <span className="cal-sb-case-date">{formatDate(c.date)}</span>
-      </div>
-      <button
-        className="cal-sb-open-btn"
-        title="Open case"
-        onClick={e => { e.stopPropagation(); onOpen(c) }}
-      >
-        →
-      </button>
-      {onDelete && (
-        <button
-          className="cal-sb-delete-btn"
-          title="Delete case"
-          onClick={e => { e.stopPropagation(); onDelete(c) }}
-        >
-          ✕
-        </button>
-      )}
-    </div>
-  )
-}
-
-// ── Calendar Sidebar ───────────────────────────────────────────────
-function CalendarSidebar({ cases, onOpenCase, onJumpTo, onDeleteCase, onAddCase }) {
-  const [query, setQuery] = useState('')
-
-  const today = new Date()
-  const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate())
-  const in30Str = toDateStr(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + 30
-  )
-
-  const sorted = useMemo(() =>
-    [...cases].sort((a, b) => a.date.localeCompare(b.date)),
-    [cases]
-  )
-
-  const filtered = useMemo(() => {
-    if (!query.trim()) return []
-    const q = query.toLowerCase()
-    return sorted.filter(c => c.name.toLowerCase().includes(q))
-  }, [query, sorted])
-
-  const upcoming = useMemo(() =>
-    sorted.filter(c => c.date >= todayStr && c.date <= in30Str),
-    [sorted, todayStr, in30Str]
-  )
-
-  const past = useMemo(() =>
-    sorted.filter(c => c.date < todayStr).reverse(),
-    [sorted, todayStr]
-  )
-
-  const isSearching = query.trim().length > 0
-
-  return (
-    <div className="cal-sb">
-      {/* Search */}
-      <div className="cal-sb-search-wrap">
-        <svg className="cal-sb-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        <input
-          className="cal-sb-search"
-          placeholder="Search cases…"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
-        {query && (
-          <button className="cal-sb-search-clear" onClick={() => setQuery('')}>✕</button>
-        )}
-      </div>
-
-      <div className="cal-sb-body">
-        {isSearching ? (
-          <>
-            <div className="cal-sb-section-label">
-              {filtered.length} result{filtered.length !== 1 ? 's' : ''}
-            </div>
-            {filtered.length === 0 ? (
-              <div className="cal-sb-empty">No cases match "{query}"</div>
-            ) : (
-              filtered.map(c => (
-                <CaseRow key={c.id} c={c} onOpen={onOpenCase} onJump={onJumpTo} onDelete={onDeleteCase} />
-              ))
-            )}
-          </>
-        ) : (
-          <>
-            {/* Upcoming */}
-            <div className="cal-sb-section-label">Upcoming (30 days)</div>
-            {upcoming.length === 0 ? (
-              <div className="cal-sb-empty">No upcoming cases</div>
-            ) : (
-              upcoming.map(c => (
-                <CaseRow key={c.id} c={c} onOpen={onOpenCase} onJump={onJumpTo} onDelete={onDeleteCase} />
-              ))
-            )}
-
-            {/* Past */}
-            {past.length > 0 && (
-              <>
-                <div className="cal-sb-section-label" style={{ marginTop: 16 }}>Recent</div>
-                {past.slice(0, 10).map(c => (
-                  <CaseRow key={c.id} c={c} onOpen={onOpenCase} onJump={onJumpTo} onDelete={onDeleteCase} />
-                ))}
-                {past.length > 10 && (
-                  <div className="cal-sb-more">+{past.length - 10} older cases</div>
-                )}
-              </>
-            )}
-
-            {cases.length === 0 && (
-              <div className="cal-sb-empty">
-                No cases yet.
-                <button className="cal-sb-add-btn" onClick={onAddCase}>+ Add case</button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ── Main Calendar ──────────────────────────────────────────────────
+// ── Main Dashboard ──────────────────────────────────────────────────
 export default function Calendar({ onOpenCase }) {
   const today = new Date()
-  const [year, setYear] = useState(today.getFullYear())
-  const [month, setMonth] = useState(today.getMonth())
   const [cases, setCases] = useState(loadCases)
-  const [modal, setModal] = useState(null)
-  const [highlightId, setHighlightId] = useState(null)
-  const [deleteCaseConfirm, setDeleteCaseConfirm] = useState(null) // { c, docCount }
+  const [modal, setModal] = useState(null)            // null | { date }
+  const [deleteCaseConfirm, setDeleteCaseConfirm] = useState(null)
+  const [sortBy, setSortBy] = useState('recent')      // 'recent' | 'date' | 'alpha'
+  const [filterBy, setFilterBy] = useState('all')     // 'all' | 'upcoming' | 'recent'
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const firstDow = new Date(year, month, 1).getDay()
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  // Mini calendar state
+  const [calYear, setCalYear] = useState(today.getFullYear())
+  const [calMonth, setCalMonth] = useState(today.getMonth())
 
-  const prevMonth = () => {
-    if (month === 0) { setMonth(11); setYear(y => y - 1) }
-    else setMonth(m => m - 1)
-  }
-  const nextMonth = () => {
-    if (month === 11) { setMonth(0); setYear(y => y + 1) }
-    else setMonth(m => m + 1)
-  }
+  // System status
+  const [ollamaStatus, setOllamaStatus] = useState(null)   // null | { ok, models }
+  const [lawStatus, setLawStatus] = useState(null)          // null | { available, rows, model }
 
+  // Lazy stats (fetched after mount for top 8 cases)
+  const [caseStats, setCaseStats] = useState({})  // { [caseId]: { noteCount, agentRuns } }
+  const [activityFeed, setActivityFeed] = useState([])  // [{ type, caseName, caseColor, text, time }]
+  const [statsLoading, setStatsLoading] = useState(true)
+
+  // Load system status on mount
+  useEffect(() => {
+    fetch('/api/ollama/api/tags').then(r=>r.json()).then(d=>{
+      setOllamaStatus({ ok: true, models: (d.models||[]).map(m=>m.name) })
+    }).catch(()=>setOllamaStatus({ ok: false, models: [] }))
+
+    fetch('/api/caselaw/status').then(r=>r.json()).then(d=>{
+      setLawStatus(d)
+    }).catch(()=>setLawStatus({ available: false }))
+  }, [])
+
+  // Load lazy stats for cases
+  useEffect(() => {
+    if (cases.length === 0) { setStatsLoading(false); return }
+    const topCases = [...cases].slice(0, 8) // limit to 8 to avoid hammering server
+    let cancelled = false
+    async function fetchStats() {
+      const stats = {}
+      const feedItems = []
+      await Promise.all(topCases.map(async c => {
+        try {
+          const [notesRes, diaryRes] = await Promise.all([
+            fetch(`/api/cases/${c.id}/all-notes`).then(r=>r.json()).catch(()=>({})),
+            fetch(`/api/cases/${c.id}/aide/diary`).then(r=>r.json()).catch(()=>[]),
+          ])
+          const noteCount = Object.values(notesRes).reduce((s,arr)=>s+(Array.isArray(arr)?arr.length:0),0)
+          const agentRuns = Array.isArray(diaryRes) ? diaryRes.length : 0
+          stats[c.id] = { noteCount, agentRuns }
+          // Build activity feed items from notes
+          Object.values(notesRes).flat().slice(0,3).forEach(note => {
+            if (note?.createdAt) feedItems.push({ type:'note', caseId:c.id, caseName:c.name, caseColor:c.color, text: note.text?.slice(0,80)||'Note', time: note.createdAt })
+          })
+          // Build feed items from diary
+          if (Array.isArray(diaryRes)) diaryRes.slice(0,2).forEach(entry => {
+            if (entry?.createdAt) feedItems.push({ type:'agent', caseId:c.id, caseName:c.name, caseColor:c.color, text: entry.task?.slice(0,80)||'Agent run', time: entry.createdAt })
+          })
+        } catch {}
+      }))
+      if (!cancelled) {
+        setCaseStats(stats)
+        // sort feed by time desc, take top 15
+        feedItems.sort((a,b)=>new Date(b.time)-new Date(a.time))
+        setActivityFeed(feedItems.slice(0,15))
+        setStatsLoading(false)
+      }
+    }
+    fetchStats()
+    return () => { cancelled = true }
+  }, [cases])
+
+  // Computed: last opened case
+  const lastOpenedCase = useMemo(() => {
+    try {
+      const lo = JSON.parse(localStorage.getItem('pdf-last-opened')||'null')
+      if (!lo?.caseId) return null
+      const c = cases.find(x=>x.id===lo.caseId)
+      return c ? { ...c, openedAt: lo.openedAt } : null
+    } catch { return null }
+  }, [cases])
+
+  // Computed: total stats
+  const totalDocs = useMemo(() => cases.reduce((s,c)=>s+getDocCount(c.id),0), [cases])
+  const totalNotes = useMemo(() => Object.values(caseStats).reduce((s,x)=>s+(x.noteCount||0),0), [caseStats])
+  const totalAgentRuns = useMemo(() => Object.values(caseStats).reduce((s,x)=>s+(x.agentRuns||0),0), [caseStats])
+
+  // Computed: filtered/sorted cases
+  const todayStr = toDateStr(today.getFullYear(),today.getMonth(),today.getDate())
+  const in30Str  = toDateStr(today.getFullYear(),today.getMonth(),today.getDate()+30)
+  const filteredCases = useMemo(() => {
+    let result = [...cases]
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      result = result.filter(c=>c.name.toLowerCase().includes(q))
+    }
+    if (filterBy === 'upcoming') result = result.filter(c=>c.date>=todayStr && c.date<=in30Str)
+    if (filterBy === 'recent') result = result.filter(c=>c.date<todayStr)
+    if (sortBy === 'alpha') result.sort((a,b)=>a.name.localeCompare(b.name))
+    else if (sortBy === 'date') result.sort((a,b)=>b.date.localeCompare(a.date))
+    else result.sort((a,b)=>b.date.localeCompare(a.date)) // 'recent' = by date desc
+    return result
+  }, [cases, searchQuery, filterBy, sortBy, todayStr, in30Str])
+
+  // Upcoming (next 7 days)
+  const in7Str = toDateStr(today.getFullYear(),today.getMonth(),today.getDate()+7)
+  const upcomingCases = useMemo(()=>
+    [...cases].filter(c=>c.date>=todayStr&&c.date<=in7Str).sort((a,b)=>a.date.localeCompare(b.date)),
+    [cases,todayStr,in7Str]
+  )
+
+  // Handlers
   const handleAddCase = useCallback((data) => {
     const newCase = { id: crypto.randomUUID(), ...data }
     const updated = [...cases, newCase]
-    setCases(updated)
-    saveCases(updated)
-    setModal(null)
+    setCases(updated); saveCases(updated); setModal(null)
   }, [cases])
 
   const handleDeleteCase = useCallback((c) => {
-    let docCount = 0
-    try {
-      const parties = JSON.parse(localStorage.getItem(`pdf-parties-${c.id}`) || '[]')
-      docCount = parties.reduce((sum, p) => sum + (p.documents?.length ?? 0), 0)
-    } catch { /* ignore */ }
+    const docCount = getDocCount(c.id)
     setDeleteCaseConfirm({ c, docCount })
   }, [])
 
@@ -300,122 +234,245 @@ export default function Calendar({ onOpenCase }) {
     if (!deleteCaseConfirm) return
     const { c } = deleteCaseConfirm
     setDeleteCaseConfirm(null)
-    await deleteCase(c.id)
-    const updated = cases.filter(x => x.id !== c.id)
-    setCases(updated)
-    saveCases(updated)
+    try { await fetch(`/api/cases/${c.id}`, { method: 'DELETE' }).catch(()=>{}) } catch {}
+    const updated = cases.filter(x=>x.id!==c.id)
+    setCases(updated); saveCases(updated)
     localStorage.removeItem(`pdf-parties-${c.id}`)
   }, [deleteCaseConfirm, cases])
 
-  // Jump to a case's month and briefly highlight it
-  const handleJumpTo = useCallback((c) => {
-    const { year: y, month: m } = parseDateStr(c.date)
-    setYear(y)
-    setMonth(m)
-    setHighlightId(c.id)
-    setTimeout(() => setHighlightId(null), 1800)
-  }, [])
-
-  const cells = Array.from({ length: 42 }, (_, i) => {
-    const day = i - firstDow + 1
-    return (day >= 1 && day <= daysInMonth) ? day : null
-  })
+  // Mini calendar data
+  const firstDow = new Date(calYear, calMonth, 1).getDay()
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate()
+  const miniCells = Array.from({length:42},(_,i)=>{ const d=i-firstDow+1; return (d>=1&&d<=daysInMonth)?d:null })
+  const caseDateSet = useMemo(()=>{
+    const m = {}
+    cases.forEach(c=>{ if(!m[c.date]) m[c.date]=[]; m[c.date].push(c) })
+    return m
+  },[cases])
 
   return (
-    <div className="cal-root">
-      {/* Left sidebar */}
-      <CalendarSidebar
-        cases={cases}
-        onOpenCase={onOpenCase}
-        onJumpTo={handleJumpTo}
-        onDeleteCase={handleDeleteCase}
-        onAddCase={() => setModal({ date: null })}
-      />
+    <div className="dash-root">
+      {/* ── Main area ── */}
+      <div className="dash-main">
 
-      {/* Main calendar area */}
-      <div className="cal-main">
-        {/* Top bar */}
-        <div className="cal-topbar">
-          <div className="cal-nav">
-            <button className="cal-nav-btn" onClick={prevMonth}>‹</button>
-            <h2 className="cal-month-label">{MONTHS[month]} {year}</h2>
-            <button className="cal-nav-btn" onClick={nextMonth}>›</button>
+        {/* Hero */}
+        {lastOpenedCase && (
+          <div className="dash-hero" style={{'--case-color': lastOpenedCase.color}}>
+            <div className="dash-hero-accent" />
+            <div className="dash-hero-body">
+              <div className="dash-hero-meta">
+                <span className="dash-hero-label">Continue working</span>
+                <span className="dash-hero-opened">Last opened {relativeTime(lastOpenedCase.openedAt)}</span>
+              </div>
+              <div className="dash-hero-name">{lastOpenedCase.name}</div>
+              <div className="dash-hero-stats">
+                <span className="dash-hero-stat">{getDocCount(lastOpenedCase.id)} docs</span>
+                {caseStats[lastOpenedCase.id]?.noteCount > 0 && <span className="dash-hero-stat">{caseStats[lastOpenedCase.id].noteCount} notes</span>}
+                {caseStats[lastOpenedCase.id]?.agentRuns > 0 && <span className="dash-hero-stat">{caseStats[lastOpenedCase.id].agentRuns} agent runs</span>}
+                <span className="dash-hero-date">{relativeDate(lastOpenedCase.date)}</span>
+              </div>
+            </div>
+            <button className="dash-hero-btn" onClick={()=>onOpenCase(lastOpenedCase)}>Resume →</button>
           </div>
-          <button className="cal-btn cal-btn--primary" onClick={() => setModal({ date: null })}>
-            + Add Case
+        )}
+
+        {/* Stat pills */}
+        <div className="dash-stats-row">
+          {[
+            { label: 'Cases', value: cases.length, icon: '⚖' },
+            { label: 'Documents', value: totalDocs, icon: '📄' },
+            { label: 'Notes', value: statsLoading ? '…' : totalNotes, icon: '📝' },
+            { label: 'Agent runs', value: statsLoading ? '…' : totalAgentRuns, icon: '🤖' },
+          ].map(s=>(
+            <div key={s.label} className="dash-stat-pill">
+              <span className="dash-stat-icon">{s.icon}</span>
+              <span className="dash-stat-value">{s.value}</span>
+              <span className="dash-stat-label">{s.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Cases section */}
+        <div className="dash-section-header">
+          <div className="dash-section-left">
+            <span className="dash-section-title">Cases</span>
+            <div className="dash-filter-tabs">
+              {['all','upcoming','recent'].map(f=>(
+                <button key={f} className={`dash-filter-tab${filterBy===f?' dash-filter-tab--active':''}`} onClick={()=>setFilterBy(f)}>
+                  {f.charAt(0).toUpperCase()+f.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="dash-section-right">
+            <div className="dash-search-wrap">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input className="dash-search" placeholder="Search…" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} />
+              {searchQuery && <button className="dash-search-clear" onClick={()=>setSearchQuery('')}>✕</button>}
+            </div>
+            <select className="dash-sort-select" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
+              <option value="recent">Recent</option>
+              <option value="date">By date</option>
+              <option value="alpha">A – Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="dash-cases-grid">
+          {filteredCases.map(c => (
+            <div key={c.id} className="dash-case-card" style={{'--case-color':c.color}}>
+              <div className="dash-case-card-accent" />
+              <div className="dash-case-card-body" onClick={()=>onOpenCase(c)}>
+                <div className="dash-case-card-name">{c.name}</div>
+                <div className="dash-case-card-meta">
+                  <span className="dash-case-card-date">{relativeDate(c.date)}</span>
+                  <span className="dash-case-card-docs">{getDocCount(c.id)} docs</span>
+                  {caseStats[c.id]?.noteCount > 0 && <span className="dash-case-card-notes">{caseStats[c.id].noteCount} notes</span>}
+                </div>
+              </div>
+              <div className="dash-case-card-actions">
+                <button className="dash-case-open-btn" onClick={()=>onOpenCase(c)} title="Open case">→</button>
+                <button className="dash-case-del-btn" onClick={e=>{e.stopPropagation();handleDeleteCase(c)}} title="Delete case">✕</button>
+              </div>
+            </div>
+          ))}
+          {/* New case card */}
+          <button className="dash-case-card dash-case-card--new" onClick={()=>setModal({date:null})}>
+            <span className="dash-case-new-icon">+</span>
+            <span className="dash-case-new-label">New Case</span>
           </button>
         </div>
 
-        {/* Day headers */}
-        <div className="cal-grid-header">
-          {DAYS.map(d => <div key={d} className="cal-day-label">{d}</div>)}
-        </div>
+        {filteredCases.length === 0 && !searchQuery && (
+          <div className="dash-empty-state">
+            <span className="dash-empty-icon">⚖</span>
+            <span className="dash-empty-text">No cases yet — create your first case above</span>
+          </div>
+        )}
 
-        {/* Calendar grid */}
-        <div className="cal-grid">
-          {cells.map((day, i) => {
-            if (!day) return <div key={i} className="cal-cell cal-cell--empty" />
-            const dateStr = toDateStr(year, month, day)
-            const dayCases = cases.filter(c => c.date === dateStr)
-            const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day
-            return (
-              <div
-                key={i}
-                className={`cal-cell${isToday ? ' cal-cell--today' : ''}`}
-                onClick={() => setModal({ date: dateStr })}
-              >
-                <span className={`cal-day-num${isToday ? ' cal-day-num--today' : ''}`}>{day}</span>
-                <div className="cal-pills">
-                  {dayCases.slice(0, 2).map(c => (
-                    <button
-                      key={c.id}
-                      className={`cal-pill${highlightId === c.id ? ' cal-pill--highlight' : ''}`}
-                      style={{ background: c.color, color: '#fff' }}
-                      title={c.name}
-                      onClick={e => { e.stopPropagation(); onOpenCase(c) }}
-                    >
-                      {c.name}
-                    </button>
-                  ))}
-                  {dayCases.length > 2 && (
-                    <span className="cal-overflow">+{dayCases.length - 2} more</span>
+        {filteredCases.length === 0 && searchQuery && (
+          <div className="dash-empty-state">
+            <span className="dash-empty-text">No cases match "{searchQuery}"</span>
+          </div>
+        )}
+
+        {/* Activity feed */}
+        {activityFeed.length > 0 && (
+          <>
+            <div className="dash-section-header" style={{marginTop:24}}>
+              <span className="dash-section-title">Recent Activity</span>
+            </div>
+            <div className="dash-feed">
+              {activityFeed.map((item,i) => (
+                <div key={i} className="dash-feed-item" onClick={()=>{const c=cases.find(x=>x.id===item.caseId);if(c)onOpenCase(c)}}>
+                  <span className="dash-feed-dot" style={{background:item.caseColor}} />
+                  <div className="dash-feed-body">
+                    <span className="dash-feed-case">{item.caseName}</span>
+                    <span className="dash-feed-icon">{item.type==='note'?'📝':'🤖'}</span>
+                    <span className="dash-feed-text">{item.text}</span>
+                  </div>
+                  <span className="dash-feed-time">{relativeTime(item.time)}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* ── Right rail ── */}
+      <div className="dash-rail">
+
+        {/* Mini calendar */}
+        <div className="dash-rail-section">
+          <div className="dash-mini-cal-header">
+            <button className="dash-mini-cal-nav" onClick={()=>{ if(calMonth===0){setCalMonth(11);setCalYear(y=>y-1)}else setCalMonth(m=>m-1) }}>‹</button>
+            <span className="dash-mini-cal-title">{MONTHS_SHORT[calMonth]} {calYear}</span>
+            <button className="dash-mini-cal-nav" onClick={()=>{ if(calMonth===11){setCalMonth(0);setCalYear(y=>y+1)}else setCalMonth(m=>m+1) }}>›</button>
+          </div>
+          <div className="dash-mini-cal-days">
+            {DAYS.map(d=><span key={d} className="dash-mini-cal-dow">{d.slice(0,1)}</span>)}
+          </div>
+          <div className="dash-mini-cal-grid">
+            {miniCells.map((day,i)=>{
+              if(!day) return <div key={i} className="dash-mini-cal-cell dash-mini-cal-cell--empty" />
+              const dateStr = toDateStr(calYear,calMonth,day)
+              const dayCases = caseDateSet[dateStr]||[]
+              const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===day
+              return (
+                <div key={i} className={`dash-mini-cal-cell${isToday?' dash-mini-cal-cell--today':''}`} title={dayCases.map(c=>c.name).join(', ')||undefined}>
+                  <span className="dash-mini-cal-day">{day}</span>
+                  {dayCases.length>0 && (
+                    <div className="dash-mini-cal-dots">
+                      {dayCases.slice(0,3).map(c=><span key={c.id} className="dash-mini-cal-dot" style={{background:c.color}} />)}
+                    </div>
                   )}
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Upcoming */}
+        <div className="dash-rail-section">
+          <div className="dash-rail-label">Upcoming — 7 days</div>
+          {upcomingCases.length===0 ? (
+            <div className="dash-rail-empty">No upcoming deadlines</div>
+          ) : (
+            upcomingCases.map(c=>{
+              const rd = relativeDate(c.date)
+              const isUrgent = rd==='Today'||rd==='Tomorrow'
+              return (
+                <div key={c.id} className={`dash-upcoming-row${isUrgent?' dash-upcoming-row--urgent':''}`} onClick={()=>onOpenCase(c)}>
+                  <span className="dash-upcoming-dot" style={{background:c.color}} />
+                  <span className="dash-upcoming-name">{c.name}</span>
+                  <span className="dash-upcoming-date">{rd}</span>
+                </div>
+              )
+            })
+          )}
+        </div>
+
+        {/* System status */}
+        <div className="dash-rail-section">
+          <div className="dash-rail-label">System</div>
+          <div className="dash-status-row">
+            <span className={`dash-status-dot${ollamaStatus?.ok?' dash-status-dot--ok':ollamaStatus?' dash-status-dot--err':' dash-status-dot--idle'}`} />
+            <span className="dash-status-name">Ollama</span>
+            <span className="dash-status-detail">{ollamaStatus?.ok ? `${ollamaStatus.models.length} model${ollamaStatus.models.length!==1?'s':''}` : ollamaStatus ? 'Offline' : '…'}</span>
+          </div>
+          <div className="dash-status-row">
+            <span className={`dash-status-dot${totalDocs>0?' dash-status-dot--ok':' dash-status-dot--idle'}`} />
+            <span className="dash-status-name">Documents</span>
+            <span className="dash-status-detail">{totalDocs} indexed</span>
+          </div>
+          <div className="dash-status-row">
+            <span className={`dash-status-dot${lawStatus?.available?' dash-status-dot--ok':lawStatus?' dash-status-dot--err':' dash-status-dot--idle'}`} />
+            <span className="dash-status-name">Caselaw</span>
+            <span className="dash-status-detail">{lawStatus?.available ? `${lawStatus.rows?.toLocaleString()} entries` : lawStatus ? 'No corpus' : '…'}</span>
+          </div>
         </div>
       </div>
 
-      {modal && (
-        <AddCaseModal
-          initialDate={modal.date}
-          onConfirm={handleAddCase}
-          onCancel={() => setModal(null)}
-        />
-      )}
+      {/* ── Modals ── */}
+      {modal && <AddCaseModal initialDate={modal.date} onConfirm={handleAddCase} onCancel={()=>setModal(null)} />}
 
       {deleteCaseConfirm && (
-        <div className="cal-modal-overlay" onClick={() => setDeleteCaseConfirm(null)}>
-          <div className="cal-modal cal-modal--sm" onClick={e => e.stopPropagation()}>
+        <div className="cal-modal-overlay" onClick={()=>setDeleteCaseConfirm(null)}>
+          <div className="cal-modal cal-modal--sm" onClick={e=>e.stopPropagation()}>
             <div className="cal-modal-header">
               <span>Delete Case</span>
-              <button className="cal-modal-close" onClick={() => setDeleteCaseConfirm(null)}>✕</button>
+              <button className="cal-modal-close" onClick={()=>setDeleteCaseConfirm(null)}>✕</button>
             </div>
             <div className="cal-modal-body">
-              <p style={{ margin: '0 0 10px', fontSize: 14 }}>
-                Permanently delete <strong>{deleteCaseConfirm.c.name}</strong>?
-              </p>
+              <p style={{margin:'0 0 10px',fontSize:14}}>Permanently delete <strong>{deleteCaseConfirm.c.name}</strong>?</p>
               <ul className="cal-delete-list">
-                {deleteCaseConfirm.docCount > 0 && (
-                  <li>{deleteCaseConfirm.docCount} document{deleteCaseConfirm.docCount !== 1 ? 's' : ''} &amp; PDFs</li>
-                )}
+                {deleteCaseConfirm.docCount>0 && <li>{deleteCaseConfirm.docCount} document{deleteCaseConfirm.docCount!==1?'s':''} &amp; PDFs</li>}
                 <li>All extractions, notes, and analysis</li>
                 <li>Search index &amp; embeddings</li>
               </ul>
             </div>
             <div className="cal-modal-footer">
-              <button className="cal-btn cal-btn--ghost" onClick={() => setDeleteCaseConfirm(null)}>Cancel</button>
+              <button className="cal-btn cal-btn--ghost" onClick={()=>setDeleteCaseConfirm(null)}>Cancel</button>
               <button className="cal-btn cal-btn--danger" onClick={confirmDeleteCase}>Delete</button>
             </div>
           </div>
