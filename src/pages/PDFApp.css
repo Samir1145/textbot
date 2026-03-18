@@ -87,20 +87,20 @@
 
 .pdfapp-sb-litigants-btn {
   flex-shrink: 0;
-  padding: 4px 8px;
-  font-size: 0.72rem;
-  font-weight: 500;
-  background: #3b82f6;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  background: none;
+  color: var(--text-dim, #94a3b8);
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background 120ms;
+  transition: color 120ms;
 }
 
 .pdfapp-sb-litigants-btn:hover {
-  background: #2563eb;
+  color: var(--text, #f1f5f9);
 }
 
 .pdfapp-sb-separator {
@@ -2098,6 +2098,18 @@
   border-bottom-left-radius: 4px;
 }
 
+.pdfapp-chat-msg--system-note {
+  justify-content: center;
+}
+.pdfapp-chat-msg--system-note .pdfapp-chat-bubble {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+  border: 1px dashed var(--border-subtle);
+  padding: 4px 10px;
+}
+
 .pdfapp-chat-input-row {
   padding: 10px 14px;
   border-top: 1px solid var(--border-subtle);
@@ -2625,9 +2637,15 @@
 .pdfapp-toolbar-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .pdfapp-toolbar-btn--active  { background: var(--bg-3); color: var(--text); }
 
-.pdfapp-toolbar-btn--thumb { background: #dc2626; color: #fff; border-color: #b91c1c; }
-.pdfapp-toolbar-btn--thumb:hover:not(:disabled) { background: #b91c1c; color: #fff; }
-.pdfapp-toolbar-btn--thumb.pdfapp-toolbar-btn--active { background: #b91c1c; color: #fff; }
+.pdfapp-toolbar-btn--thumb {
+  border: 1.5px solid #1e293b;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2' y='2' width='20' height='20' rx='1' fill='%233b82f6'/><rect x='3' y='3' width='2.5' height='3.5' fill='%231e3a5f'/><rect x='8' y='3' width='2.5' height='3.5' fill='%231e3a5f'/><rect x='13' y='3' width='2.5' height='3.5' fill='%231e3a5f'/><rect x='18' y='3' width='2.5' height='3.5' fill='%231e3a5f'/><rect x='3' y='17.5' width='2.5' height='3.5' fill='%231e3a5f'/><rect x='8' y='17.5' width='2.5' height='3.5' fill='%231e3a5f'/><rect x='13' y='17.5' width='2.5' height='3.5' fill='%231e3a5f'/><rect x='18' y='17.5' width='2.5' height='3.5' fill='%231e3a5f'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 18px 18px;
+}
+.pdfapp-toolbar-btn--thumb:hover:not(:disabled) { background-color: #eff6ff; border-color: #1e293b; }
+.pdfapp-toolbar-btn--thumb.pdfapp-toolbar-btn--active { background-color: #dbeafe; border-color: #1e293b; }
 
 .pdfapp-toolbar-btn--annot { background: #16a34a; color: #fff; border-color: #15803d; }
 .pdfapp-toolbar-btn--annot:hover:not(:disabled) { background: #15803d; color: #fff; }
@@ -2796,7 +2814,7 @@
   width: 96px;
   height: 100%;
   background: var(--bg-sidebar);
-  border-right: 1px solid var(--border);
+  border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -4468,3 +4486,70 @@
 .pdfapp-svc-dot-label {
   line-height: 1;
 }
+
+/* ── Skills tab preview toggle ── */
+.pdfapp-aide-skill-preview-toggle {
+  font-size: 0.7rem; color: var(--text-dim); background: none; border: 1px solid var(--border, rgba(255,255,255,0.12)); border-radius: 4px; padding: 2px 8px; cursor: pointer; transition: color 0.15s, border-color 0.15s;
+}
+.pdfapp-aide-skill-preview-toggle:hover { color: var(--text); border-color: var(--text-dim); }
+.pdfapp-aide-skill-md-preview {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 6px; padding: 10px 12px; font-size: 0.75rem; line-height: 1.6; color: var(--text); white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;
+}
+
+/* ── Tools tab ── */
+.pdfapp-aide-exec-mode-row { display: flex; gap: 8px; margin-top: 4px; }
+.pdfapp-aide-exec-btn {
+  flex: 1; display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 8px; cursor: pointer; text-align: left; transition: background 0.15s, border-color 0.15s; color: var(--text);
+}
+.pdfapp-aide-exec-btn--active { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.4); }
+.pdfapp-aide-exec-btn:hover { background: rgba(255,255,255,0.06); }
+.pdfapp-aide-exec-icon { font-size: 1.1rem; margin-top: 1px; flex-shrink: 0; }
+.pdfapp-aide-exec-info { display: flex; flex-direction: column; gap: 2px; }
+.pdfapp-aide-exec-label { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+.pdfapp-aide-exec-hint { font-size: 0.69rem; color: var(--text-dim); line-height: 1.4; }
+.pdfapp-aide-exec-model-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.pdfapp-aide-tool-row {
+  display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,0.06)); cursor: pointer;
+}
+.pdfapp-aide-tool-row:last-child { border-bottom: none; }
+.pdfapp-aide-tool-checkbox { accent-color: #60a5fa; width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+.pdfapp-aide-tool-info { display: flex; flex-direction: column; gap: 1px; }
+.pdfapp-aide-tool-name { font-size: 0.76rem; font-weight: 500; color: var(--text); font-family: monospace; }
+.pdfapp-aide-slider-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.pdfapp-aide-slider { flex: 1; accent-color: #60a5fa; cursor: pointer; }
+.pdfapp-aide-slider-val { font-size: 0.75rem; font-weight: 600; color: var(--text); min-width: 28px; text-align: right; }
+
+/* ── RAG tab ── */
+.pdfapp-aide-rag-scope-row { display: flex; gap: 8px; margin-top: 4px; }
+.pdfapp-aide-rag-scope-btn {
+  flex: 1; padding: 7px 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 6px; cursor: pointer; font-size: 0.75rem; color: var(--text-dim); transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.pdfapp-aide-rag-scope-btn--active { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.4); color: var(--text); }
+.pdfapp-aide-rag-scope-btn:hover { color: var(--text); }
+.pdfapp-aide-rag-db-info { display: flex; flex-direction: column; gap: 3px; background: rgba(255,255,255,0.03); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 6px; padding: 10px 12px; }
+.pdfapp-aide-rag-db-label { font-size: 0.74rem; font-weight: 600; color: #60a5fa; font-family: monospace; }
+
+/* ── Audit tab ── */
+.pdfapp-aide-audit-header { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); padding: 8px 12px 4px; }
+.pdfapp-aide-audit-breakdown { margin: 0 12px; border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 6px; overflow: hidden; }
+.pdfapp-aide-audit-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.06)); }
+.pdfapp-aide-audit-row:last-child { border-bottom: none; }
+.pdfapp-aide-audit-row--total { background: rgba(255,255,255,0.03); }
+.pdfapp-aide-audit-row--total .pdfapp-aide-audit-row-label { font-weight: 600; color: var(--text); }
+.pdfapp-aide-audit-row-label { font-size: 0.72rem; color: var(--text-dim); }
+.pdfapp-aide-audit-row-tokens { font-size: 0.72rem; font-weight: 500; color: var(--text); font-family: monospace; }
+.pdfapp-aide-audit-tokens--warn { color: #f59e0b; }
+.pdfapp-aide-audit-warn { font-size: 0.69rem; color: #f59e0b; padding: 4px 10px 6px; }
+.pdfapp-aide-audit-files { margin: 4px 12px; display: flex; flex-direction: column; gap: 4px; }
+.pdfapp-aide-audit-file-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: 5px; }
+.pdfapp-aide-audit-file-icon { font-size: 0.9rem; }
+.pdfapp-aide-audit-file-name { flex: 1; font-size: 0.73rem; color: var(--text); }
+.pdfapp-aide-audit-file-size { font-size: 0.68rem; color: var(--text-dim); font-family: monospace; }
+.pdfapp-aide-audit-prompt { margin: 4px 12px 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: 6px; padding: 10px 12px; font-size: 0.68rem; line-height: 1.6; color: var(--text-dim); white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto; font-family: monospace; }
+
+/* ── Memory tab updates ── */
+.pdfapp-aide-memory-header-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px 4px; }
+.pdfapp-aide-memory-header-row .pdfapp-aide-memory-header { padding: 0; }
+.pdfapp-aide-diary-clear-confirm { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-dim); }
+.pdfapp-aide-diary-pin-btn { margin-top: 6px; font-size: 0.7rem; color: #60a5fa; background: none; border: 1px solid rgba(96,165,250,0.3); border-radius: 4px; padding: 2px 8px; cursor: pointer; transition: background 0.15s; }
+.pdfapp-aide-diary-pin-btn:hover { background: rgba(96,165,250,0.1); }

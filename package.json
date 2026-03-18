@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "logs": "node scripts/logs.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

@@ -2,6 +2,11 @@ import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { createWorker } from 'tesseract.js'
 
+function diag(msg) {
+  console.log(`[DIAG] ${msg}`)
+  fetch('/api/diag', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ msg }) }).catch(() => {})
+}
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc
 
 // PDFs with fewer than this many average chars/page are treated as scanned
@@ -195,7 +200,12 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
     totalChars += text.length
   }
 
-  const isScanned = (totalChars / numPages) < SCANNED_THRESHOLD
+  const avgCharsPerPage = totalChars / numPages
+  const totalWords = nativePages.reduce((s, p) => s + p.words.length, 0)
+  // Treat as scanned if: avg chars/page is low OR all pages have 0 extractable words
+  // (handles PDFs with metadata/page-number text that fools the char count but no real content)
+  const isScanned = avgCharsPerPage < SCANNED_THRESHOLD || totalWords === 0
+  diag(`totalChars=${totalChars} totalWords=${totalWords} numPages=${numPages} avgCharsPerPage=${avgCharsPerPage.toFixed(1)} threshold=${SCANNED_THRESHOLD} isScanned=${isScanned}`)
 
   let fullText
   let isOcr
@@ -228,6 +238,7 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
     isOcr = true
     onStatus?.(`Scanned PDF detected — starting OCR (${numPages} page${numPages > 1 ? 's' : ''})…`)
 
+    diag(`OCR branch starting — ${numPages} page(s)`)
     const worker = await createWorker('eng')
     const ocrResults = []
 
@@ -242,16 +253,54 @@ export async function extractAndSaveText(docId, file, { onStatus, signal, caseId
       canvas.height = Math.floor(viewport.height)
       await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise
 
-      const { data } = await worker.recognize(canvas)
-      const words = (data.words || [])
-        .filter(w => w.text?.trim() && w.confidence > 20)
-        .map(w => ({
-          text: w.text,
-          x1_pct: clamp01(w.bbox.x0 / canvas.width),
-          y1_pct: clamp01(w.bbox.y0 / canvas.height),
-          x2_pct: clamp01(w.bbox.x1 / canvas.width),
-          y2_pct: clamp01(w.bbox.y1 / canvas.height),
-        }))
+      // Request blocks output — Tesseract.js v7 nests words inside blocks[].paragraphs[].lines[].words[]
+      // data.words / data.lines do not exist at the top level in v7.
+      const { data } = await worker.recognize(canvas, {}, { blocks: true })
+
+      // Flatten all words from the block hierarchy
+      const allWords = []
+      for (const block of data.blocks || []) {
+        for (const para of block.paragraphs || []) {
+          for (const line of para.lines || []) {
+            for (const word of line.words || []) {
+              allWords.push(word)
+            }
+          }
+        }
+      }
+
+      const mapWord = w => ({
+        text: w.text,
+        x1_pct: clamp01(w.bbox.x0 / canvas.width),
+        y1_pct: clamp01(w.bbox.y0 / canvas.height),
+        x2_pct: clamp01(w.bbox.x1 / canvas.width),
+        y2_pct: clamp01(w.bbox.y1 / canvas.height),
+      })
+      // Primary: words with confidence > 10
+      let words = allWords.filter(w => w.text?.trim() && w.confidence > 10).map(mapWord)
+      // Fallback: if all filtered out, use unfiltered words
+      if (words.length === 0 && allWords.length > 0) {
+        words = allWords.filter(w => w.text?.trim()).map(mapWord)
+      }
+      // Last resort: if no word objects at all but text exists, use line-level bboxes
+      if (words.length === 0 && data.text?.trim()) {
+        for (const block of data.blocks || []) {
+          for (const para of block.paragraphs || []) {
+            for (const line of para.lines || []) {
+              if (line.text?.trim() && line.bbox) {
+                words.push({
+                  text: line.text.trim(),
+                  x1_pct: clamp01(line.bbox.x0 / canvas.width),
+                  y1_pct: clamp01(line.bbox.y0 / canvas.height),
+                  x2_pct: clamp01(line.bbox.x1 / canvas.width),
+                  y2_pct: clamp01(line.bbox.y1 / canvas.height),
+                })
+              }
+            }
+          }
+        }
+      }
+      diag(`OCR page ${i}: canvas=${canvas.width}x${canvas.height} rawWords=${allWords.length} wordsAfterFilter=${words.length} textLen=${data.text.trim().length}`)
       const chunks = words.length ? groupIntoParagraphs(words) : []
       ocrResults.push({ pageNum: i, text: data.text.trim(), chunks, rawWords: words })
 

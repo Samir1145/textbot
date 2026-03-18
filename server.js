@@ -287,7 +287,7 @@ app.get('/api/cases/:caseId/all-highlights', (req, res) => {
 
 // ── Aide Soul & Diary ────────────────────────────────────────────────────
 
-const SOUL_DEFAULT = { soul: { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }, savedAt: null }
+const SOUL_DEFAULT = { soul: { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [], toolConfig: { executionMode: 'local', enabledTools: { search_case: true, search_doc: true, search_caselaw: true, add_note: true }, maxSteps: 15, temperature: 0.3 }, docScope: [] }, savedAt: null }
 app.get('/api/cases/:caseId/aide/soul', (req, res) => {
   const { agentId } = req.query
   const fileName = agentId ? `soul-${agentId}.json` : 'soul.json'
@@ -327,6 +327,14 @@ app.post('/api/cases/:caseId/aide/diary/entry', express.json(), (req, res) => {
   const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), fileName)
   const existing = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : []
   fs.writeFileSync(filePath, JSON.stringify([req.body, ...existing]))  // newest first
+  res.json({ ok: true })
+})
+
+app.delete('/api/cases/:caseId/aide/diary', (req, res) => {
+  const { agentId } = req.query
+  const fileName = agentId ? `diary-${agentId}.json` : 'diary.json'
+  const filePath = path.join(getCaseSubdir(req.params.caseId, 'aide'), fileName)
+  if (fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify([]))
   res.json({ ok: true })
 })
 
@@ -554,6 +562,37 @@ async function embed(text) {
     return _embedBackend.call(text)
 }
 
+// HyDE: generate a short hypothetical passage that would answer the query,
+// then embed that passage instead of the raw query.
+// Falls back to raw query embedding on any error.
+async function hydeEmbed(query) {
+    try {
+        const { genModel } = loadSettings()
+        const model = genModel || process.env.VITE_OLLAMA_MODEL || 'gemma3n:e2b'
+        const res = await fetch('http://localhost:11434/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                messages: [{
+                    role: 'user',
+                    content: `Write a short 2-3 sentence passage from a legal document that directly answers this question. Output only the passage, no preamble.\n\nQuestion: ${query}`,
+                }],
+                stream: false,
+                options: { temperature: 0.3 },
+            }),
+        })
+        if (!res.ok) throw new Error(`HyDE LLM ${res.status}`)
+        const { message } = await res.json()
+        const hypothetical = message?.content?.trim()
+        if (!hypothetical) throw new Error('Empty HyDE response')
+        return await embed(hypothetical)
+    } catch (err) {
+        console.warn('[HyDE] falling back to raw query embed:', err.message)
+        return embed(query)
+    }
+}
+
 function toBlob(floats) {
     return Buffer.from(new Float32Array(floats).buffer)
 }
@@ -649,6 +688,26 @@ async function getRagDb(caseId = 'default') {
     // Migration v3: add chunk_hash column for incremental indexing
     try { db.exec("ALTER TABLE doc_chunks ADD COLUMN chunk_hash TEXT") } catch { /* already exists */ }
 
+    // BM25 full-text index — porter stemming for better recall on inflected legal terms
+    // rowid matches doc_chunks.id so we can join directly without a separate key column.
+    db.exec(`
+        CREATE VIRTUAL TABLE IF NOT EXISTS fts_chunks
+            USING fts5(text, tokenize='porter unicode61');
+    `)
+
+    // Migration: populate fts_chunks for any existing chunks not yet indexed there
+    const ftsMissing = db.prepare(`
+        SELECT d.id, d.text FROM doc_chunks d
+        WHERE NOT EXISTS (SELECT 1 FROM fts_chunks WHERE rowid = d.id)
+        LIMIT 5000
+    `).all()
+    if (ftsMissing.length) {
+        const ins = db.prepare('INSERT INTO fts_chunks(rowid, text) VALUES (?, ?)')
+        const insertMany = db.transaction(rows => { for (const r of rows) ins.run(r.id, r.text) })
+        insertMany(ftsMissing)
+        console.log(`[RAG] BM25 migration: indexed ${ftsMissing.length} existing chunks into fts_chunks`)
+    }
+
     // Embedding cache: avoids re-calling Ollama for chunks whose text hasn't changed
     db.exec(`CREATE TABLE IF NOT EXISTS embed_cache (hash TEXT PRIMARY KEY, embedding BLOB)`)
 
@@ -683,6 +742,7 @@ app.delete('/api/rag/clear-doc/:docId', (req, res) => {
         const rows = db.prepare('SELECT id FROM doc_chunks WHERE doc_id = ?').all(safeDocId)
         for (const row of rows) {
             db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
+            db.prepare('DELETE FROM fts_chunks WHERE rowid = ?').run(row.id)
         }
         db.prepare('DELETE FROM doc_chunks WHERE doc_id = ?').run(safeDocId)
         res.json({ ok: true, deleted: rows.length })
@@ -724,16 +784,19 @@ app.post('/api/rag/index-doc', async (req, res) => {
                     skipped++
                     continue
                 }
-                // Text changed — replace vec entry
+                // Text changed — replace vec + fts entries
                 db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(existing.id))
+                db.prepare('DELETE FROM fts_chunks WHERE rowid = ?').run(existing.id)
                 db.prepare('UPDATE doc_chunks SET text = ?, bbox = ?, chunk_hash = ? WHERE id = ?')
                     .run(text, bboxJson, hash, existing.id)
                 db.prepare('INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)').run(BigInt(existing.id), toBlob(floats))
+                db.prepare('INSERT INTO fts_chunks(rowid, text) VALUES (?, ?)').run(existing.id, text)
             } else {
                 const { lastInsertRowid: chunkId } = db.prepare(
                     'INSERT INTO doc_chunks (doc_id, case_id, page_num, chunk_idx, text, bbox, chunk_hash) VALUES (?, ?, ?, ?, ?, ?, ?)'
                 ).run(safeDocId, safeCaseId, pageNum, ci, text, bboxJson, hash)
                 db.prepare('INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)').run(BigInt(chunkId), toBlob(floats))
+                db.prepare('INSERT INTO fts_chunks(rowid, text) VALUES (?, ?)').run(Number(chunkId), text)
             }
             indexed++
         }
@@ -765,6 +828,7 @@ app.post('/api/rag/prune-doc', (req, res) => {
 
         for (const row of toDelete) {
             db.prepare('DELETE FROM vec_chunks WHERE id = ?').run(BigInt(row.id))
+            db.prepare('DELETE FROM fts_chunks WHERE rowid = ?').run(row.id)
             db.prepare('DELETE FROM doc_chunks WHERE id = ?').run(row.id)
         }
         res.json({ ok: true, pruned: toDelete.length })
@@ -805,63 +869,113 @@ app.get('/api/rag/doc-status/:docId', async (req, res) => {
     }
 })
 
-// Keyword overlap score — TF-style, normalized by sqrt(doc_len) to penalize long chunks less
-function keywordScore(query, text) {
-    const qTokens = new Set(query.toLowerCase().split(/\W+/).filter(t => t.length > 2))
-    if (!qTokens.size) return 0
-    const tWords = text.toLowerCase().split(/\W+/)
-    const hits = tWords.filter(t => qTokens.has(t)).length
-    return hits / (Math.sqrt(tWords.length) || 1)
+// Build a safe FTS5 MATCH expression from a free-text query.
+// Each word is quoted to prevent FTS5 syntax errors; joined with OR for max recall.
+function buildFtsQuery(query) {
+    const terms = query.toLowerCase().split(/\W+/).filter(t => t.length > 2)
+    if (!terms.length) return null
+    return terms.map(t => `"${t.replace(/"/g, '')}"`).join(' OR ')
 }
 
-// Combined re-ranking: 60% vector similarity + 40% keyword overlap
-function rerank(chunks, distMap, query, k) {
-    const maxDist = Math.max(...chunks.map(c => distMap.get(c.id)), 1e-6)
-    return chunks
-        .map(c => ({
-            ...c,
-            _score: 0.6 * (1 - distMap.get(c.id) / maxDist) + 0.4 * keywordScore(query, c.text),
-            distance: distMap.get(c.id),
-        }))
-        .sort((a, b) => b._score - a._score)
+// Reciprocal Rank Fusion — combines vector and BM25 ranked lists without score normalization.
+// k=60 is the standard RRF constant (Cormack et al. 2009).
+// vecRows:  [{ id (Number), distance }] sorted best-first
+// bm25Rows: [{ rowid (Number), bm25_score }] sorted best-first (bm25 returns negative; more negative = better)
+// chunkRows: all fetched chunk objects keyed by id
+function rrfFuse(vecRows, bm25Rows, chunkMap, k = 5, RRF_K = 60) {
+    const scores = new Map()
+    const add = (id, rank) => scores.set(id, (scores.get(id) ?? 0) + 1 / (RRF_K + rank))
+
+    vecRows.forEach((r, i)  => add(r.id,    i + 1))
+    bm25Rows.forEach((r, i) => add(r.rowid, i + 1))
+
+    return [...scores.entries()]
+        .sort((a, b) => b[1] - a[1])
         .slice(0, k)
-        .map(({ _score, ...c }) => c)
+        .map(([id]) => chunkMap.get(id))
+        .filter(Boolean)
 }
 
-// POST /api/rag/search  — semantic search within a document
+// POST /api/rag/embed-manual  — embed a user-typed note into the case RAG index
+// Stored as doc_id='__manual__', page_num=0; retrieved alongside doc chunks in searches.
+app.post('/api/rag/embed-manual', async (req, res) => {
+    try {
+        const { text, caseId = 'default', label } = req.body
+        if (!text?.trim()) return res.status(400).json({ error: 'Missing text' })
+        const { db } = await getRagDb(caseId)
+        const MANUAL_DOC = '__manual__'
+        const safeCaseId = safeId(caseId)
+
+        const maxRow = db.prepare('SELECT MAX(chunk_idx) as mx FROM doc_chunks WHERE doc_id = ?').get(MANUAL_DOC)
+        const chunkIdx = (maxRow?.mx ?? -1) + 1
+
+        const storedText = label ? `[${label}] ${text.trim()}` : text.trim()
+        const hash = createHash('sha256').update(storedText).digest('hex')
+        const floats = await embed(storedText)
+
+        const { lastInsertRowid: chunkId } = db.prepare(
+            'INSERT INTO doc_chunks (doc_id, case_id, page_num, chunk_idx, text, bbox, chunk_hash) VALUES (?, ?, 0, ?, ?, NULL, ?)'
+        ).run(MANUAL_DOC, safeCaseId, chunkIdx, storedText, hash)
+
+        db.prepare('INSERT INTO vec_chunks (id, embedding) VALUES (?, ?)').run(BigInt(chunkId), toBlob(floats))
+        db.prepare('INSERT INTO fts_chunks(rowid, text) VALUES (?, ?)').run(chunkId, storedText)
+
+        console.log(`[RAG] manual embed: case=${caseId} idx=${chunkIdx} len=${storedText.length}`)
+        res.json({ ok: true, chunkId: Number(chunkId), chunkIdx })
+    } catch (err) {
+        console.error('[RAG] embed-manual error:', err.message)
+        res.status(500).json({ error: err.message })
+    }
+})
+
+// POST /api/rag/search  — hybrid BM25 + vector search within a document
 app.post('/api/rag/search', async (req, res) => {
     try {
         const { docId, query, k = 5, caseId = 'default', windowSize = 0 } = req.body
         const { db } = await getRagDb(caseId)
-        const emb = await embed(query)
-
-        // KNN within this case's DB, then filter by doc_id
+        const safeDocId = safeId(docId)
+        const safeCaseId = safeId(caseId)
         const topK = Math.min(k * 20, 200)
-        const knnRows = db.prepare(
+
+        // ── Vector retrieval (HyDE: embed hypothetical answer, not raw query) ──
+        const emb = await hydeEmbed(query)
+        const vecRows = db.prepare(
             'SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ? ORDER BY distance'
-        ).all(toBlob(emb), topK)
+        ).all(toBlob(emb), topK).map(r => ({ id: Number(r.id), distance: r.distance }))
 
-        if (!knnRows.length) return res.json([])
+        // ── BM25 retrieval (FTS5) ─────────────────────────────────────────
+        const ftsQuery = buildFtsQuery(query)
+        let bm25Rows = []
+        if (ftsQuery) {
+            try {
+                bm25Rows = db.prepare(
+                    `SELECT rowid, bm25(fts_chunks) as bm25_score
+                     FROM fts_chunks
+                     WHERE fts_chunks MATCH ?
+                     ORDER BY bm25_score
+                     LIMIT ?`
+                ).all(ftsQuery, topK)
+                  .map(r => ({ rowid: Number(r.rowid), bm25_score: r.bm25_score }))
+            } catch { /* FTS5 syntax error on unusual queries — degrade to vector-only */ }
+        }
 
-        // vec_chunks returns BigInt ids — convert to Number for cross-table lookups
-        const distMap = new Map(knnRows.map(r => [Number(r.id), r.distance]))
-        const ids = knnRows.map(r => Number(r.id))
-        const placeholders = ids.map(() => '?').join(',')
+        if (!vecRows.length && !bm25Rows.length) return res.json([])
 
-        const chunks = db.prepare(
-            `SELECT id, page_num, chunk_idx, text, bbox FROM doc_chunks WHERE doc_id = ? AND id IN (${placeholders})`
-        ).all(safeId(docId), ...ids)
+        // ── Fetch all candidate chunks (union of both result sets) ────────
+        const allIds = [...new Set([...vecRows.map(r => r.id), ...bm25Rows.map(r => r.rowid)])]
+        const placeholders = allIds.map(() => '?').join(',')
+        const fetched = db.prepare(
+            `SELECT id, doc_id, page_num, chunk_idx, text, bbox FROM doc_chunks
+             WHERE (doc_id = ? OR doc_id = '__manual__') AND id IN (${placeholders})`
+        ).all(safeDocId, ...allIds)
+        const chunkMap = new Map(fetched.map(c => [c.id, c]))
 
-        const results = rerank(chunks, distMap, query, k).map(c => ({
-            ...c,
-            bbox: c.bbox ? JSON.parse(c.bbox) : null,
-        }))
+        // ── RRF fusion ────────────────────────────────────────────────────
+        const results = rrfFuse(vecRows, bm25Rows, chunkMap, k)
+            .map(c => ({ ...c, bbox: c.bbox ? JSON.parse(c.bbox) : null }))
 
-        // Sentence-window expansion: fetch ±windowSize neighboring chunks and attach as
-        // windowText. The LLM uses windowText for context; bbox/text stay sentence-tight.
+        // ── Sentence-window expansion ─────────────────────────────────────
         if (windowSize > 0) {
-            const safeDocId = safeId(docId)
-            const safeCaseId = safeId(caseId)
             for (const chunk of results) {
                 const lo = Math.max(0, chunk.chunk_idx - windowSize)
                 const hi = chunk.chunk_idx + windowSize
@@ -879,35 +993,65 @@ app.post('/api/rag/search', async (req, res) => {
     }
 })
 
-// POST /api/rag/search-case  — semantic search across all docs in a case
+// POST /api/rag/search-case  — hybrid BM25 + vector search across all docs in a case
 // Uses the per-case DB so KNN is already confined to this case (no case_id filter needed)
 app.post('/api/rag/search-case', async (req, res) => {
     try {
         const { caseId, query, k = 5 } = req.body
         if (!caseId || !query) return res.status(400).json({ error: 'Missing caseId or query' })
         const { db } = await getRagDb(caseId)
-        const emb = await embed(query)
 
         const topK = Math.min(k * 20, 200)
-        const knnRows = db.prepare(
+
+        // ── Vector retrieval (HyDE: embed hypothetical answer, not raw query) ──
+        const emb = await hydeEmbed(query)
+        const vecRows = db.prepare(
             'SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ? ORDER BY distance'
-        ).all(toBlob(emb), topK)
+        ).all(toBlob(emb), topK).map(r => ({ id: Number(r.id), distance: r.distance }))
 
-        if (!knnRows.length) return res.json([])
+        // ── BM25 retrieval (FTS5) ─────────────────────────────────────────
+        const ftsQuery = buildFtsQuery(query)
+        let bm25Rows = []
+        if (ftsQuery) {
+            try {
+                bm25Rows = db.prepare(
+                    `SELECT rowid, bm25(fts_chunks) as bm25_score
+                     FROM fts_chunks
+                     WHERE fts_chunks MATCH ?
+                     ORDER BY bm25_score
+                     LIMIT ?`
+                ).all(ftsQuery, topK)
+                  .map(r => ({ rowid: Number(r.rowid), bm25_score: r.bm25_score }))
+            } catch { /* FTS5 syntax error on unusual queries — degrade to vector-only */ }
+        }
 
-        const distMap = new Map(knnRows.map(r => [Number(r.id), r.distance]))
-        const ids = knnRows.map(r => Number(r.id))
-        const placeholders = ids.map(() => '?').join(',')
+        if (!vecRows.length && !bm25Rows.length) return res.json([])
 
-        // All rows in this DB belong to the case — select all matching ids with doc_id for provenance
-        const chunks = db.prepare(
+        // ── Fetch all candidate chunks (union of both result sets) ────────
+        const allIds = [...new Set([...vecRows.map(r => r.id), ...bm25Rows.map(r => r.rowid)])]
+        const placeholders = allIds.map(() => '?').join(',')
+
+        // Include doc_id for cross-doc provenance
+        const fetched = db.prepare(
             `SELECT id, doc_id, page_num, chunk_idx, text, bbox FROM doc_chunks WHERE id IN (${placeholders})`
-        ).all(...ids)
+        ).all(...allIds)
+        const chunkMap = new Map(fetched.map(c => [c.id, c]))
 
-        res.json(rerank(chunks, distMap, query, k).map(c => ({
-            ...c,
-            bbox: c.bbox ? JSON.parse(c.bbox) : null,
-        })))
+        // ── RRF fusion ────────────────────────────────────────────────────
+        const results = rrfFuse(vecRows, bm25Rows, chunkMap, k)
+            .map(c => ({ ...c, bbox: c.bbox ? JSON.parse(c.bbox) : null }))
+
+        // ── Sentence-window expansion (±2 neighbors per doc) ─────────────
+        for (const chunk of results) {
+            const lo = Math.max(0, chunk.chunk_idx - 2)
+            const hi = chunk.chunk_idx + 2
+            const neighbors = db.prepare(
+                'SELECT text FROM doc_chunks WHERE doc_id = ? AND chunk_idx BETWEEN ? AND ? ORDER BY chunk_idx'
+            ).all(chunk.doc_id, lo, hi)
+            chunk.windowText = neighbors.map(n => n.text).join(' ')
+        }
+
+        res.json(results)
     } catch (err) {
         console.error('[RAG] search-case error:', err.message)
         res.status(500).json({ error: err.message })
@@ -1070,7 +1214,7 @@ const AGENT_TOOLS = [
     },
 ]
 
-async function agentExecuteTool(name, args, caseId) {
+async function agentExecuteTool(name, args, caseId, docScope = []) {
     if (name === 'search_case') {
         const { query, k = 5 } = args
         const { db } = await getRagDb(caseId)
@@ -1153,6 +1297,17 @@ async function agentExecuteTool(name, args, caseId) {
 async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diary = [], agentId = null }) {
     const job = agentJobs.get(jobId)
 
+    // Extract toolConfig settings
+    const tc = soul.toolConfig || {}
+    const MAX_STEPS = tc.maxSteps || 15
+    const executionMode = tc.executionMode || 'local'
+    const temperature = tc.temperature ?? 0.3
+    const enabledTools = tc.enabledTools || {}
+    const docScope = soul.docScope || []
+
+    // Filter AGENT_TOOLS based on enabled tools
+    const activeTools = AGENT_TOOLS.filter(t => enabledTools[t.function.name] !== false)
+
     // Last 3 diary entries — most recent first, injected as compounding memory
     const recentDiary = [...diary].reverse().slice(0, 3)
 
@@ -1179,15 +1334,15 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
         intent ? `\n## Your Goal for This Task\n${intent}` : '',
         role   ? `\nActing as: ${role}` : '',
         '\n## Instructions',
-        '- Use search_case to search broadly across all case documents.',
-        '- Use search_doc to search a specific document by ID.',
-        '- Use search_caselaw to verify a case citation or find legal precedent — always verify citations mentioned in documents.',
-        '- Use add_note to save important findings as you discover them.',
+        enabledTools.search_case    !== false ? '- Use search_case to search broadly across all case documents.' : '',
+        enabledTools.search_doc     !== false ? '- Use search_doc to search a specific document by ID.' : '',
+        enabledTools.search_caselaw !== false ? '- Use search_caselaw to verify a case citation or find legal precedent — always verify citations mentioned in documents.' : '',
+        enabledTools.add_note       !== false ? '- Use add_note to save important findings as you discover them.' : '',
         '- Only cite text you have directly retrieved via tools.',
         '- When search results are weak, rephrase and search again.',
         '- Apply everything you have learned from previous sessions.',
         '- After gathering evidence, give a clear final answer with citations (doc ID, page number, and case citation where relevant).',
-        '- Stop after 15 tool calls maximum.',
+        `- Stop after ${MAX_STEPS} tool calls maximum.`,
     ].filter(Boolean).join('\n')
 
     const messages = [
@@ -1196,27 +1351,83 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
     ]
 
     let stepCount = 0
-    const MAX_STEPS = 15
 
     while (stepCount < MAX_STEPS) {
         if (job.cancelled) return
 
         let response
-        try {
-            const res = await fetch('http://localhost:11434/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'qwen2.5:7b', messages, tools: AGENT_TOOLS, stream: false }),
-            })
-            if (!res.ok) throw new Error(`Ollama ${res.status}`)
-            response = await res.json()
-        } catch (err) {
-            const step = { type: 'error', content: `LLM error: ${err.message}` }
-            job.steps.push(step)
-            agentBroadcast(job.clients, step)
-            job.status = 'error'; job.error = err.message
-            agentBroadcast(job.clients, { type: 'status', status: 'error' })
-            return
+        if (executionMode === 'internet') {
+            const apiKey = process.env.ANTHROPIC_API_KEY
+            if (!apiKey) {
+                const step = { type: 'error', content: 'Internet mode requires ANTHROPIC_API_KEY environment variable.' }
+                job.steps.push(step)
+                agentBroadcast(job.clients, step)
+                job.status = 'error'
+                agentBroadcast(job.clients, { type: 'status', status: 'error' })
+                return
+            }
+            try {
+                const claudeMessages = messages.filter(m => m.role !== 'system').map(m => {
+                    if (m.role === 'tool') return { role: 'user', content: [{ type: 'tool_result', tool_use_id: m.tool_use_id || 'unknown', content: m.content }] }
+                    if (m.tool_calls) return { role: 'assistant', content: m.tool_calls.map(tc2 => ({ type: 'tool_use', id: tc2.id || crypto.randomUUID(), name: tc2.function.name, input: typeof tc2.function.arguments === 'string' ? JSON.parse(tc2.function.arguments) : tc2.function.arguments })) }
+                    return m
+                })
+                const claudeTools = activeTools.map(t => ({
+                    name: t.function.name,
+                    description: t.function.description,
+                    input_schema: t.function.parameters,
+                }))
+                const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+                    body: JSON.stringify({
+                        model: tc.internetModel || 'claude-sonnet-4-6',
+                        max_tokens: 4096,
+                        system: messages.find(m => m.role === 'system')?.content || '',
+                        messages: claudeMessages,
+                        tools: claudeTools,
+                        temperature,
+                    }),
+                })
+                if (!claudeRes.ok) throw new Error(`Claude API ${claudeRes.status}: ${await claudeRes.text()}`)
+                const claudeData = await claudeRes.json()
+                const toolUses = claudeData.content?.filter(b => b.type === 'tool_use') || []
+                const textContent = claudeData.content?.filter(b => b.type === 'text').map(b => b.text).join('') || ''
+                response = {
+                    message: {
+                        role: 'assistant',
+                        content: textContent,
+                        tool_calls: toolUses.map(tu => ({
+                            id: tu.id,
+                            function: { name: tu.name, arguments: JSON.stringify(tu.input) },
+                        })),
+                    }
+                }
+            } catch (err) {
+                const step = { type: 'error', content: `Claude API error: ${err.message}` }
+                job.steps.push(step)
+                agentBroadcast(job.clients, step)
+                job.status = 'error'; job.error = err.message
+                agentBroadcast(job.clients, { type: 'status', status: 'error' })
+                return
+            }
+        } else {
+            try {
+                const res = await fetch('http://localhost:11434/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: tc.localModel || 'qwen2.5:7b', messages, tools: activeTools, stream: false, options: { temperature } }),
+                })
+                if (!res.ok) throw new Error(`Ollama ${res.status}`)
+                response = await res.json()
+            } catch (err) {
+                const step = { type: 'error', content: `LLM error: ${err.message}` }
+                job.steps.push(step)
+                agentBroadcast(job.clients, step)
+                job.status = 'error'; job.error = err.message
+                agentBroadcast(job.clients, { type: 'status', status: 'error' })
+                return
+            }
         }
 
         const msg = response.message
@@ -1301,7 +1512,7 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
 
             let result
             try {
-                result = await agentExecuteTool(toolName, toolArgs, caseId)
+                result = await agentExecuteTool(toolName, toolArgs, caseId, docScope)
             } catch (toolErr) {
                 result = { error: toolErr.message }
                 const errStep = { type: 'error', content: `Tool "${toolName}" failed: ${toolErr.message}` }
@@ -1329,14 +1540,14 @@ async function runAgentLoop({ jobId, task, intent, role, caseId, soul = {}, diar
 
 // POST /api/agent/start
 app.post('/api/agent/start', express.json(), async (req, res) => {
-    const { task, intent, role, caseId, agentId } = req.body
+    const { task, intent, role, caseId, agentId, toolConfig: clientToolConfig } = req.body
     if (!task?.trim()) return res.status(400).json({ error: 'task is required' })
     if (!caseId)       return res.status(400).json({ error: 'caseId is required' })
 
     // Load soul and recent diary entries from disk (per-agent files when agentId is provided)
     const soulFileName  = agentId ? `soul-${agentId}.json`  : 'soul.json'
     const diaryFileName = agentId ? `diary-${agentId}.json` : 'diary.json'
-    let soul = { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] }
+    let soul = { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [], toolConfig: { executionMode: 'local', enabledTools: { search_case: true, search_doc: true, search_caselaw: true, add_note: true }, maxSteps: 15, temperature: 0.3 }, docScope: [] }
     let diary = []
     try {
         const soulPath = path.join(getCaseSubdir(caseId, 'aide'), soulFileName)
@@ -1345,6 +1556,10 @@ app.post('/api/agent/start', express.json(), async (req, res) => {
             soul = raw.soul || raw
         }
     } catch {}
+    // Client-side toolConfig overrides disk soul.toolConfig for this run
+    if (clientToolConfig) {
+        soul.toolConfig = { ...(soul.toolConfig || {}), ...clientToolConfig }
+    }
     try {
         const diaryPath = path.join(getCaseSubdir(caseId, 'aide'), diaryFileName)
         if (fs.existsSync(diaryPath)) diary = JSON.parse(fs.readFileSync(diaryPath, 'utf8'))
@@ -1394,6 +1609,20 @@ app.delete('/api/agent/:jobId', (req, res) => {
     job.status = 'cancelled'
     agentBroadcast(job.clients, { type: 'status', status: 'cancelled' })
     res.json({ ok: true })
+})
+
+// ── Diagnostic log relay ─────────────────────────────────────────────────────
+const diagLogs = []
+app.post('/api/diag', (req, res) => {
+  const entry = { t: Date.now(), msg: req.body?.msg ?? '' }
+  diagLogs.push(entry)
+  if (diagLogs.length > 200) diagLogs.shift()
+  console.log(`[DIAG] ${entry.msg}`)
+  res.json({ ok: true })
+})
+app.get('/api/diag', (req, res) => {
+  const since = Number(req.query.since ?? 0)
+  res.json(diagLogs.filter(e => e.t > since))
 })
 
 // Global error handler — converts multer/express errors to JSON responses

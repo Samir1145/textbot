@@ -116,6 +116,23 @@ export async function searchCaseChunks(caseId, query, k = 5) {
 }
 
 /**
+ * Embed a user-typed note directly into the case RAG index.
+ * Stored as a synthetic chunk (doc_id='__manual__') retrievable in all searches.
+ */
+export async function embedManualNote(text, { caseId = 'default', label } = {}) {
+    const res = await fetch('/api/rag/embed-manual', {
+        method: 'POST',
+        headers: JSON_HEADERS,
+        body: JSON.stringify({ text, caseId, label }),
+    })
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(`Embed error ${res.status}: ${body.error ?? 'unknown'}`)
+    }
+    return res.json()
+}
+
+/**
  * Index format categories (skips already-indexed ones).
  * categories: [{ name, description }]
  */

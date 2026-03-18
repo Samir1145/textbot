@@ -30,7 +30,7 @@ export function buildEvidenceBlock(chunks, { docLabels } = {}) {
   })
 
   const ragContext =
-    '\n\nEvidence — cite inline as [1], [2], etc. when drawing on these sections:\n' +
+    '\n\nEvidence — you MUST cite every claim inline using [1], [2], etc. matching the numbers below. Do not answer without citations.\n\n' +
     lines.join('\n\n')
 
   return { ragContext, chunkMap }

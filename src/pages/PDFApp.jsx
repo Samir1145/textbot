@@ -5,7 +5,7 @@ import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { uploadCaseBlob, loadCaseBlob, deleteCaseBlob, loadChatHistory, saveChatHistory, loadNotes, saveNotes, loadAllNotes, deleteNotes, deleteSummary } from '../db.js'
 import { FORMAT_CATEGORIES } from '../skills/formatsIndex.js'
-import { getDocRagStatus, getCaseRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories } from '../rag.js'
+import { getDocRagStatus, getCaseRagStatus, indexDocPages, pruneDocChunks, clearDocChunks, searchDocChunks, searchCaseChunks, initFormatCategories, embedManualNote } from '../rag.js'
 import { extractAndSaveText, loadExtraction, extractPageChunksFromPDF, groupIntoParagraphs } from '../utils/pdfExtract.js'
 import { getCachedThumb, setCachedThumb } from '../utils/thumbnailCache.js'
 import { buildEvidenceBlock, parseCitations, tokeniseMessage, narrowCitations, distanceToScore } from '../utils/parseCitations.js'
@@ -63,11 +63,16 @@ function enrichCitationsWithLiveData(citations, extractedPages) {
   return out
 }
 
+function diag(msg) {
+  console.log(`[DIAG] ${msg}`)
+  fetch('/api/diag', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ msg }) }).catch(() => {})
+}
+
 // ── Word-count-based chunk merging ──────────────────────────────────────────
 // Merges paragraph chunks so each resulting chunk is ≤ targetWords words.
 // Named countWords (not estimateTokens) because it counts whitespace-delimited
 // words, not sub-word tokens. Legal text typically runs ~1.3 tokens/word so a
-// 300-word chunk ≈ 390 tokens — safely within nomic-embed-text-v1.5's 8192 limit.
+// 100-word chunk ≈ 130 tokens — safely within nomic-embed-text-v1.5's 8192 limit.
 function countWords(text) {
   return text.trim().split(/\s+/).length
 }
@@ -158,12 +163,17 @@ function _splitParaIntoSentences(para) {
   return sentences.length > 0 ? sentences : [{ text: para.text, words }]
 }
 
+// ── Chunking constants ───────────────────────────────────────────────────
+const CHUNK_TARGET_WORDS  = 100
+// Words carried forward from end of one chunk into start of the next.
+const CHUNK_OVERLAP_WORDS = 25
+
 // ── Chunking: Recursive ─────────────────────────────────────────────────
 // Accumulates paragraphs up to targetWords. If a paragraph exceeds the
 // target it's split into sentences; sentences that still exceed are split
 // by words. Merges adjacent small units to avoid orphan fragments.
 // Best for general Q&A with balanced precision and context.
-function chunkRecursive(pages, targetWords = 300) {
+function chunkRecursive(pages, targetWords = 100, overlapWords = CHUNK_OVERLAP_WORDS) {
   const result = []
   for (const page of pages) {
     const paragraphs = page.rawWords?.length
@@ -171,10 +181,17 @@ function chunkRecursive(pages, targetWords = 300) {
       : (page.chunks ?? [])
 
     let acc = [], accT = 0
-    const flushAcc = () => {
+    // carry=true: keep last overlapWords as seed for next chunk (mid-page flush)
+    // carry=false: fully reset (end-of-page flush — no cross-page overlap)
+    const flushAcc = (carry = true) => {
       if (!acc.length) return
       result.push({ pageNum: page.pageNum, text: acc.map(w => w.text).join(' '), bbox: _bboxFromWords(acc), lineRects: _lineRectsFromWords(acc), sourceWords: acc })
-      acc = []; accT = 0
+      if (carry && overlapWords > 0 && acc.length > overlapWords) {
+        const tail = acc.slice(-overlapWords)
+        acc = tail; accT = tail.length
+      } else {
+        acc = []; accT = 0
+      }
     }
 
     for (const para of paragraphs) {
@@ -214,15 +231,13 @@ function chunkRecursive(pages, targetWords = 300) {
         }
       }
     }
-    flushAcc()
+    flushAcc(false)  // end of page — no cross-page overlap
   }
   return result
 }
 
-// ── Chunking constants + shared helpers ─────────────────────────────────────
-// Defined at module scope so buildChunkedPages / applyChunkStrategy can
-// reference CHUNK_TARGET_WORDS without being inside the React component.
-const CHUNK_TARGET_WORDS = 300
+// ── Chunking shared helpers ──────────────────────────────────────────────────
+// CHUNK_TARGET_WORDS and CHUNK_OVERLAP_WORDS are defined above chunkRecursive.
 
 // Map rawChunks (output of chunkRecursive) back onto rawPages, producing pages
 // where each page.chunks is the array of semantic chunks for that page.
@@ -257,9 +272,223 @@ const CENTER_DEFAULT_PCT = 50   // % of non-sidebar space
 const MIN_SPLIT_PCT = 20   // minimum for center OR right, of non-sidebar space
 const MAX_SPLIT_PCT = 80
 
+// ── Workspace settings helpers ──────────────────────────────────────────────
+const WS_SETTINGS_KEY = 'textbot-model-settings'
+function _loadWsSettings() {
+  try { return JSON.parse(localStorage.getItem(WS_SETTINGS_KEY) || '{}') } catch { return {} }
+}
+function _saveWsSettings(obj) {
+  localStorage.setItem(WS_SETTINGS_KEY, JSON.stringify(obj))
+}
+
+function WorkspaceModal({ onClose }) {
+  const [ollamaModels, setOllamaModels] = useState([])
+  const [genModel,     setGenModel]     = useState('')
+  const [embedModel,   setEmbedModel]   = useState('')
+  const [embedBackend, setEmbedBackend] = useState('ollama')
+  const [saving, setSaving] = useState(false)
+  const [saved,  setSaved]  = useState(false)
+
+  const [lawStatus,     setLawStatus]     = useState(null)
+  const [lawVersions,   setLawVersions]   = useState([])
+  const [lawUploadFile, setLawUploadFile] = useState(null)
+  const [lawUploading,  setLawUploading]  = useState(false)
+  const [lawImportMsg,  setLawImportMsg]  = useState(null)
+  const [lawDragOver,   setLawDragOver]   = useState(false)
+  const lawFileInputRef = useRef(null)
+
+  const refreshLawStatus = useCallback(async () => {
+    try {
+      const d = await fetch('/api/caselaw/status').then(r => r.json())
+      setLawStatus(d)
+      const versions = []
+      if (d.activeFile) versions.push(d.activeFile)
+      if (Array.isArray(d.backups)) versions.push(...d.backups)
+      setLawVersions(versions)
+    } catch {
+      setLawStatus({ available: false, message: 'Server unreachable' })
+    }
+  }, [])
+
+  const handleLawDbDrop = useCallback((e) => {
+    e.preventDefault?.()
+    setLawDragOver(false)
+    const file = e.dataTransfer?.files?.[0] || e.target?.files?.[0]
+    if (!file) return
+    if (!file.name.endsWith('.db')) { setLawImportMsg({ type: 'err', text: 'Only .db files are accepted' }); return }
+    setLawUploadFile(file)
+    setLawImportMsg(null)
+  }, [])
+
+  const handleLawSwap = useCallback(async () => {
+    if (!lawUploadFile || lawUploading) return
+    setLawUploading(true)
+    setLawImportMsg(null)
+    try {
+      const safeName = lawUploadFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+      const arrayBuf = await lawUploadFile.arrayBuffer()
+      const r = await fetch(`/api/admin/caselaw/upload?filename=${encodeURIComponent(safeName)}&autoSwap=true`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/octet-stream' },
+        body: arrayBuf,
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'Upload failed')
+      const swapResult = d.swap || d
+      if (swapResult.ok === false) throw new Error(swapResult.message || 'Swap failed')
+      setLawImportMsg({ type: 'ok', text: swapResult.message || `Activated ${safeName}` })
+      setLawUploadFile(null)
+      await refreshLawStatus()
+    } catch (err) {
+      setLawImportMsg({ type: 'err', text: err.message })
+    } finally {
+      setLawUploading(false)
+    }
+  }, [lawUploadFile, lawUploading, refreshLawStatus])
+
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(d => {
+      setGenModel(d.genModel || '')
+      setEmbedModel(d.embedModel || '')
+      setEmbedBackend(d.embedBackend || 'ollama')
+      const local = _loadWsSettings()
+      if (local.genModel) setGenModel(local.genModel)
+    }).catch(() => {
+      setGenModel(_loadWsSettings().genModel || '')
+    })
+    fetch('/api/ollama/api/tags').then(r => r.json()).then(d => {
+      setOllamaModels((d.models || []).map(m => m.name).filter(Boolean))
+    }).catch(() => {})
+    refreshLawStatus()
+  }, [refreshLawStatus])
+
+  const handleSave = async () => {
+    setSaving(true)
+    _saveWsSettings({ ..._loadWsSettings(), genModel })
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ genModel, embedModel }),
+      })
+    } catch {}
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => { setSaved(false); onClose() }, 800)
+  }
+
+  return (
+    <div className="settings-overlay" onClick={onClose}>
+      <div className="settings-modal" onClick={e => e.stopPropagation()}>
+        <div className="settings-header">
+          <span className="settings-title">Workspace</span>
+          <button className="settings-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="settings-body">
+          <div className="settings-section">
+            <label className="settings-label">
+              Generative Model
+              <span className="settings-hint">default model for chat and summaries (agents override per-agent in Tools tab)</span>
+            </label>
+            {ollamaModels.length > 0 && (
+              <select className="settings-select" value={genModel} onChange={e => setGenModel(e.target.value)}>
+                <option value="">— select model —</option>
+                {ollamaModels.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            )}
+            <input className="settings-input" placeholder="e.g. gemma3n:e2b or qwen2.5:7b" value={genModel} onChange={e => setGenModel(e.target.value)} />
+          </div>
+          <div className="settings-section">
+            <label className="settings-label">
+              Embedding Model
+              <span className="settings-hint">{embedBackend} · used for document search indexing</span>
+            </label>
+            {ollamaModels.length > 0 && (
+              <select className="settings-select" value={embedModel} onChange={e => setEmbedModel(e.target.value)}>
+                <option value="">— select model —</option>
+                {ollamaModels.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            )}
+            <input className="settings-input" placeholder="e.g. nomic-embed-text:latest" value={embedModel} onChange={e => setEmbedModel(e.target.value)} />
+            <p className="settings-warn">⚠ Changing the embedding model requires re-indexing all documents.</p>
+          </div>
+          <div className="settings-section">
+            <label className="settings-label">
+              Caselaw Database
+              <span className="settings-hint">SQLite .db corpus for offline legal search</span>
+            </label>
+            <div className="settings-law-status">
+              {lawStatus?.available ? (
+                <>
+                  <span className="settings-law-badge settings-law-badge--ok">Active</span>
+                  <span className="settings-law-meta">
+                    {lawStatus.rows?.toLocaleString()} entries · {lawStatus.model} · dim {lawStatus.embeddingDim}
+                    {lawStatus.lastSwapped ? ` · Updated ${new Date(lawStatus.lastSwapped).toLocaleDateString()}` : ''}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="settings-law-badge settings-law-badge--none">No corpus</span>
+                  <span className="settings-law-meta">{lawStatus?.message || 'No database loaded'}</span>
+                </>
+              )}
+            </div>
+            <div
+              className={`settings-law-drop${lawDragOver ? ' settings-law-drop--over' : ''}${lawUploadFile ? ' settings-law-drop--staged' : ''}`}
+              onDragOver={e => { e.preventDefault(); setLawDragOver(true) }}
+              onDragLeave={() => setLawDragOver(false)}
+              onDrop={handleLawDbDrop}
+              onClick={() => !lawUploadFile && lawFileInputRef.current?.click()}
+            >
+              <input ref={lawFileInputRef} type="file" accept=".db" style={{ display: 'none' }} onChange={e => handleLawDbDrop({ target: e.target })} />
+              {lawUploadFile ? (
+                <>
+                  <span>📦 {lawUploadFile.name}</span>
+                  <span className="settings-law-drop-size">({(lawUploadFile.size / 1024 / 1024).toFixed(1)} MB)</span>
+                  <button className="settings-law-drop-clear" onClick={e => { e.stopPropagation(); setLawUploadFile(null); setLawImportMsg(null) }}>× Clear</button>
+                </>
+              ) : (
+                <span>⚖ Drop a <strong>.db</strong> file here or click to browse</span>
+              )}
+            </div>
+            {lawImportMsg && (
+              <p className={`settings-law-msg settings-law-msg--${lawImportMsg.type}`}>
+                {lawImportMsg.type === 'ok' ? '✓ ' : '✗ '}{lawImportMsg.text}
+              </p>
+            )}
+            {lawUploadFile && (
+              <button className="settings-law-activate-btn" onClick={handleLawSwap} disabled={lawUploading}>
+                {lawUploading ? 'Uploading & validating…' : 'Validate & activate corpus'}
+              </button>
+            )}
+            {lawVersions.length > 0 && (
+              <div className="settings-law-versions">
+                <span className="settings-law-versions-label">Backup versions</span>
+                {lawVersions.map((v, i) => (
+                  <div key={v} className="settings-law-version-row">
+                    <span>{v}</span>
+                    {i === 0 && <span className="settings-law-version-active">active</span>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="settings-footer">
+          <button className="settings-cancel" onClick={onClose}>Cancel</button>
+          <button className="settings-save" onClick={handleSave} disabled={saving || saved}>
+            {saved ? '✓ Saved' : saving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles }) {
   const { theme, toggleTheme } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [workspaceOpen, setWorkspaceOpen] = useState(false)
   // centerSplit: % of the non-sidebar space that center takes (20–80)
   const [centerSplit, setCenterSplit] = useState(CENTER_DEFAULT_PCT)
 
@@ -309,6 +538,8 @@ export default function PDFApp({ folder, caseId, caseName, onBack, onAddFiles })
     if (!caseId) return {}
     try { return JSON.parse(localStorage.getItem(`pdf-chunkcounts-${caseId}`) || '{}') } catch { return {} }
   })
+  const docChunkCountsByIdRef = useRef(docChunkCountsById)
+  useEffect(() => { docChunkCountsByIdRef.current = docChunkCountsById }, [docChunkCountsById])
   const [pageDims, setPageDims] = useState({})   // pageNum → {w,h} — drives skeleton sizing
   const [renderScale, setRenderScale] = useState(1.0)
   const [pdfLoading, setPdfLoading] = useState(false)
@@ -692,6 +923,7 @@ const fileInputRef = useRef(null)
     if (renderWorkerRef.current) { renderWorkerRef.current.terminate(); renderWorkerRef.current = null }
 
     if (isDocChange) {
+      reloadChunksAttemptedRef.current = null
       // Full reset — clear extraction + rendering state
       setPageCount(null)
       setPageDims({})
@@ -1010,6 +1242,8 @@ const fileInputRef = useRef(null)
   // Stores bbox-rich pages from the most recent extraction for this doc (avoids re-OCR when indexing)
   const lastExtractionPagesRef = useRef({ docId: null, pages: null })
   const extractedTextRef = useRef(null)
+  // Guards the recovery effect from looping: tracks the last docId+ragStatus combo that triggered reloadChunksOnly
+  const reloadChunksAttemptedRef = useRef(null)
 
   // ── RAG state ──
   const [ragStatus, setRagStatus] = useState(null)   // null | 'indexing' | 'indexed' | 'failed'
@@ -1076,8 +1310,10 @@ const fileInputRef = useRef(null)
   const aideEsRef = useRef(null)
 
   // ── Aide Soul / Memory ────────────────────────────────────────────────────
-  const [aideSoulTab,    setAideSoulTab]    = useState('run') // 'run' | 'soul' | 'memory'
-  const [aideSoul,       setAideSoul]       = useState({ skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] })
+  const [aideSoulTab,    setAideSoulTab]    = useState('run') // 'run' | 'identity' | 'skills' | 'tools' | 'rag' | 'audit' | 'memory'
+  const [aideSoul,       setAideSoul]       = useState({ skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [], toolConfig: { executionMode: 'local', enabledTools: { search_case: true, search_doc: true, search_caselaw: true, add_note: true }, maxSteps: 15, temperature: 0.3 }, docScope: [] })
+  const [aideSkillPreview,       setAideSkillPreview]       = useState(false)
+  const [aideDiaryClearConfirm,  setAideDiaryClearConfirm]  = useState(false)
   const [aideDiary,      setAideDiary]      = useState([])
   const [aideSoulDirty,  setAideSoulDirty]  = useState(false)
   const [aideSoulSaving, setAideSoulSaving] = useState(false)
@@ -1299,7 +1535,7 @@ const fileInputRef = useRef(null)
     setChunkSemanticLoading(true)
     setChunkSemanticResults(null)
     try {
-      const results = await searchDocChunks(activeDocumentId, q, 10, { caseId })
+      const results = await searchDocChunks(activeDocumentId, q, 10, { caseId, windowSize: 2 })
       setChunkSemanticResults(results)
       setChunkSearchMode('semantic')
     } catch {
@@ -1384,7 +1620,7 @@ const fileInputRef = useRef(null)
     const res = await fetch('/api/agent/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task: aideTask, intent: aideIntent, role: aideRole, caseId, agentId: activeAgentId }),
+      body: JSON.stringify({ task: aideTask, intent: aideIntent, role: aideRole, caseId, agentId: activeAgentId, toolConfig: aideSoul.toolConfig }),
     })
     const { jobId, error } = await res.json()
     if (error) { setAideStatus('error'); return }
@@ -1411,7 +1647,7 @@ const fileInputRef = useRef(null)
       }
     }
     es.onerror = () => { setAideStatus('error'); es.close(); aideEsRef.current = null }
-  }, [aideTask, aideIntent, aideRole, caseId, activeAgentId, setAllCaseNotes])
+  }, [aideTask, aideIntent, aideRole, caseId, activeAgentId, aideSoul, setAllCaseNotes])
 
   const handleAideStop = useCallback(async () => {
     aideEsRef.current?.close()
@@ -1438,7 +1674,7 @@ const fileInputRef = useRef(null)
     if (!caseId || !activeAgentId) return
     const agentParam = `?agentId=${encodeURIComponent(activeAgentId)}`
     fetch(`/api/cases/${caseId}/aide/soul${agentParam}`).then(r => r.json()).then(d => {
-      setAideSoul(d.soul || { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [] })
+      setAideSoul(d.soul || { skillMd: '', redFlags: '', styleGuide: '', corrections: [], styleSamples: [], toolConfig: { executionMode: 'local', enabledTools: { search_case: true, search_doc: true, search_caselaw: true, add_note: true }, maxSteps: 15, temperature: 0.3 }, docScope: [] })
       setAideSoulDirty(false)
       setAideSoulSavedAt(d.savedAt || null)
     }).catch(() => {})
@@ -1504,6 +1740,31 @@ const fileInputRef = useRef(null)
     return Math.round(texts.reduce((sum, t) => sum + (t?.length || 0), 0) / 4)
   }, [aideSoul])
 
+  const aideAuditData = useMemo(() => {
+    const s = aideSoul
+    const tc = s.toolConfig || {}
+    const enabledToolNames = Object.entries(tc.enabledTools || {}).filter(([,v]) => v !== false).map(([k]) => k)
+    const tok = t => Math.round((t?.length || 0) / 4)
+    const breakdown = {
+      'Skill / Persona': tok(s.skillMd),
+      'Standing checklist': tok(s.redFlags),
+      'Style guide': tok(s.styleGuide),
+      'Example outputs': tok((s.styleSamples || []).map(x => x.text).join('\n')),
+      'Corrections': tok((s.corrections || []).map(c => c.text).join('\n')),
+      'Session diary (last 3)': tok(aideDiary.slice(0, 3).map(e => (e.task || '') + (e.reflection || '')).join('\n')),
+    }
+    const total = Object.values(breakdown).reduce((sum, v) => sum + v, 0)
+    const parts = [
+      s.skillMd?.trim() || 'You are a professional document analyst with access to tools that search case documents.',
+      s.redFlags?.trim()    ? `## Standing Checklist\n${s.redFlags}` : '',
+      s.styleGuide?.trim()  ? `## Writing Style\n${s.styleGuide}` : '',
+      s.styleSamples?.length ? `## Example Outputs\n${s.styleSamples.map(x => x.text).filter(Boolean).join('\n---\n')}` : '',
+      s.corrections?.length  ? `## Corrections\n${s.corrections.map(c => `- ${c.text || c}`).join('\n')}` : '',
+      `[Tools: ${enabledToolNames.join(', ') || 'none'} | Max steps: ${tc.maxSteps || 15} | Temp: ${(tc.temperature ?? 0.3).toFixed(2)} | Mode: ${tc.executionMode || 'local'}]`,
+    ]
+    return { breakdown, total, systemPrompt: parts.filter(Boolean).join('\n\n') }
+  }, [aideSoul, aideDiary])
+
 
 
   const handlePageClick = useCallback((e, pageNum) => {
@@ -1537,6 +1798,26 @@ const fileInputRef = useRef(null)
     const text = chatInput.trim()
     if (!text || chatLoading) return
 
+    // ── /embed command — store text directly as a RAG chunk ──────────────
+    if (text.startsWith('/embed ')) {
+      const content = text.slice(7).trim()
+      if (!content) return
+      setChatInput('')
+      const noteId = crypto.randomUUID()
+      setChatMessages(prev => [...prev, { role: 'system-note', id: noteId, content: `Embedding…` }])
+      try {
+        await embedManualNote(content, { caseId })
+        setChatMessages(prev => prev.map(m => m.id === noteId
+          ? { ...m, content: `Note embedded: "${content.slice(0, 120)}${content.length > 120 ? '…' : ''}"` }
+          : m))
+      } catch (err) {
+        setChatMessages(prev => prev.map(m => m.id === noteId
+          ? { ...m, content: `Embed failed: ${err.message}` }
+          : m))
+      }
+      return
+    }
+
     const userMsg = { role: 'user', id: crypto.randomUUID(), content: text }
     // Track finalMessages locally so we can persist after streaming completes
     let finalMessages = [...chatMessages, userMsg]
@@ -1561,7 +1842,7 @@ const fileInputRef = useRef(null)
       if (!rawChunks) {
         rawChunks = caseSearchActive && caseId
           ? await searchCaseChunks(caseId, text, 5)
-          : await searchDocChunks(activeDocumentId, text, 3, { caseId })
+          : await searchDocChunks(activeDocumentId, text, 3, { caseId, windowSize: 2 })
         if (rawChunks?.length) ragQueryCacheRef.current.set(cacheKey, rawChunks)
       }
       // Build doc-name labels so the LLM prompt shows human-readable provenance
@@ -1582,14 +1863,22 @@ const fileInputRef = useRef(null)
         : ''
 
     // Build message history for Ollama
-    const systemPrompt = `You are LexChat, a legal AI assistant. Analyze documents and answer legal questions concisely. Not a substitute for qualified legal counsel.${docContext}`
+    const citationRule = ragContext
+      ? `\n\nCITATION RULES (mandatory):\n- Every factual claim MUST end with an inline citation like [1] or [2].\n- Use the number from the Evidence list above.\n- Never write a sentence about the document without citing it.\n- If multiple sources support a claim, cite all: [1][2].\n- Example: "Members must pay an entrance fee [1]. The fee is reviewed annually [2]."`
+      : ''
+    const systemPrompt = `You are LexChat, a legal AI assistant. Analyze documents and answer legal questions precisely. Not a substitute for qualified legal counsel.${docContext}${citationRule}`
 
     // Keep only the last 6 messages (3 exchanges) to limit context growth
     const recentHistory = chatMessages.slice(-6)
+    // Append a citation reminder to the user message when RAG context is active.
+    // Small local LLMs respond far better to instructions in the last user turn than in system.
+    const userMsgWithReminder = ragContext
+      ? { ...userMsg, content: userMsg.content + '\n\n(Remember: cite every claim with [1], [2], etc.)' }
+      : userMsg
     const ollamaMessages = [
       { role: 'system', content: systemPrompt },
       ...recentHistory,
-      userMsg,
+      userMsgWithReminder,
     ]
 
     const assistantId = crypto.randomUUID()
@@ -1667,15 +1956,29 @@ const fileInputRef = useRef(null)
       // Prefer cached pages from extraction (has OCR bboxes too); fallback to native re-extract
       let pages
       if (hasCachedPages) {
+        diag(`handleIndexDocument: using cached pages (${cached.pages.length} pages)`)
         pages = cached.pages
       } else {
+        diag(`handleIndexDocument: no cached pages — falling back to native extractPageChunksFromPDF (NO OCR)`)
         const pdf = pdfDocRef.current
         setRagProgress('Extracting text with coordinates…')
         pages = await extractPageChunksFromPDF(pdf, { onStatus: setRagProgress })
       }
+      diag(`handleIndexDocument: pages=${pages.length} totalRawWords=${pages.reduce((s,p)=>(s+(p.rawWords?.length||0)),0)} totalChunks=${pages.reduce((s,p)=>(s+(p.chunks?.length||0)),0)}`)
 
-      // Step 4 — chunk using recursive strategy (paragraph → sentence → word, ~300 words)
+      // If fallback native extraction produced 0 words across all pages, the PDF is likely
+      // scanned. Abort early — indexing 0 chunks silently marks the doc as indexed and makes
+      // the chunk panel appear empty with no indication of why.
+      if (!hasCachedPages) {
+        const totalWords = pages.reduce((s, p) => s + (p.rawWords?.length || 0) + (p.chunks?.length || 0), 0)
+        if (totalWords === 0) {
+          throw new Error('No text found — this PDF may be scanned. Run extraction (OCR) first, then index.')
+        }
+      }
+
+      // Step 4 — chunk using recursive strategy (paragraph → sentence → word, ~100 words)
       const rawChunks = chunkRecursive(pages, CHUNK_TARGET_WORDS)
+      diag(`chunkRecursive produced ${rawChunks.length} chunks`)
       const allChunks = rawChunks.map((c, idx) => ({
         pageNum: c.pageNum,
         chunkIdx: idx,
@@ -1843,6 +2146,8 @@ const fileInputRef = useRef(null)
         setExtractionSource(result.isOcr ? 'ocr' : 'text')
         setDocStatuses(prev => ({ ...prev, [docId]: 'extracted' }))
         lastExtractionPagesRef.current = { docId, pages: result.pages }
+        // If SQLite has no chunks (bad prior index), reset ragStatus so auto-index can re-fire
+        setRagStatus(prev => (prev === 'indexed' || prev === 'failed') && !(docChunkCountsByIdRef.current[docId] > 0) ? null : prev)
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -1862,7 +2167,9 @@ const fileInputRef = useRef(null)
   // algorithm changes. forceClear ensures stale bboxes are fully replaced, not just pruned.
   const handleReextractAndReindex = useCallback(async (docId, file) => {
     await runExtraction(docId, file)
-    // runExtraction updates lastExtractionPagesRef.current which handleIndexDocument reads.
+    // Only proceed if extraction actually produced pages for this doc
+    const cached = lastExtractionPagesRef.current
+    if (cached?.docId !== docId || !cached?.pages?.length) return
     await handleIndexDocument({ forceClear: true })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1914,8 +2221,12 @@ const fileInputRef = useRef(null)
   useEffect(() => {
     const cached = lastExtractionPagesRef.current
     const hasCachedPages = cached?.docId === activeDocumentId && cached?.pages
-    const knownIndexed = !!docChunkCountsById[activeDocumentId]
+    // Once DB has confirmed status (ragStatusChecked=true), trust ragStatus over localStorage.
+    // ragStatus=null means DB has no chunks — treat as not indexed regardless of localStorage.
+    const knownIndexed = ragStatusChecked ? false : !!docChunkCountsById[activeDocumentId]
+    diag(`auto-index check: extractedPages=${!!extractedPages} ragStatusChecked=${ragStatusChecked} ragStatus=${ragStatus} knownIndexed=${knownIndexed} extractingText=${extractingText} hasCachedPages=${!!hasCachedPages} hasPdfDoc=${!!pdfDocRef.current}`)
     if (extractedPages && ragStatusChecked && ragStatus === null && !knownIndexed && !extractingText && activeDocumentId && (hasCachedPages || pdfDocRef.current)) {
+      diag(`auto-index FIRING`)
       handleIndexDocument()
     }
   }, [extractedPages, ragStatus, ragStatusChecked, extractingText, activeDocumentId]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -1935,6 +2246,11 @@ const fileInputRef = useRef(null)
     const chunkCount = extractedPages?.reduce((s, p) => s + (p.chunks?.length ?? 0), 0) ?? 0
     const knownIndexed = ragStatus === 'indexed' || !!docChunkCountsById[activeDocumentId]
     if (!knownIndexed || chunkCount > 0 || !activeDocumentId) return
+    // Guard: only attempt once per docId+ragStatus combination to prevent infinite loops
+    // when the server cache has 0 chunks (e.g. bad prior index). Reset when doc or status changes.
+    const attemptKey = `${activeDocumentId}:${ragStatus}`
+    if (reloadChunksAttemptedRef.current === attemptKey) return
+    reloadChunksAttemptedRef.current = attemptKey
     reloadChunksOnly()
   }, [ragStatus, extractedPages, activeDocumentId, pdfMainThreadReady, docChunkCountsById]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -2106,14 +2422,34 @@ const fileInputRef = useRef(null)
                       </svg>
                     )}
                   </button>
+                  <button
+                    type="button"
+                    className="pdfapp-sb-icon-btn"
+                    onClick={() => setWorkspaceOpen(true)}
+                    title="Workspace settings"
+                  >
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                  </button>
                 </div>
 
                 <span className="pdfapp-sb-case-title" title={caseName || folder?.name}>
                   {caseName || folder?.name || 'Documents'}
                 </span>
 
-                <button type="button" className="pdfapp-sb-litigants-btn" onClick={handleAddParty}>
-                  + Folder
+                <button type="button" className="pdfapp-sb-litigants-btn" onClick={handleAddParty} title="Add folder">
+                  <svg viewBox="0 0 100 90" width="22" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Folder body */}
+                    <path d="M8 22 C8 16 12 12 18 12 L38 12 C41 12 43 14 45 17 L49 22 L82 22 C88 22 92 26 92 32 L92 74 C92 80 88 84 82 84 L18 84 C12 84 8 80 8 74 Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round"/>
+                    {/* Folder tab */}
+                    <path d="M8 22 L8 18 C8 14 11 11 15 11 L36 11 C39 11 41 13 43 16 L48 22" stroke="currentColor" strokeWidth="6" strokeLinejoin="round"/>
+                    {/* Plus circle */}
+                    <circle cx="62" cy="66" r="20" fill="currentColor"/>
+                    <line x1="62" y1="56" x2="62" y2="76" stroke="white" strokeWidth="5" strokeLinecap="round"/>
+                    <line x1="52" y1="66" x2="72" y2="66" stroke="white" strokeWidth="5" strokeLinecap="round"/>
+                  </svg>
                 </button>
                 <button
                   type="button"
@@ -2134,8 +2470,14 @@ const fileInputRef = useRef(null)
               {parties.length === 0 ? (
                 <div className="pdfapp-sb-empty-state">
                   <p>No folders yet.</p>
-                  <button type="button" className="pdfapp-sb-litigants-btn" onClick={handleAddParty}>
-                    + Add Folder
+                  <button type="button" className="pdfapp-sb-litigants-btn" onClick={handleAddParty} title="Add folder">
+                    <svg viewBox="0 0 100 90" width="22" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 22 C8 16 12 12 18 12 L38 12 C41 12 43 14 45 17 L49 22 L82 22 C88 22 92 26 92 32 L92 74 C92 80 88 84 82 84 L18 84 C12 84 8 80 8 74 Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round"/>
+                      <path d="M8 22 L8 18 C8 14 11 11 15 11 L36 11 C39 11 41 13 43 16 L48 22" stroke="currentColor" strokeWidth="6" strokeLinejoin="round"/>
+                      <circle cx="62" cy="66" r="20" fill="currentColor"/>
+                      <line x1="62" y1="56" x2="62" y2="76" stroke="white" strokeWidth="5" strokeLinecap="round"/>
+                      <line x1="52" y1="66" x2="72" y2="66" stroke="white" strokeWidth="5" strokeLinecap="round"/>
+                    </svg>
                   </button>
                 </div>
               ) : (
@@ -2421,68 +2763,33 @@ const fileInputRef = useRef(null)
         )}
       </div>
 
-      {/* ── Thumbnails strip (between sidebar and center) ── */}
-      {thumbsOpen && pageCount && (
-        <div className="pdfapp-thumbs" ref={thumbsContainerRef}>
-          {Array.from({ length: pageCount }, (_, i) => {
-            const n = i + 1
-            const dim = pageDims[n] || pageDims[1]
-            const thumbW = 72
-            const thumbH = dim ? Math.round(thumbW * dim.h / dim.w) : Math.round(thumbW * 1.414)
-            return (
-              <div
-                key={`thumb-${activeDocumentId}-${n}`}
-                className="pdfapp-thumb-item"
-                onClick={() => {
-                  scrollPageIntoView(n, 'start')
-                }}
-              >
-                <canvas
-                  data-page={n}
-                  className="pdfapp-thumb-canvas"
-                  style={{ width: thumbW, height: thumbH }}
-                />
-                <span className="pdfapp-thumb-num">{n}</span>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
       {/* ── Panel 2: Center (PDF viewer) ── */}
       <div className="pdfapp-center" style={{ flex: centerFlex }}>
         {(() => {
           const activeDoc = documents.find(d => d.id === activeDocumentId)
-          if (!activeDoc) {
-            return (
-              <div className="pdfapp-center-placeholder">
-                Select a document from the sidebar
-              </div>
-            )
-          }
           return (
             <div className="pdfapp-center-content">
               <div className="pdfapp-center-header">
                 <div className="pdfapp-toolbar-left">
-                  {/* Thumbnail toggle */}
+                </div>
+                <span className="pdfapp-center-filename" title={activeDoc?.name || ''}>
+                  {activeDoc ? (activeDoc.name.length > 50 ? activeDoc.name.slice(0, 50) + '…' : activeDoc.name) : ''}
+                </span>
+                <div className="pdfapp-toolbar-right">
                   <button
                     className={`pdfapp-toolbar-btn pdfapp-toolbar-btn--thumb${thumbsOpen ? ' pdfapp-toolbar-btn--active' : ''}`}
                     onClick={() => setThumbsOpen(o => !o)}
                     title={thumbsOpen ? 'Hide thumbnails' : 'Show page thumbnails'}
-                    disabled={!pageCount}
+                    style={{ visibility: activeDoc ? 'visible' : 'hidden' }}
                   >
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                    </svg>
                   </button>
                 </div>
-                <span className="pdfapp-center-filename" title={activeDoc.name}>
-                  {activeDoc.name.length > 50 ? activeDoc.name.slice(0, 50) + '…' : activeDoc.name}
-                </span>
-                <div className="pdfapp-toolbar-right">
-                </div>
               </div>
+              {!activeDoc ? (
+                <div className="pdfapp-center-placeholder">
+                  Select a document from the sidebar
+                </div>
+              ) : (<>
               <div className="pdfapp-center-body" ref={pagesContainerRef}>
                 {pdfError && (
                   <div className="pdfapp-center-placeholder">
@@ -2711,15 +3018,30 @@ const fileInputRef = useRef(null)
                         </span>
                       )
                     })()}
+                    {activeDoc?.file && !extractingText && (
+                      <button
+                        className="pdfapp-action-btn"
+                        onClick={() => runExtraction(activeDocumentId, activeDoc.file)}
+                        title="Re-extract text (runs OCR on scanned PDFs)"
+                      >Re-extract</button>
+                    )}
                     {activeDoc?.file && (
                       <button
                         className="pdfapp-action-btn pdfapp-action-btn--chunk"
-                        disabled={ragStatus === 'indexed' || ragStatus === 'indexing' || extractingText
-                          || (extractedPages?.some(p => p.chunks?.length > 0))
-                          || (!!docChunkCountsById[activeDocumentId])}
+                        disabled={(() => {
+                          if (ragStatus === 'indexing' || extractingText) return true
+                          // ragStatus=null after DB check = not indexed; always allow
+                          if (ragStatusChecked && ragStatus === null) return false
+                          if (ragStatus === 'indexed') return true
+                          const storedCount = docChunkCountsById[activeDocumentId] ?? 0
+                          return storedCount > 0
+                        })()}
                         onClick={() => handleIndexDocument({ forceClear: true })}
-                        title={ragStatus === 'indexed' || extractedPages?.some(p => p.chunks?.length > 0) || docChunkCountsById[activeDocumentId]
-                          ? 'Text already chunked' : 'Chunk and index the document text'}
+                        title={(() => {
+                          const storedCount = docChunkCountsById[activeDocumentId] ?? 0
+                          if (storedCount === 0) return 'Index document for semantic search'
+                          return 'Text already chunked'
+                        })()}
                       >Chunk Text</button>
                     )}
                   </div>
@@ -2933,6 +3255,7 @@ const fileInputRef = useRef(null)
                   )
                 )}
               </div>
+              </>)}
             </div>
           )
         })()}
@@ -2961,6 +3284,32 @@ const fileInputRef = useRef(null)
           <span className="pdfapp-divider-handle">⠿</span>
         </div>
       </div>
+
+      {/* ── Thumbnails strip (right of center) ── */}
+      {thumbsOpen && pageCount && (
+        <div className="pdfapp-thumbs" ref={thumbsContainerRef}>
+          {Array.from({ length: pageCount }, (_, i) => {
+            const n = i + 1
+            const dim = pageDims[n] || pageDims[1]
+            const thumbW = 72
+            const thumbH = dim ? Math.round(thumbW * dim.h / dim.w) : Math.round(thumbW * 1.414)
+            return (
+              <div
+                key={`thumb-${activeDocumentId}-${n}`}
+                className="pdfapp-thumb-item"
+                onClick={() => scrollPageIntoView(n, 'start')}
+              >
+                <canvas
+                  data-page={n}
+                  className="pdfapp-thumb-canvas"
+                  style={{ width: thumbW, height: thumbH }}
+                />
+                <span className="pdfapp-thumb-num">{n}</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* ── Panel 3: Right Workspace ── */}
       <div className="pdfapp-right" style={{ flex: rightFlex }}>
@@ -3516,12 +3865,20 @@ const fileInputRef = useRef(null)
 
                 {/* Sub-tab bar */}
                 <div className="pdfapp-aide-subtabs">
-                  <button className={`pdfapp-aide-subtab${aideSoulTab === 'run' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('run')}>Run</button>
-                  <button className={`pdfapp-aide-subtab${aideSoulTab === 'soul' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('soul')}>Soul</button>
-                  <button className={`pdfapp-aide-subtab${aideSoulTab === 'memory' ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab('memory')}>
-                    Memory
-                    {aideDiary.length > 0 && <span className="pdfapp-aide-subtab-badge">{aideDiary.length}</span>}
-                  </button>
+                  {[
+                    { id: 'run',      label: 'Run' },
+                    { id: 'identity', label: 'Identity' },
+                    { id: 'skills',   label: 'Skills' },
+                    { id: 'tools',    label: 'Tools' },
+                    { id: 'rag',      label: 'RAG' },
+                    { id: 'audit',    label: 'Audit' },
+                    { id: 'memory',   label: 'Memory', badge: aideDiary.length > 0 ? aideDiary.length : null },
+                  ].map(t => (
+                    <button key={t.id} className={`pdfapp-aide-subtab${aideSoulTab === t.id ? ' pdfapp-aide-subtab--active' : ''}`} onClick={() => setAideSoulTab(t.id)}>
+                      {t.label}
+                      {t.badge && <span className="pdfapp-aide-subtab-badge">{t.badge}</span>}
+                    </button>
+                  ))}
                 </div>
               </>
             )
@@ -3651,8 +4008,8 @@ const fileInputRef = useRef(null)
               )}
             </>)}
 
-            {/* ── Soul sub-tab ── */}
-            {activeAgentId && aideSoulTab === 'soul' && (
+            {/* ── Identity sub-tab ── */}
+            {activeAgentId && aideSoulTab === 'identity' && (
               <div className="pdfapp-aide-soul-panel">
                 <div className="pdfapp-aide-soul-header">
                   <span className="pdfapp-aide-soul-title">{AGENTS.find(a => a.id === activeAgentId)?.name ?? 'Agent'} — Identity</span>
@@ -3665,43 +4022,9 @@ const fileInputRef = useRef(null)
                       onClick={handleAideSoulSave}
                       disabled={!aideSoulDirty || aideSoulSaving || !caseId}
                     >
-                      {aideSoulSaving ? 'Saving…' : 'Save Soul'}
+                      {aideSoulSaving ? 'Saving…' : 'Save'}
                     </button>
                   </div>
-                </div>
-
-                {/* Skill.md upload */}
-                <div className="pdfapp-aide-soul-section">
-                  <div className="pdfapp-aide-soul-section-label">Skill file <span className="pdfapp-aide-soul-hint">(defines who your Aide is)</span></div>
-                  {aideSoul.skillMd ? (
-                    <div className="pdfapp-aide-skill-loaded">
-                      <span className="pdfapp-aide-skill-filename">{aideSkillFileName || 'skill.md'}</span>
-                      <span className="pdfapp-aide-skill-preview">{aideSoul.skillMd.slice(0, 120)}{aideSoul.skillMd.length > 120 ? '…' : ''}</span>
-                      <button className="pdfapp-aide-skill-remove" onClick={() => { patchSoul('skillMd', ''); setAideSkillFileName('') }}>× Remove</button>
-                    </div>
-                  ) : (
-                    <label className="pdfapp-aide-skill-drop">
-                      <input type="file" accept=".md,.txt" style={{ display: 'none' }} onChange={e => {
-                        const file = e.target.files?.[0]
-                        if (!file) return
-                        const reader = new FileReader()
-                        reader.onload = ev => { patchSoul('skillMd', ev.target.result); setAideSkillFileName(file.name) }
-                        reader.readAsText(file)
-                        e.target.value = ''
-                      }} />
-                      <span className="pdfapp-aide-skill-drop-icon">↑</span>
-                      <span>Drop a .md file or click to upload</span>
-                    </label>
-                  )}
-                  {!aideSoul.skillMd && (
-                    <textarea
-                      className="pdfapp-aide-soul-textarea"
-                      placeholder="Or paste your skill / persona here…"
-                      rows={4}
-                      value=""
-                      onChange={e => { if (e.target.value) patchSoul('skillMd', e.target.value) }}
-                    />
-                  )}
                 </div>
 
                 {/* Red flags checklist */}
@@ -3777,20 +4100,351 @@ const fileInputRef = useRef(null)
               </div>
             )}
 
+            {/* ── Skills sub-tab ── */}
+            {activeAgentId && aideSoulTab === 'skills' && (
+              <div className="pdfapp-aide-soul-panel">
+                <div className="pdfapp-aide-soul-header">
+                  <span className="pdfapp-aide-soul-title">Skills — Persona &amp; Instruction File</span>
+                  <div className="pdfapp-aide-soul-actions">
+                    {aideSoul.skillMd && (
+                      <button className="pdfapp-aide-skill-preview-toggle" onClick={() => setAideSkillPreview(p => !p)}>
+                        {aideSkillPreview ? 'Edit' : 'Preview'}
+                      </button>
+                    )}
+                    {aideSoulSavedAt && !aideSoulDirty && (
+                      <span className="pdfapp-aide-soul-saved">Saved {new Date(aideSoulSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    )}
+                    <button
+                      className={`pdfapp-aide-soul-save-btn${aideSoulDirty ? ' pdfapp-aide-soul-save-btn--dirty' : ''}`}
+                      onClick={handleAideSoulSave}
+                      disabled={!aideSoulDirty || aideSoulSaving || !caseId}
+                    >
+                      {aideSoulSaving ? 'Saving…' : 'Save'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label">Skill file <span className="pdfapp-aide-soul-hint">(injected as system prompt — defines who this agent is)</span></div>
+                  {aideSoul.skillMd && aideSkillPreview ? (
+                    <div className="pdfapp-aide-skill-md-preview">{aideSoul.skillMd}</div>
+                  ) : aideSoul.skillMd ? (
+                    <div className="pdfapp-aide-skill-loaded">
+                      <span className="pdfapp-aide-skill-filename">{aideSkillFileName || 'skill.md'}</span>
+                      <span className="pdfapp-aide-skill-preview">{aideSoul.skillMd.slice(0, 120)}{aideSoul.skillMd.length > 120 ? '…' : ''}</span>
+                      <button className="pdfapp-aide-skill-remove" onClick={() => { patchSoul('skillMd', ''); setAideSkillFileName('') }}>× Remove</button>
+                    </div>
+                  ) : (
+                    <>
+                      <label className="pdfapp-aide-skill-drop">
+                        <input type="file" accept=".md,.txt" style={{ display: 'none' }} onChange={e => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const reader = new FileReader()
+                          reader.onload = ev => { patchSoul('skillMd', ev.target.result); setAideSkillFileName(file.name) }
+                          reader.readAsText(file)
+                          e.target.value = ''
+                        }} />
+                        <span className="pdfapp-aide-skill-drop-icon">↑</span>
+                        <span>Drop a .md file or click to upload</span>
+                      </label>
+                      <textarea
+                        className="pdfapp-aide-soul-textarea"
+                        placeholder="Or paste your skill / persona here…"
+                        rows={6}
+                        value=""
+                        onChange={e => { if (e.target.value) patchSoul('skillMd', e.target.value) }}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── Tools sub-tab ── */}
+            {activeAgentId && aideSoulTab === 'tools' && (() => {
+              const tc = aideSoul.toolConfig || { executionMode: 'local', enabledTools: { search_case: true, search_doc: true, search_caselaw: true, add_note: true }, maxSteps: 15, temperature: 0.3 }
+              const patchTc = (key, val) => patchSoul('toolConfig', { ...tc, [key]: val })
+              const patchTool = (toolName, val) => patchTc('enabledTools', { ...tc.enabledTools, [toolName]: val })
+              return (
+                <div className="pdfapp-aide-soul-panel">
+                  <div className="pdfapp-aide-soul-header">
+                    <span className="pdfapp-aide-soul-title">Tools &amp; Execution</span>
+                    <div className="pdfapp-aide-soul-actions">
+                      {aideSoulSavedAt && !aideSoulDirty && (
+                        <span className="pdfapp-aide-soul-saved">Saved {new Date(aideSoulSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      )}
+                      <button
+                        className={`pdfapp-aide-soul-save-btn${aideSoulDirty ? ' pdfapp-aide-soul-save-btn--dirty' : ''}`}
+                        onClick={handleAideSoulSave}
+                        disabled={!aideSoulDirty || aideSoulSaving || !caseId}
+                      >
+                        {aideSoulSaving ? 'Saving…' : 'Save'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Execution mode */}
+                  <div className="pdfapp-aide-soul-section">
+                    <div className="pdfapp-aide-soul-section-label">Execution mode</div>
+                    <div className="pdfapp-aide-exec-mode-row">
+                      <button
+                        className={`pdfapp-aide-exec-btn${tc.executionMode === 'local' ? ' pdfapp-aide-exec-btn--active' : ''}`}
+                        onClick={() => patchTc('executionMode', 'local')}
+                      >
+                        <span className="pdfapp-aide-exec-icon">⚙</span>
+                        <div className="pdfapp-aide-exec-info">
+                          <span className="pdfapp-aide-exec-label">Local</span>
+                          <span className="pdfapp-aide-exec-hint">Runs on your device via Ollama. Private, no internet required.</span>
+                        </div>
+                      </button>
+                      <button
+                        className={`pdfapp-aide-exec-btn${tc.executionMode === 'internet' ? ' pdfapp-aide-exec-btn--active' : ''}`}
+                        onClick={() => patchTc('executionMode', 'internet')}
+                      >
+                        <span className="pdfapp-aide-exec-icon">☁</span>
+                        <div className="pdfapp-aide-exec-info">
+                          <span className="pdfapp-aide-exec-label">Internet</span>
+                          <span className="pdfapp-aide-exec-hint">Uses Claude API. Faster, smarter — requires API key.</span>
+                        </div>
+                      </button>
+                    </div>
+                    {tc.executionMode === 'local' && (
+                      <div className="pdfapp-aide-exec-model-row">
+                        <span className="pdfapp-aide-soul-hint">Model:</span>
+                        <select className="pdfapp-aide-select" style={{ flex: 1 }} value={tc.localModel || 'qwen2.5:7b'} onChange={e => patchTc('localModel', e.target.value)}>
+                          <option value="qwen2.5:3b">qwen2.5:3b (~2 GB RAM)</option>
+                          <option value="qwen2.5:7b">qwen2.5:7b (~5 GB RAM)</option>
+                          <option value="qwen2.5:14b">qwen2.5:14b (~9 GB RAM)</option>
+                          <option value="gemma3n:e2b">gemma3n:e2b (~3 GB RAM)</option>
+                        </select>
+                      </div>
+                    )}
+                    {tc.executionMode === 'internet' && (
+                      <div className="pdfapp-aide-exec-model-row">
+                        <span className="pdfapp-aide-soul-hint">Model:</span>
+                        <select className="pdfapp-aide-select" style={{ flex: 1 }} value={tc.internetModel || 'claude-sonnet-4-6'} onChange={e => patchTc('internetModel', e.target.value)}>
+                          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (fast, cheap)</option>
+                          <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (balanced)</option>
+                          <option value="claude-opus-4-6">Claude Opus 4.6 (most capable)</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Enabled tools */}
+                  <div className="pdfapp-aide-soul-section">
+                    <div className="pdfapp-aide-soul-section-label">Enabled tools</div>
+                    {[
+                      { id: 'search_case',    label: 'search_case',    desc: 'Search all documents in the case' },
+                      { id: 'search_doc',     label: 'search_doc',     desc: 'Search a specific document by ID' },
+                      { id: 'search_caselaw', label: 'search_caselaw', desc: 'Search offline case law database' },
+                      { id: 'add_note',       label: 'add_note',       desc: 'Save findings as notes' },
+                    ].map(tool => (
+                      <label key={tool.id} className="pdfapp-aide-tool-row">
+                        <input
+                          type="checkbox"
+                          className="pdfapp-aide-tool-checkbox"
+                          checked={tc.enabledTools?.[tool.id] !== false}
+                          onChange={e => patchTool(tool.id, e.target.checked)}
+                        />
+                        <div className="pdfapp-aide-tool-info">
+                          <span className="pdfapp-aide-tool-name">{tool.label}</span>
+                          <span className="pdfapp-aide-soul-hint">{tool.desc}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+
+                  {/* Max steps */}
+                  <div className="pdfapp-aide-soul-section">
+                    <div className="pdfapp-aide-soul-section-label">Max steps <span className="pdfapp-aide-soul-hint">(tool calls before stopping)</span></div>
+                    <div className="pdfapp-aide-slider-row">
+                      <input type="range" min={3} max={30} step={1} value={tc.maxSteps || 15}
+                        onChange={e => patchTc('maxSteps', Number(e.target.value))}
+                        className="pdfapp-aide-slider"
+                      />
+                      <span className="pdfapp-aide-slider-val">{tc.maxSteps || 15}</span>
+                    </div>
+                  </div>
+
+                  {/* Temperature */}
+                  <div className="pdfapp-aide-soul-section">
+                    <div className="pdfapp-aide-soul-section-label">Temperature <span className="pdfapp-aide-soul-hint">(0 = precise, 1 = creative)</span></div>
+                    <div className="pdfapp-aide-slider-row">
+                      <input type="range" min={0} max={1} step={0.05} value={tc.temperature ?? 0.3}
+                        onChange={e => patchTc('temperature', Number(e.target.value))}
+                        className="pdfapp-aide-slider"
+                      />
+                      <span className="pdfapp-aide-slider-val">{(tc.temperature ?? 0.3).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* ── RAG sub-tab ── */}
+            {activeAgentId && aideSoulTab === 'rag' && (
+              <div className="pdfapp-aide-soul-panel">
+                <div className="pdfapp-aide-soul-header">
+                  <span className="pdfapp-aide-soul-title">RAG — Document Scope</span>
+                  <div className="pdfapp-aide-soul-actions">
+                    {aideSoulSavedAt && !aideSoulDirty && (
+                      <span className="pdfapp-aide-soul-saved">Saved {new Date(aideSoulSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    )}
+                    <button
+                      className={`pdfapp-aide-soul-save-btn${aideSoulDirty ? ' pdfapp-aide-soul-save-btn--dirty' : ''}`}
+                      onClick={handleAideSoulSave}
+                      disabled={!aideSoulDirty || aideSoulSaving || !caseId}
+                    >
+                      {aideSoulSaving ? 'Saving…' : 'Save'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label">Search scope <span className="pdfapp-aide-soul-hint">(which documents this agent can search)</span></div>
+                  <div className="pdfapp-aide-rag-scope-row">
+                    <button
+                      className={`pdfapp-aide-rag-scope-btn${!aideSoul.docScope?.length ? ' pdfapp-aide-rag-scope-btn--active' : ''}`}
+                      onClick={() => patchSoul('docScope', [])}
+                    >
+                      All documents
+                    </button>
+                    <button
+                      className={`pdfapp-aide-rag-scope-btn${aideSoul.docScope?.length > 0 ? ' pdfapp-aide-rag-scope-btn--active' : ''}`}
+                      onClick={() => { if (!aideSoul.docScope?.length) patchSoul('docScope', ['contract']) }}
+                    >
+                      Filter by type
+                    </button>
+                  </div>
+                  {aideSoul.docScope?.length > 0 && (
+                    <>
+                      <div className="pdfapp-aide-soul-hint" style={{ marginTop: 8, marginBottom: 4 }}>Select document types to include:</div>
+                      {['contract', 'exhibit', 'statement', 'correspondence', 'pleading', 'order', 'report', 'invoice', 'other'].map(dt => {
+                        const checked = aideSoul.docScope?.includes(dt)
+                        return (
+                          <label key={dt} className="pdfapp-aide-tool-row">
+                            <input
+                              type="checkbox"
+                              className="pdfapp-aide-tool-checkbox"
+                              checked={checked}
+                              onChange={e => {
+                                const next = e.target.checked
+                                  ? [...(aideSoul.docScope || []), dt]
+                                  : (aideSoul.docScope || []).filter(x => x !== dt)
+                                patchSoul('docScope', next)
+                              }}
+                            />
+                            <span className="pdfapp-aide-tool-name">{dt}</span>
+                          </label>
+                        )
+                      })}
+                    </>
+                  )}
+                </div>
+
+                <div className="pdfapp-aide-soul-section">
+                  <div className="pdfapp-aide-soul-section-label">Case RAG database</div>
+                  {caseId ? (
+                    <div className="pdfapp-aide-rag-db-info">
+                      <span className="pdfapp-aide-rag-db-label">sqlite-vec</span>
+                      <span className="pdfapp-aide-soul-hint">Case ID: {caseId.slice(0, 16)}…</span>
+                      <span className="pdfapp-aide-soul-hint">Scope: {aideSoul.docScope?.length ? aideSoul.docScope.join(', ') : 'all documents'}</span>
+                    </div>
+                  ) : (
+                    <div className="pdfapp-aide-soul-empty">Open a case to see RAG database info.</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── Audit sub-tab ── */}
+            {activeAgentId && aideSoulTab === 'audit' && (() => {
+              const { breakdown, total, systemPrompt } = aideAuditData
+              return (
+                <div className="pdfapp-aide-memory-panel">
+                  {/* Token breakdown */}
+                  <div className="pdfapp-aide-audit-header">Token Budget</div>
+                  <div className="pdfapp-aide-audit-breakdown">
+                    {Object.entries(breakdown).map(([label, tokens]) => (
+                      <div key={label} className="pdfapp-aide-audit-row">
+                        <span className="pdfapp-aide-audit-row-label">{label}</span>
+                        <span className={`pdfapp-aide-audit-row-tokens${tokens > 1000 ? ' pdfapp-aide-audit-tokens--warn' : ''}`}>{tokens.toLocaleString()} tok</span>
+                      </div>
+                    ))}
+                    <div className="pdfapp-aide-audit-row pdfapp-aide-audit-row--total">
+                      <span className="pdfapp-aide-audit-row-label">Total</span>
+                      <span className={`pdfapp-aide-audit-row-tokens${total > 3000 ? ' pdfapp-aide-audit-tokens--warn' : ''}`}>{total.toLocaleString()} tok</span>
+                    </div>
+                    {total > 3000 && <div className="pdfapp-aide-audit-warn">⚠ Context is large — consider trimming Soul / Skills content</div>}
+                  </div>
+
+                  {/* Files in scope */}
+                  <div className="pdfapp-aide-audit-header" style={{ marginTop: 12 }}>Files &amp; Config</div>
+                  <div className="pdfapp-aide-audit-files">
+                    {aideSoul.skillMd && (
+                      <div className="pdfapp-aide-audit-file-row">
+                        <span className="pdfapp-aide-audit-file-icon">📄</span>
+                        <span className="pdfapp-aide-audit-file-name">{aideSkillFileName || 'skill.md'}</span>
+                        <span className="pdfapp-aide-audit-file-size">{Math.round(aideSoul.skillMd.length / 1024 * 10) / 10} KB</span>
+                      </div>
+                    )}
+                    {aideSoul.redFlags?.trim() && (
+                      <div className="pdfapp-aide-audit-file-row">
+                        <span className="pdfapp-aide-audit-file-icon">🚩</span>
+                        <span className="pdfapp-aide-audit-file-name">Standing checklist</span>
+                        <span className="pdfapp-aide-audit-file-size">{(aideSoul.redFlags.match(/\n/g) || []).length + 1} items</span>
+                      </div>
+                    )}
+                    {aideSoul.corrections?.length > 0 && (
+                      <div className="pdfapp-aide-audit-file-row">
+                        <span className="pdfapp-aide-audit-file-icon">✏️</span>
+                        <span className="pdfapp-aide-audit-file-name">Corrections</span>
+                        <span className="pdfapp-aide-audit-file-size">{aideSoul.corrections.length} items</span>
+                      </div>
+                    )}
+                    {aideDiary.length > 0 && (
+                      <div className="pdfapp-aide-audit-file-row">
+                        <span className="pdfapp-aide-audit-file-icon">📓</span>
+                        <span className="pdfapp-aide-audit-file-name">Session diary</span>
+                        <span className="pdfapp-aide-audit-file-size">{aideDiary.length} entries (last 3 injected)</span>
+                      </div>
+                    )}
+                    {!aideSoul.skillMd && !aideSoul.redFlags?.trim() && !aideSoul.corrections?.length && !aideDiary.length && (
+                      <div className="pdfapp-aide-soul-empty">No .md files or config loaded for this agent.</div>
+                    )}
+                  </div>
+
+                  {/* System prompt preview */}
+                  <div className="pdfapp-aide-audit-header" style={{ marginTop: 12 }}>System Prompt Preview</div>
+                  <pre className="pdfapp-aide-audit-prompt">{systemPrompt}</pre>
+                </div>
+              )
+            })()}
+
             {/* ── Memory sub-tab ── */}
             {activeAgentId && aideSoulTab === 'memory' && (
               <div className="pdfapp-aide-memory-panel">
-                {/* Token audit */}
-                <div className="pdfapp-aide-audit">
-                  <span className="pdfapp-aide-audit-label">Soul context</span>
-                  <span className={`pdfapp-aide-audit-tokens${aideSoulTokenEstimate > 2000 ? ' pdfapp-aide-audit-tokens--warn' : ''}`}>
-                    ~{aideSoulTokenEstimate.toLocaleString()} tokens
-                  </span>
-                  {aideSoulTokenEstimate > 2000 && <span className="pdfapp-aide-audit-warn">⚠ Over budget — trim Soul content</span>}
+                {/* Header with clear button */}
+                <div className="pdfapp-aide-memory-header-row">
+                  <span className="pdfapp-aide-memory-header">Session Diary</span>
+                  {aideDiary.length > 0 && (
+                    aideDiaryClearConfirm
+                      ? <div className="pdfapp-aide-diary-clear-confirm">
+                          Clear all {aideDiary.length} entries?
+                          <button className="pdfapp-aide-soul-save-btn pdfapp-aide-soul-save-btn--dirty" onClick={async () => {
+                            if (!caseId) return
+                            const agentParam = activeAgentId ? `?agentId=${encodeURIComponent(activeAgentId)}` : ''
+                            await fetch(`/api/cases/${caseId}/aide/diary${agentParam}`, { method: 'DELETE' }).catch(() => {})
+                            setAideDiary([])
+                            setAideDiaryClearConfirm(false)
+                          }}>Confirm</button>
+                          <button className="pdfapp-aide-soul-add-btn" onClick={() => setAideDiaryClearConfirm(false)}>Cancel</button>
+                        </div>
+                      : <button className="pdfapp-aide-soul-add-btn" onClick={() => setAideDiaryClearConfirm(true)}>Clear all</button>
+                  )}
                 </div>
-
-                {/* Session diary */}
-                <div className="pdfapp-aide-memory-header">Session Diary</div>
                 {aideDiary.length === 0 && (
                   <div className="pdfapp-aide-soul-empty" style={{ margin: '8px 12px' }}>
                     No sessions yet. Run your Aide and it will write a diary entry summarising what it learned.
@@ -3819,6 +4473,16 @@ const fileInputRef = useRef(null)
                           {entry.findings && <div className="pdfapp-aide-diary-section"><span className="pdfapp-aide-diary-section-label">Findings</span><div>{entry.findings}</div></div>}
                           {entry.gaps && <div className="pdfapp-aide-diary-section"><span className="pdfapp-aide-diary-section-label">Gaps</span><div>{entry.gaps}</div></div>}
                           {entry.suggestions && <div className="pdfapp-aide-diary-section"><span className="pdfapp-aide-diary-section-label">For next time</span><div>{entry.suggestions}</div></div>}
+                          {entry.reflection && (
+                            <button className="pdfapp-aide-diary-pin-btn" onClick={() => {
+                              const pinText = `Session (${entry.createdAt ? new Date(entry.createdAt).toLocaleDateString() : 'past'}): ${entry.reflection}`
+                              setAideSoul(prev => ({
+                                ...prev,
+                                corrections: [...(prev.corrections || []), { id: crypto.randomUUID(), text: pinText, createdAt: new Date().toISOString() }]
+                              }))
+                              setAideSoulDirty(true)
+                            }}>+ Pin to Identity</button>
+                          )}
                         </div>
                       )}
                     </div>
@@ -3834,6 +4498,9 @@ const fileInputRef = useRef(null)
       </div>
 
 
+
+      {/* ── Workspace Modal ── */}
+      {workspaceOpen && <WorkspaceModal onClose={() => setWorkspaceOpen(false)} />}
 
       {/* ── Delete Document Confirmation Modal ── */}
       {deleteDocConfirm && createPortal(

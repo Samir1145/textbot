@@ -36,6 +36,7 @@ export default defineConfig({
       '/api/caselaw': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/admin': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/settings': { target: 'http://localhost:3001', changeOrigin: true },
+      '/api/diag': { target: 'http://localhost:3001', changeOrigin: true },
       '/api/blobs': {
         target: 'http://localhost:3001',
         changeOrigin: true,
